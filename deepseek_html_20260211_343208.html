@@ -1,0 +1,1844 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Gestion Pro - Victor & Arthur (Supabase)</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+
+<style>
+/* ============ TON CSS EXISTANT (GARDÉ IDENTIQUE) ============ */
+:root {
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --text: #0f172a;
+  --text-light: #64748b;
+  --accent: #2563eb;
+  --victor-color: #2563eb;
+  --arthur-color: #10b981;
+  --border: #e2e8f0;
+  --hover: #f1f5f9;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --sidebar-bg: #ffffff;
+  --shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+  --radius: 16px;
+}
+
+body.dark {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --text: #f1f5f9;
+  --text-light: #94a3b8;
+  --accent: #38bdf8;
+  --victor-color: #3b82f6;
+  --arthur-color: #10b981;
+  --border: #334155;
+  --hover: #2d3a4f;
+  --sidebar-bg: #1e293b;
+  --shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
+}
+
+/* ============ RESET & BASE ============ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* ============ LAYOUT PRINCIPAL ============ */
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============ TOP BAR ============ */
+.top-bar {
+  background: var(--card);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  box-shadow: var(--shadow);
+}
+
+.top-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.menu-btn {
+  background: transparent;
+  color: var(--text);
+  font-size: 22px;
+  padding: 10px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.menu-btn:hover {
+  background: var(--hover);
+  transform: scale(1.05);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo i {
+  font-size: 24px;
+  color: var(--accent);
+}
+
+.logo h1 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  margin-left: 8px;
+}
+
+.theme-btn {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.theme-btn:hover {
+  background: var(--hover);
+  transform: rotate(15deg);
+}
+
+/* ============ MENU HAMBURGER OVERLAY ============ */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(3px);
+  z-index: 98;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s;
+}
+
+.overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ============ SIDEBAR MENU ============ */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -300px;
+  width: 280px;
+  height: 100vh;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
+  z-index: 99;
+  transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 5px 0 20px rgba(0,0,0,0.05);
+  overflow-y: auto;
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+.sidebar-header {
+  padding: 24px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sidebar-header i {
+  font-size: 28px;
+  color: var(--accent);
+}
+
+.sidebar-header h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.sidebar-menu {
+  flex: 1;
+  padding: 20px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  color: var(--text);
+  text-decoration: none;
+  transition: all 0.2s;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.sidebar-item i {
+  width: 22px;
+  text-align: center;
+  font-size: 18px;
+  color: var(--text-light);
+  transition: all 0.2s;
+}
+
+.sidebar-item span {
+  flex: 1;
+}
+
+.sidebar-item:hover {
+  background: var(--hover);
+}
+
+.sidebar-item:hover i {
+  color: var(--accent);
+}
+
+.sidebar-item.active {
+  background: var(--accent);
+  color: white;
+}
+
+.sidebar-item.active i {
+  color: white;
+}
+
+.sidebar-footer {
+  padding: 20px 12px;
+  border-top: 1px solid var(--border);
+  margin-top: auto;
+}
+
+/* ============ CONTENU PRINCIPAL ============ */
+.main-content {
+  flex: 1;
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ============ TABS ============ */
+.tab-content {
+  display: none;
+  animation: fadeIn 0.3s;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============ CARDS ============ */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+}
+
+.card-title i {
+  color: var(--accent);
+}
+
+/* ============ GRILLES ============ */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+/* ============ FORMULAIRES ============ */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+input, select, textarea {
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  width: 100%;
+  transition: all 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+}
+
+.btn {
+  padding: 14px 20px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s;
+  background: var(--accent);
+  color: white;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(37,99,235,0.2);
+}
+
+.btn-sm {
+  padding: 10px 16px;
+  font-size: 14px;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+/* ============ BADGES ============ */
+.badge {
+  padding: 6px 12px;
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.badge-success {
+  background: rgba(16,185,129,0.15);
+  color: #10b981;
+}
+
+.badge-warning {
+  background: rgba(245,158,11,0.15);
+  color: #f59e0b;
+}
+
+.badge-danger {
+  background: rgba(239,68,68,0.15);
+  color: #ef4444;
+}
+
+.badge-info {
+  background: rgba(37,99,235,0.15);
+  color: #2563eb;
+}
+
+/* ============ STATS ============ */
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: rgba(37,99,235,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.stat-icon i {
+  font-size: 24px;
+  color: var(--accent);
+}
+
+.stat-number {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: var(--text-light);
+}
+
+/* ============ TABLEAUX ============ */
+.table-responsive {
+  overflow-x: auto;
+  margin-top: 16px;
+  border-radius: 12px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  text-align: left;
+  padding: 16px;
+  background: var(--bg);
+  font-weight: 600;
+  color: var(--text);
+  border-bottom: 2px solid var(--border);
+}
+
+td {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+tr:hover td {
+  background: var(--hover);
+}
+
+/* ============ PRODUITS ============ */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.product-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: all 0.2s;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
+}
+
+.stock-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--border);
+  border-radius: 4px;
+  margin: 16px 0;
+  overflow: hidden;
+}
+
+.stock-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+
+/* ============ CALENDRIER ============ */
+.calendar-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 0 4px;
+}
+
+.calendar-weekday {
+  text-align: center;
+  font-weight: 600;
+  color: var(--text-light);
+  font-size: 14px;
+  padding: 8px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.calendar-day {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 8px;
+  min-height: 100px;
+}
+
+.calendar-day-number {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--accent);
+}
+
+.calendar-event {
+  background: rgba(37,99,235,0.1);
+  color: var(--accent);
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  margin-top: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ============ CLIENTS ============ */
+.clients-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.client-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 1024px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 16px;
+  }
+  
+  .logo h1 {
+    display: none;
+  }
+  
+  .page-title {
+    font-size: 18px;
+  }
+  
+  .grid-4 {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .calendar-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+  
+  .calendar-header {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid-4 {
+    grid-template-columns: 1fr;
+  }
+  
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .clients-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .btn {
+    width: 100%;
+  }
+}
+
+/* ============ UTILS ============ */
+.mb-2 { margin-bottom: 16px; }
+.mb-3 { margin-bottom: 24px; }
+.mt-2 { margin-top: 16px; }
+.text-center { text-align: center; }
+.w-100 { width: 100%; }
+</style>
+</head>
+
+<body>
+<div class="app">
+  <!-- Overlay pour fermer le menu -->
+  <div class="overlay" id="overlay" onclick="window.closeMenu()"></div>
+
+  <!-- Menu Hamburger Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <i class="fas fa-chart-line"></i>
+      <h2>Gestion Pro</h2>
+    </div>
+    
+    <div class="sidebar-menu">
+      <div class="sidebar-item active" onclick="window.switchTab('dashboard'); window.closeMenu()">
+        <i class="fas fa-home"></i>
+        <span>Tableau de bord</span>
+      </div>
+      <div class="sidebar-item" onclick="window.switchTab('products'); window.closeMenu()">
+        <i class="fas fa-box"></i>
+        <span>Produits</span>
+      </div>
+      <div class="sidebar-item" onclick="window.switchTab('inventory'); window.closeMenu()">
+        <i class="fas fa-warehouse"></i>
+        <span>Stocks</span>
+      </div>
+      <div class="sidebar-item" onclick="window.switchTab('sheets'); window.closeMenu()">
+        <i class="fas fa-file-alt"></i>
+        <span>Fiches produits</span>
+      </div>
+      <div class="sidebar-item" onclick="window.switchTab('calendar'); window.closeMenu()">
+        <i class="fas fa-calendar"></i>
+        <span>Calendrier</span>
+      </div>
+      <div class="sidebar-item" onclick="window.switchTab('stats'); window.closeMenu()">
+        <i class="fas fa-chart-pie"></i>
+        <span>Statistiques</span>
+      </div>
+      <div class="sidebar-item" onclick="window.switchTab('clients'); window.closeMenu()">
+        <i class="fas fa-users"></i>
+        <span>Clients</span>
+      </div>
+    </div>
+    
+    <div class="sidebar-footer">
+      <div class="sidebar-item" onclick="window.toggleDark(); window.closeMenu()">
+        <i class="fas fa-moon"></i>
+        <span>Mode sombre</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <button class="menu-btn" onclick="window.toggleMenu()">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="logo">
+        <i class="fas fa-chart-line"></i>
+        <h1>Gestion Pro</h1>
+      </div>
+      <span class="page-title" id="pageTitle">Tableau de bord</span>
+    </div>
+    <button class="theme-btn" onclick="window.toggleDark()">
+      <i class="fas fa-moon"></i>
+    </button>
+  </div>
+
+  <!-- Contenu Principal -->
+  <div class="main-content">
+    <!-- Tableau de bord -->
+    <div id="tab-dashboard" class="tab-content active">
+      <!-- Sélecteur de personne -->
+      <div class="grid-3" style="margin-bottom: 20px;">
+        <button onclick="window.showPerson('victor')" id="victor-toggle" class="btn active" style="background: var(--victor-color); opacity: 0.9;">
+          <i class="fas fa-user"></i> Victor
+        </button>
+        <button onclick="window.showPerson('arthur')" id="arthur-toggle" class="btn" style="background: var(--arthur-color); opacity: 0.9;">
+          <i class="fas fa-user"></i> Arthur
+        </button>
+        <button onclick="window.showBoth()" id="both-toggle" class="btn" style="background: var(--accent);">
+          <i class="fas fa-users"></i> Les deux
+        </button>
+      </div>
+
+      <!-- Formulaire gains -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">
+            <i class="fas fa-user"></i> Victor - Ajouter un gain
+          </div>
+          <form onsubmit="window.addGain(event, 'victor')">
+            <div class="form-group">
+              <input type="date" id="victor-date" required>
+            </div>
+            <div class="form-group">
+              <input type="number" id="victor-amount" placeholder="Montant (€)" required min="0" step="0.01">
+            </div>
+            <div class="form-group">
+              <input type="text" id="victor-description" placeholder="Description">
+            </div>
+            <button type="submit" class="btn btn-block" style="background: var(--victor-color);">
+              <i class="fas fa-plus-circle"></i> Ajouter
+            </button>
+          </form>
+          <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+            <div style="display: flex; justify-content: space-between;">
+              <span style="font-weight: 600;">Total Victor:</span>
+              <span style="font-weight: 700; color: var(--victor-color);" id="victor-total">0 €</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <i class="fas fa-user"></i> Arthur - Ajouter un gain
+          </div>
+          <form onsubmit="window.addGain(event, 'arthur')">
+            <div class="form-group">
+              <input type="date" id="arthur-date" required>
+            </div>
+            <div class="form-group">
+              <input type="number" id="arthur-amount" placeholder="Montant (€)" required min="0" step="0.01">
+            </div>
+            <div class="form-group">
+              <input type="text" id="arthur-description" placeholder="Description">
+            </div>
+            <button type="submit" class="btn btn-block" style="background: var(--arthur-color);">
+              <i class="fas fa-plus-circle"></i> Ajouter
+            </button>
+          </form>
+          <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+            <div style="display: flex; justify-content: space-between;">
+              <span style="font-weight: 600;">Total Arthur:</span>
+              <span style="font-weight: 700; color: var(--arthur-color);" id="arthur-total">0 €</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats rapides -->
+      <div class="grid-4">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-euro-sign"></i>
+          </div>
+          <div class="stat-number" id="total">0 €</div>
+          <div class="stat-label">Total combiné</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-calendar-day"></i>
+          </div>
+          <div class="stat-number" id="yesterday">0 €</div>
+          <div class="stat-label">Hier</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-calendar-week"></i>
+          </div>
+          <div class="stat-number" id="week">0 €</div>
+          <div class="stat-label">Cette semaine</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-calendar-alt"></i>
+          </div>
+          <div class="stat-number" id="month">0 €</div>
+          <div class="stat-label">Ce mois</div>
+        </div>
+      </div>
+
+      <!-- Graphique -->
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <div class="card-title" style="margin-bottom: 0;">
+            <i class="fas fa-chart-line"></i> Évolution des gains
+          </div>
+          <select id="period" onchange="window.drawChart()" style="width: auto; padding: 10px 16px;">
+            <option value="today">Aujourd'hui</option>
+            <option value="7">7 derniers jours</option>
+            <option value="30">30 derniers jours</option>
+            <option value="month">Ce mois</option>
+            <option value="year">Cette année</option>
+            <option value="all">Tout</option>
+          </select>
+        </div>
+        <div style="position: relative; height: 300px;">
+          <canvas id="chart"></canvas>
+        </div>
+      </div>
+
+      <!-- Historique -->
+      <div class="card">
+        <div class="card-title">
+          <i class="fas fa-history"></i> Derniers gains
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Personne</th>
+                <th>Description</th>
+                <th>Montant</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="history-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Onglet Produits -->
+    <div id="tab-products" class="tab-content">
+      <div class="card">
+        <div class="card-title">
+          <i class="fas fa-box"></i> Ajouter un produit
+        </div>
+        <form onsubmit="window.addProduct(event)">
+          <div class="grid-3">
+            <input type="text" id="product-name" placeholder="Nom du produit" required>
+            <input type="number" id="product-price" placeholder="Prix (€)" step="0.01" required>
+            <input type="number" id="product-quantity" placeholder="Quantité" required>
+            <select id="product-category">
+              <option>Électronique</option>
+              <option>Vêtements</option>
+              <option>Alimentation</option>
+              <option>Maison</option>
+              <option>Autre</option>
+            </select>
+            <button type="submit" class="btn" style="background: var(--success);">
+              <i class="fas fa-save"></i> Ajouter
+            </button>
+          </div>
+        </form>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">
+          <i class="fas fa-boxes"></i> Catalogue produits
+        </div>
+        <div id="products-list" class="product-grid"></div>
+      </div>
+    </div>
+
+    <!-- Onglet Stocks -->
+    <div id="tab-inventory" class="tab-content">
+      <div class="grid-4">
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-box"></i></div>
+          <div class="stat-number" id="total-products">0</div>
+          <div class="stat-label">Produits</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-cubes"></i></div>
+          <div class="stat-number" id="total-stock">0</div>
+          <div class="stat-label">Unités en stock</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+          <div class="stat-number" id="low-stock">0</div>
+          <div class="stat-label">Stock faible</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-euro-sign"></i></div>
+          <div class="stat-number" id="stock-value">0 €</div>
+          <div class="stat-label">Valeur totale</div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">
+          <i class="fas fa-clipboard-list"></i> État des stocks
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Produit</th>
+                <th>Catégorie</th>
+                <th>Prix</th>
+                <th>Quantité</th>
+                <th>Valeur</th>
+                <th>Statut</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="stock-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Onglet Fiches produits -->
+    <div id="tab-sheets" class="tab-content">
+      <div class="card">
+        <div class="card-title">
+          <i class="fas fa-file-alt"></i> Fiches détaillées
+        </div>
+        <div id="product-sheets" class="product-grid"></div>
+      </div>
+    </div>
+
+    <!-- Onglet Calendrier -->
+    <div id="tab-calendar" class="tab-content">
+      <div class="card">
+        <div class="card-title">
+          <i class="fas fa-calendar-plus"></i> Ajouter un événement
+        </div>
+        <form onsubmit="window.addEvent(event)">
+          <div class="grid-3">
+            <input type="text" id="event-title" placeholder="Titre" required>
+            <input type="date" id="event-date" required>
+            <select id="event-person">
+              <option value="commun">Commun</option>
+              <option value="victor">Victor</option>
+              <option value="arthur">Arthur</option>
+            </select>
+            <input type="text" id="event-time" placeholder="Heure (ex: 14:30)">
+            <button type="submit" class="btn">
+              <i class="fas fa-plus"></i> Ajouter
+            </button>
+          </div>
+        </form>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">
+          <i class="fas fa-calendar"></i> Mars 2026
+        </div>
+        <div class="calendar-header">
+          <div class="calendar-weekday">Lun</div>
+          <div class="calendar-weekday">Mar</div>
+          <div class="calendar-weekday">Mer</div>
+          <div class="calendar-weekday">Jeu</div>
+          <div class="calendar-weekday">Ven</div>
+          <div class="calendar-weekday">Sam</div>
+          <div class="calendar-weekday">Dim</div>
+        </div>
+        <div id="calendar-view" class="calendar-grid"></div>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">
+          <i class="fas fa-list"></i> Tous les événements
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Heure</th>
+                <th>Titre</th>
+                <th>Personne</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="events-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Onglet Statistiques -->
+    <div id="tab-stats" class="tab-content">
+      <div class="grid-4">
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-euro-sign"></i></div>
+          <div class="stat-number" id="stats-total">0 €</div>
+          <div class="stat-label">Gains totaux</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-user"></i></div>
+          <div class="stat-number" id="stats-victor">0 €</div>
+          <div class="stat-label">Victor</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-user"></i></div>
+          <div class="stat-number" id="stats-arthur">0 €</div>
+          <div class="stat-label">Arthur</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+          <div class="stat-number" id="stats-average">0 €</div>
+          <div class="stat-label">Moyenne/jour</div>
+        </div>
+      </div>
+      
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">
+            <i class="fas fa-chart-pie"></i> Répartition des gains
+          </div>
+          <div style="position: relative; height: 250px;">
+            <canvas id="pie-chart"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">
+            <i class="fas fa-chart-bar"></i> Performance mensuelle
+          </div>
+          <div style="position: relative; height: 250px;">
+            <canvas id="monthly-chart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Onglet Clients -->
+    <div id="tab-clients" class="tab-content">
+      <div class="card">
+        <div class="card-title">
+          <i class="fas fa-user-plus"></i> Ajouter un client
+        </div>
+        <form onsubmit="window.addClient(event)">
+          <div class="grid-3">
+            <input type="text" id="client-name" placeholder="Nom complet" required>
+            <input type="email" id="client-email" placeholder="Email">
+            <input type="text" id="client-phone" placeholder="Téléphone">
+            <button type="submit" class="btn" style="background: var(--success);">
+              <i class="fas fa-user-plus"></i> Ajouter
+            </button>
+          </div>
+        </form>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">
+          <i class="fas fa-users"></i> Liste des clients
+        </div>
+        <div id="clients-list" class="clients-grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================
+// SUPABASE CONFIGURATION - CONNEXION DIRECTE
+// ============================================
+const SUPABASE_URL = 'https://pytjwprzgljaeqfoixac.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_secret_b3jpz6DlJRYG4grwkYPayg_SqxHVoAo';
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ============================================
+// DONNÉES GLOBALES (VIDES AU DÉPART)
+// ============================================
+let victorGains = [];
+let arthurGains = [];
+let products = [];
+let events = [];
+let clients = [];
+let currentView = 'both';
+
+// ============================================
+// CHARGEMENT DES DONNÉES DEPUIS SUPABASE
+// ============================================
+async function loadAllData() {
+  try {
+    // Charger les gains
+    const { data: gainsData, error: gainsError } = await supabase
+      .from('gains')
+      .select('*')
+      .order('date', { ascending: false });
+    
+    if (!gainsError) {
+      victorGains = gainsData.filter(g => g.person === 'victor') || [];
+      arthurGains = gainsData.filter(g => g.person === 'arthur') || [];
+    } else {
+      console.error('Erreur chargement gains:', gainsError);
+    }
+
+    // Charger les produits
+    const { data: productsData, error: productsError } = await supabase
+      .from('products')
+      .select('*')
+      .order('name');
+    
+    if (!productsError) products = productsData || [];
+
+    // Charger les événements
+    const { data: eventsData, error: eventsError } = await supabase
+      .from('events')
+      .select('*')
+      .order('event_date');
+    
+    if (!eventsError) events = eventsData || [];
+
+    // Charger les clients
+    const { data: clientsData, error: clientsError } = await supabase
+      .from('clients')
+      .select('*')
+      .order('name');
+    
+    if (!clientsError) clients = clientsData || [];
+
+    console.log('Données chargées depuis Supabase');
+  } catch (e) {
+    console.error('Erreur chargement:', e);
+  }
+}
+
+// ============================================
+// FONCTIONS GAINS (SUPABASE)
+// ============================================
+async function addGain(e, person) {
+  e.preventDefault();
+  
+  const gain = {
+    date: document.getElementById(`${person}-date`).value,
+    amount: Number(document.getElementById(`${person}-amount`).value),
+    description: document.getElementById(`${person}-description`).value || "Gain",
+    person: person
+  };
+  
+  const { error } = await supabase
+    .from('gains')
+    .insert([gain]);
+  
+  if (error) {
+    console.error('Erreur ajout gain:', error);
+    alert('Erreur: ' + error.message);
+  } else {
+    await loadAllData();
+    refresh();
+    drawChart();
+    updateStats();
+    updateHistory();
+    e.target.reset();
+    document.getElementById(`${person}-date`).value = new Date().toISOString().split('T')[0];
+  }
+}
+
+async function deleteGain(id) {
+  if (confirm('Supprimer ce gain ?')) {
+    const { error } = await supabase
+      .from('gains')
+      .delete()
+      .match({ id });
+    
+    if (!error) {
+      await loadAllData();
+      refresh();
+      drawChart();
+      updateStats();
+      updateHistory();
+    }
+  }
+}
+
+// ============================================
+// FONCTIONS PRODUITS (SUPABASE)
+// ============================================
+async function addProduct(e) {
+  e.preventDefault();
+  
+  const product = {
+    name: document.getElementById('product-name').value,
+    price: Number(document.getElementById('product-price').value),
+    quantity: Number(document.getElementById('product-quantity').value),
+    category: document.getElementById('product-category').value
+  };
+  
+  const { error } = await supabase
+    .from('products')
+    .insert([product]);
+  
+  if (error) {
+    console.error('Erreur ajout produit:', error);
+    alert('Erreur: ' + error.message);
+  } else {
+    await loadAllData();
+    updateProducts();
+    updateStock();
+    updateSheets();
+    e.target.reset();
+  }
+}
+
+async function updateProductQuantity(id, newQuantity) {
+  const { error } = await supabase
+    .from('products')
+    .update({ quantity: newQuantity })
+    .match({ id });
+  
+  if (!error) {
+    await loadAllData();
+    updateProducts();
+    updateStock();
+    updateSheets();
+  }
+}
+
+async function deleteProduct(id) {
+  if (confirm('Supprimer ce produit ?')) {
+    const { error } = await supabase
+      .from('products')
+      .delete()
+      .match({ id });
+    
+    if (!error) {
+      await loadAllData();
+      updateProducts();
+      updateStock();
+      updateSheets();
+    }
+  }
+}
+
+// Remplacer editProduct et addStock par updateProductQuantity
+function editProduct(id) {
+  const p = products.find(p => p.id === id);
+  const q = prompt("Nouvelle quantité:", p.quantity);
+  if (q) {
+    updateProductQuantity(id, Number(q));
+  }
+}
+
+function addStock(id) {
+  const p = products.find(p => p.id === id);
+  updateProductQuantity(id, p.quantity + 1);
+}
+
+// ============================================
+// FONCTIONS ÉVÉNEMENTS (SUPABASE)
+// ============================================
+async function addEvent(e) {
+  e.preventDefault();
+  
+  const event = {
+    title: document.getElementById('event-title').value,
+    event_date: document.getElementById('event-date').value,
+    event_time: document.getElementById('event-time').value || null,
+    person: document.getElementById('event-person').value
+  };
+  
+  const { error } = await supabase
+    .from('events')
+    .insert([event]);
+  
+  if (error) {
+    console.error('Erreur ajout événement:', error);
+    alert('Erreur: ' + error.message);
+  } else {
+    await loadAllData();
+    updateCalendar();
+    updateEventsList();
+    e.target.reset();
+    document.getElementById('event-date').value = new Date().toISOString().split('T')[0];
+  }
+}
+
+async function deleteEvent(id) {
+  if (confirm('Supprimer cet événement ?')) {
+    const { error } = await supabase
+      .from('events')
+      .delete()
+      .match({ id });
+    
+    if (!error) {
+      await loadAllData();
+      updateCalendar();
+      updateEventsList();
+    }
+  }
+}
+
+// ============================================
+// FONCTIONS CLIENTS (SUPABASE)
+// ============================================
+async function addClient(e) {
+  e.preventDefault();
+  
+  const client = {
+    name: document.getElementById('client-name').value,
+    email: document.getElementById('client-email').value || null,
+    phone: document.getElementById('client-phone').value || null
+  };
+  
+  const { error } = await supabase
+    .from('clients')
+    .insert([client]);
+  
+  if (error) {
+    console.error('Erreur ajout client:', error);
+    alert('Erreur: ' + error.message);
+  } else {
+    await loadAllData();
+    updateClients();
+    e.target.reset();
+  }
+}
+
+async function deleteClient(id) {
+  if (confirm('Supprimer ce client ?')) {
+    const { error } = await supabase
+      .from('clients')
+      .delete()
+      .match({ id });
+    
+    if (!error) {
+      await loadAllData();
+      updateClients();
+    }
+  }
+}
+
+// ============================================
+// FONCTIONS DE CALCUL
+// ============================================
+function sum(gainsArray, filter) {
+  return gainsArray.filter(filter).reduce((s, g) => s + (Number(g.amount) || 0), 0);
+}
+
+// ============================================
+// RAFRAÎCHISSEMENT DE L'AFFICHAGE
+// ============================================
+function refresh() {
+  const now = new Date();
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  
+  const victorTotal = sum(victorGains, () => true);
+  const arthurTotal = sum(arthurGains, () => true);
+  const allGains = [...victorGains, ...arthurGains];
+  
+  if (document.getElementById("victor-total")) {
+    document.getElementById("victor-total").innerText = victorTotal.toFixed(2) + " €";
+  }
+  if (document.getElementById("arthur-total")) {
+    document.getElementById("arthur-total").innerText = arthurTotal.toFixed(2) + " €";
+  }
+  if (document.getElementById("total")) {
+    document.getElementById("total").innerText = (victorTotal + arthurTotal).toFixed(2) + " €";
+  }
+  if (document.getElementById("yesterday")) {
+    document.getElementById("yesterday").innerText = 
+      sum(allGains, g => new Date(g.date).toDateString() === yesterday.toDateString()).toFixed(2) + " €";
+  }
+  if (document.getElementById("week")) {
+    document.getElementById("week").innerText = 
+      sum(allGains, g => (now - new Date(g.date)) / 86400000 <= 7).toFixed(2) + " €";
+  }
+  if (document.getElementById("month")) {
+    document.getElementById("month").innerText = 
+      sum(allGains, g => {
+        const d = new Date(g.date);
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      }).toFixed(2) + " €";
+  }
+}
+
+// ============================================
+// FONCTIONS D'AFFICHAGE
+// ============================================
+function updateHistory() {
+  const all = [...victorGains.map(g => ({ ...g, person: 'Victor' })), 
+               ...arthurGains.map(g => ({ ...g, person: 'Arthur' }))]
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .slice(0, 10);
+  
+  if (document.getElementById('history-table-body')) {
+    document.getElementById('history-table-body').innerHTML = all.map(g => 
+      `<tr>
+        <td>${g.date}</td>
+        <td><span class="badge ${g.person === 'Victor' ? 'badge-info' : 'badge-success'}">${g.person}</span></td>
+        <td>${g.description || '-'}</td>
+        <td><strong>${Number(g.amount).toFixed(2)} €</strong></td>
+        <td>
+          <button onclick="window.deleteGain(${g.id})" class="btn-sm" style="background: var(--danger);">
+            <i class="fas fa-trash"></i>
+          </button>
+        </td>
+      </tr>`
+    ).join('');
+  }
+}
+
+function updateProducts() {
+  if (document.getElementById('products-list')) {
+    document.getElementById('products-list').innerHTML = products.map(p => `
+      <div class="product-card">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+          <h3 style="margin: 0 0 10px 0;">${p.name}</h3>
+          <span class="badge badge-info">${p.category}</span>
+        </div>
+        <div style="font-size: 24px; font-weight: 700; margin: 10px 0; color: var(--accent);">
+          ${Number(p.price).toFixed(2)} €
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+          <span><i class="fas fa-cubes"></i> Stock:</span>
+          <span style="font-weight: 600;">${p.quantity}</span>
+        </div>
+        <div class="stock-bar">
+          <div class="stock-fill" style="width: ${Math.min(100, p.quantity)}%"></div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+          <button onclick="window.editProduct(${p.id})" class="btn btn-sm" style="background: var(--warning); flex: 1;">
+            <i class="fas fa-edit"></i> Modifier
+          </button>
+          <button onclick="window.deleteProduct(${p.id})" class="btn btn-sm" style="background: var(--danger); flex: 1;">
+            <i class="fas fa-trash"></i> Suppr.
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+function updateStock() {
+  const totalProducts = products.length;
+  const totalStock = products.reduce((s, p) => s + (p.quantity || 0), 0);
+  const lowStock = products.filter(p => p.quantity < 10).length;
+  const stockValue = products.reduce((s, p) => s + ((p.price || 0) * (p.quantity || 0)), 0);
+  
+  if (document.getElementById('total-products')) document.getElementById('total-products').innerText = totalProducts;
+  if (document.getElementById('total-stock')) document.getElementById('total-stock').innerText = totalStock;
+  if (document.getElementById('low-stock')) document.getElementById('low-stock').innerText = lowStock;
+  if (document.getElementById('stock-value')) document.getElementById('stock-value').innerHTML = stockValue.toFixed(2) + ' €';
+  
+  if (document.getElementById('stock-table-body')) {
+    document.getElementById('stock-table-body').innerHTML = products.map(p => `
+      <tr>
+        <td><strong>${p.name}</strong></td>
+        <td>${p.category}</td>
+        <td>${Number(p.price).toFixed(2)} €</td>
+        <td>
+          <span class="badge ${p.quantity < 5 ? 'badge-danger' : p.quantity < 10 ? 'badge-warning' : 'badge-success'}">
+            ${p.quantity}
+          </span>
+        </td>
+        <td>${(p.price * p.quantity).toFixed(2)} €</td>
+        <td>
+          ${p.quantity < 5 ? '<span class="badge badge-danger">Critique</span>' : 
+            p.quantity < 10 ? '<span class="badge badge-warning">Faible</span>' : 
+            '<span class="badge badge-success">OK</span>'}
+        </td>
+        <td>
+          <button onclick="window.addStock(${p.id})" class="btn-sm" style="background: var(--success); padding: 8px 12px;">
+            <i class="fas fa-plus"></i>
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  }
+}
+
+function updateSheets() {
+  if (document.getElementById('product-sheets')) {
+    document.getElementById('product-sheets').innerHTML = products.map(p => `
+      <div class="product-card">
+        <h3 style="color: var(--accent); margin-top: 0;">${p.name}</h3>
+        <p><i class="fas fa-tag"></i> <strong>Catégorie:</strong> ${p.category}</p>
+        <p><i class="fas fa-euro-sign"></i> <strong>Prix:</strong> ${Number(p.price).toFixed(2)} €</p>
+        <p><i class="fas fa-cubes"></i> <strong>Stock:</strong> ${p.quantity} unités</p>
+        <p><i class="fas fa-chart-line"></i> <strong>Valeur:</strong> ${(p.price * p.quantity).toFixed(2)} €</p>
+        <div class="stock-bar">
+          <div class="stock-fill ${p.quantity < 5 ? 'critical' : p.quantity < 10 ? 'low' : ''}" 
+               style="width: ${Math.min(100, p.quantity)}%"></div>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+function updateCalendar() {
+  if (!document.getElementById('calendar-view')) return;
+  
+  let html = '';
+  const firstDay = new Date(2026, 2, 1).getDay();
+  let firstDayIndex = firstDay === 0 ? 6 : firstDay - 1;
+  
+  for (let i = 0; i < firstDayIndex; i++) {
+    html += '<div class="calendar-day" style="background: transparent; border: none;"></div>';
+  }
+  
+  for (let d = 1; d <= 31; d++) {
+    const dateStr = `2026-03-${d.toString().padStart(2, '0')}`;
+    const dayEvents = events.filter(e => e.event_date === dateStr);
+    
+    html += `<div class="calendar-day">`;
+    html += `<div class="calendar-day-number">${d}</div>`;
+    
+    dayEvents.slice(0, 3).forEach(e => {
+      html += `<div class="calendar-event" style="background: ${e.person === 'victor' ? 'rgba(37,99,235,0.1)' : e.person === 'arthur' ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)'}">
+                <i class="fas fa-calendar-check"></i> ${e.title}
+               </div>`;
+    });
+    
+    if (dayEvents.length > 3) {
+      html += `<div style="font-size: 11px; color: var(--text-light); margin-top: 4px;">
+                +${dayEvents.length - 3}...
+               </div>`;
+    }
+    
+    html += '</div>';
+  }
+  
+  document.getElementById('calendar-view').innerHTML = html;
+}
+
+function updateEventsList() {
+  if (document.getElementById('events-table-body')) {
+    document.getElementById('events-table-body').innerHTML = events
+      .sort((a, b) => a.event_date.localeCompare(b.event_date))
+      .map(e => `
+        <tr>
+          <td>${e.event_date}</td>
+          <td>${e.event_time || '-'}</td>
+          <td>${e.title}</td>
+          <td>
+            <span class="badge ${e.person === 'victor' ? 'badge-info' : e.person === 'arthur' ? 'badge-success' : 'badge-warning'}">
+              ${e.person}
+            </span>
+          </td>
+          <td>
+            <button onclick="window.deleteEvent(${e.id})" style="background: var(--danger); padding: 8px 12px;" class="btn-sm">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+  }
+}
+
+function updateClients() {
+  if (document.getElementById('clients-list')) {
+    document.getElementById('clients-list').innerHTML = clients.map(c => `
+      <div class="client-card">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+          <h3 style="margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-user-circle" style="color: var(--accent);"></i> ${c.name}
+          </h3>
+          <button onclick="window.deleteClient(${c.id})" style="background: var(--danger); padding: 8px 12px;" class="btn-sm">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <p style="margin: 8px 0; display: flex; align-items: center; gap: 10px;">
+          <i class="fas fa-envelope" style="color: var(--text-light);"></i> ${c.email || 'Non renseigné'}
+        </p>
+        <p style="margin: 8px 0; display: flex; align-items: center; gap: 10px;">
+          <i class="fas fa-phone" style="color: var(--text-light);"></i> ${c.phone || 'Non renseigné'}
+        </p>
+      </div>
+    `).join('');
+  }
+}
+
+function updateStats() {
+  const victorTotal = sum(victorGains, () => true);
+  const arthurTotal = sum(arthurGains, () => true);
+  const allGains = [...victorGains, ...arthurGains];
+  
+  if (document.getElementById('stats-total')) {
+    document.getElementById('stats-total').innerHTML = (victorTotal + arthurTotal).toFixed(2) + ' €';
+  }
+  if (document.getElementById('stats-victor')) {
+    document.getElementById('stats-victor').innerHTML = victorTotal.toFixed(2) + ' €';
+  }
+  if (document.getElementById('stats-arthur')) {
+    document.getElementById('stats-arthur').innerHTML = arthurTotal.toFixed(2) + ' €';
+  }
+  
+  const uniqueDays = new Set(allGains.map(g => g.date)).size;
+  const avg = uniqueDays ? (victorTotal + arthurTotal) / uniqueDays : 0;
+  if (document.getElementById('stats-average')) {
+    document.getElementById('stats-average').innerHTML = avg.toFixed(2) + ' €';
+  }
+  
+  if (pieChart) {
+    pieChart.data.datasets[0].data = [victorTotal, arthurTotal];
+    pieChart.update();
+  }
+  
+  if (monthlyChart) {
+    const monthData = [1200, 1500, victorTotal + arthurTotal, 800, 950, 1100];
+    monthlyChart.data.datasets[0].data = monthData;
+    monthlyChart.update();
+  }
+}
+
+// ============================================
+// FONCTIONS GRAPHIQUES
+// ============================================
+function drawChart() {
+  if (!chart) return;
+  
+  const p = document.getElementById("period")?.value || "all";
+  const now = new Date();
+  let victorMap = {}, arthurMap = {}, allDates = new Set();
+  
+  [...victorGains, ...arthurGains].forEach(g => {
+    const d = new Date(g.date);
+    let include = p === "today" ? d.toDateString() === now.toDateString() :
+                 p === "7" ? (now - d) / 86400000 <= 7 :
+                 p === "30" ? (now - d) / 86400000 <= 30 :
+                 p === "month" ? d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear() :
+                 p === "year" ? d.getFullYear() === now.getFullYear() : true;
+    
+    if (include) {
+      const key = d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+      allDates.add(key);
+      if (g.person === 'victor') {
+        victorMap[key] = (victorMap[key] || 0) + Number(g.amount);
+      } else {
+        arthurMap[key] = (arthurMap[key] || 0) + Number(g.amount);
+      }
+    }
+  });
+  
+  const sortedDates = Array.from(allDates).sort((a, b) => 
+    new Date(a.split('/').reverse().join('-')) - new Date(b.split('/').reverse().join('-'))
+  );
+  
+  chart.data.labels = sortedDates;
+  chart.data.datasets[0].data = (currentView === 'victor' || currentView === 'both') ? 
+    sortedDates.map(d => victorMap[d] || 0) : [];
+  chart.data.datasets[1].data = (currentView === 'arthur' || currentView === 'both') ? 
+    sortedDates.map(d => arthurMap[d] || 0) : [];
+  chart.update();
+}
+
+// ============================================
+// FONCTIONS UI
+// ============================================
+function showPerson(person) {
+  currentView = person;
+  if (document.getElementById('victor-toggle')) document.getElementById('victor-toggle').classList.remove('active');
+  if (document.getElementById('arthur-toggle')) document.getElementById('arthur-toggle').classList.remove('active');
+  if (document.getElementById('both-toggle')) document.getElementById('both-toggle').classList.remove('active');
+  if (document.getElementById(`${person}-toggle`)) document.getElementById(`${person}-toggle`).classList.add('active');
+  drawChart();
+}
+
+function showBoth() { showPerson('both'); }
+
+function toggleMenu() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('active');
+}
+
+function closeMenu() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('active');
+}
+
+function switchTab(tabName) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  const tab = document.getElementById(`tab-${tabName}`);
+  if (tab) tab.classList.add('active');
+  
+  const titles = {
+    'dashboard': 'Tableau de bord',
+    'products': 'Produits',
+    'inventory': 'Stocks',
+    'sheets': 'Fiches produits',
+    'calendar': 'Calendrier',
+    'stats': 'Statistiques',
+    'clients': 'Clients'
+  };
+  
+  const titleEl = document.getElementById('pageTitle');
+  if (titleEl) titleEl.innerText = titles[tabName];
+  
+  document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+  
+  // Activer l'élément de menu correspondant
+  const activeMenuItem = Array.from(document.querySelectorAll('.sidebar-item')).find(
+    item => item.innerHTML.includes(titles[tabName])
+  );
+  if (activeMenuItem) activeMenuItem.classList.add('active');
+  
+  // Rafraîchir l'onglet si nécessaire
+  if (tabName === 'stats') updateStats();
+  if (tabName === 'calendar') { updateCalendar(); updateEventsList(); }
+  if (tabName === 'products') updateProducts();
+  if (tabName === 'inventory') updateStock();
+  if (tabName === 'sheets') updateSheets();
+  if (tabName === 'clients') updateClients();
+}
+
+function toggleDark() {
+  document.body.classList.toggle("dark");
+  if (chart) chart.update();
+  if (pieChart) pieChart.update();
+  if (monthlyChart) monthlyChart.update();
+}
+
+// ============================================
+// INITIALISATION DES GRAPHIQUES
+// ============================================
+let chart, pieChart, monthlyChart;
+
+function initCharts() {
+  if (document.getElementById('chart')) {
+    chart = new Chart(document.getElementById("chart"), {
+      type: "line",
+      data: { 
+        labels: [], 
+        datasets: [
+          { label: "Victor", data: [], borderColor: "var(--victor-color)", backgroundColor: "rgba(37,99,235,0.05)", fill: true, tension: 0.4 },
+          { label: "Arthur", data: [], borderColor: "var(--arthur-color)", backgroundColor: "rgba(16,185,129,0.05)", fill: true, tension: 0.4 }
+        ]
+      },
+      options: { 
+        responsive: true, 
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'top' } }, 
+        scales: { y: { beginAtZero: true, title: { display: true, text: 'Montant (€)' } } } 
+      }
+    });
+  }
+
+  if (document.getElementById("pie-chart")) {
+    pieChart = new Chart(document.getElementById("pie-chart"), { 
+      type: "pie", 
+      data: { labels: ["Victor", "Arthur"], datasets: [{ data: [0,0], backgroundColor: ["var(--victor-color)", "var(--arthur-color)"] }] },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+  }
+
+  if (document.getElementById("monthly-chart")) {
+    monthlyChart = new Chart(document.getElementById("monthly-chart"), { 
+      type: "bar", 
+      data: { labels: ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin"], 
+              datasets: [{ label: "Gains 2026", data: [0,0,0,0,0,0], backgroundColor: "var(--accent)" }] },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+  }
+}
+
+// ============================================
+// INITIALISATION PRINCIPALE
+// ============================================
+window.onload = async function() {
+  console.log('Démarrage de l\'application avec Supabase...');
+  
+  // Initialiser les dates
+  const today = new Date().toISOString().split('T')[0];
+  if (document.getElementById('victor-date')) document.getElementById('victor-date').value = today;
+  if (document.getElementById('arthur-date')) document.getElementById('arthur-date').value = today;
+  if (document.getElementById('event-date')) document.getElementById('event-date').value = today;
+  
+  // Initialiser les graphiques
+  initCharts();
+  
+  // Charger les données depuis Supabase
+  await loadAllData();
+  
+  // Rafraîchir l'affichage
+  refresh();
+  drawChart();
+  updateHistory();
+  updateProducts();
+  updateStock();
+  updateSheets();
+  updateCalendar();
+  updateEventsList();
+  updateStats();
+  updateClients();
+  
+  // Fermer le menu si on clique en dehors
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.sidebar') && !e.target.closest('.menu-btn')) {
+      closeMenu();
+    }
+  });
+  
+  console.log('Application prête !');
+};
+
+// ============================================
+// RENDRE TOUTES LES FONCTIONS GLOBALES
+// ============================================
+window.addGain = addGain;
+window.deleteGain = deleteGain;
+window.addProduct = addProduct;
+window.updateProductQuantity = updateProductQuantity;
+window.deleteProduct = deleteProduct;
+window.editProduct = editProduct;
+window.addStock = addStock;
+window.addEvent = addEvent;
+window.deleteEvent = deleteEvent;
+window.addClient = addClient;
+window.deleteClient = deleteClient;
+window.showPerson = showPerson;
+window.showBoth = showBoth;
+window.toggleMenu = toggleMenu;
+window.closeMenu = closeMenu;
+window.switchTab = switchTab;
+window.toggleDark = toggleDark;
+window.drawChart = drawChart;
+</script>
+
+</body>
+</html>
