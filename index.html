@@ -1,351 +1,884 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Gestion Pro des Gains - Victor & Arthur</title>
+<title>Gestion Pro - Victor & Arthur (Supabase)</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
 
 <style>
+/* ============ VARIABLES ============ */
 :root {
-  --bg:#f4f6f9; --card:#fff; --text:#111827; --accent:#2563eb;
-  --victor-color:#2563eb; --arthur-color:#10b981;
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --text: #0f172a;
+  --text-light: #64748b;
+  --accent: #2563eb;
+  --victor-color: #2563eb;
+  --arthur-color: #10b981;
+  --border: #e2e8f0;
+  --hover: #f1f5f9;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --sidebar-bg: #ffffff;
+  --shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+  --radius: 16px;
 }
+
 body.dark {
-  --bg:#0f172a; --card:#1e293b; --text:#e5e7eb; --accent:#38bdf8;
-  --victor-color:#3b82f6; --arthur-color:#10b981;
+  --bg: #0f172a;
+  --card: #1e293b;
+  --text: #f1f5f9;
+  --text-light: #94a3b8;
+  --accent: #38bdf8;
+  --victor-color: #3b82f6;
+  --arthur-color: #10b981;
+  --border: #334155;
+  --hover: #2d3a4f;
+  --sidebar-bg: #1e293b;
+  --shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
 }
-body { margin:0; font-family:Arial; background:var(--bg); color:var(--text); }
-header { padding:20px; display:flex; justify-content:space-between; align-items:center; }
-button {
-  background:var(--accent); border:none; color:white;
-  padding:8px 14px; border-radius:8px; cursor:pointer;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s, transform 0.2s;
 }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============ TOP BAR ============ */
+.top-bar {
+  background: var(--card);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  box-shadow: var(--shadow);
+}
+
+.top-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.menu-btn {
+  background: transparent;
+  color: var(--text);
+  font-size: 22px;
+  padding: 10px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.menu-btn:hover {
+  background: var(--hover);
+  transform: scale(1.05);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo i {
+  font-size: 24px;
+  color: var(--accent);
+}
+
+.logo h1 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  margin-left: 8px;
+}
+
+.theme-btn {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.theme-btn:hover {
+  background: var(--hover);
+  transform: rotate(15deg);
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(3px);
+  z-index: 98;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s;
+}
+
+.overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -300px;
+  width: 280px;
+  height: 100vh;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
+  z-index: 99;
+  transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 5px 0 20px rgba(0,0,0,0.05);
+  overflow-y: auto;
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+.sidebar-header {
+  padding: 24px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sidebar-header i {
+  font-size: 28px;
+  color: var(--accent);
+}
+
+.sidebar-header h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.sidebar-menu {
+  flex: 1;
+  padding: 20px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  color: var(--text);
+  text-decoration: none;
+  transition: all 0.2s;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.sidebar-item i {
+  width: 22px;
+  text-align: center;
+  font-size: 18px;
+  color: var(--text-light);
+  transition: all 0.2s;
+}
+
+.sidebar-item span {
+  flex: 1;
+}
+
+.sidebar-item:hover {
+  background: var(--hover);
+}
+
+.sidebar-item:hover i {
+  color: var(--accent);
+}
+
+.sidebar-item.active {
+  background: var(--accent);
+  color: white;
+}
+
+.sidebar-item.active i {
+  color: white;
+}
+
+.sidebar-footer {
+  padding: 20px 12px;
+  border-top: 1px solid var(--border);
+  margin-top: auto;
+}
+
+.main-content {
+  flex: 1;
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.tab-content {
+  display: none;
+  animation: fadeIn 0.3s;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .card {
-  background:var(--card); padding:20px; border-radius:14px;
-  box-shadow:0 10px 25px rgba(0,0,0,.08);
-  margin-bottom:20px;
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
 }
-.dashboard {
-  display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-  gap:20px; padding:20px;
+
+.card-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
 }
-.amount { font-size:26px; font-weight:bold }
-.form-container {
-  padding:20px;
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-  gap:20px;
+
+.card-title i {
+  color: var(--accent);
 }
-.person-form {
-  background:var(--card);
-  padding:20px;
-  border-radius:14px;
-  box-shadow:0 10px 25px rgba(0,0,0,.08);
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
 }
-.person-form h3 {
-  margin-top:0;
-  padding-bottom:10px;
-  border-bottom:2px solid;
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
 }
-.person-form.victor h3 {
-  color:var(--victor-color);
-  border-color:var(--victor-color);
+
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
 }
-.person-form.arthur h3 {
-  color:var(--arthur-color);
-  border-color:var(--arthur-color);
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
 }
-form { display:flex; flex-direction:column; gap:10px; }
-input, select { padding:10px; border-radius:8px; border:1px solid #ddd; }
-.person-toggle {
-  display:flex;
-  gap:10px;
-  padding:20px;
+
+input, select, textarea {
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  width: 100%;
+  transition: all 0.2s;
 }
-.person-toggle button {
-  flex:1;
-  opacity:0.6;
-  transition:all 0.3s;
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
 }
-.person-toggle button.active {
-  opacity:1;
-  transform:scale(1.05);
+
+.btn {
+  padding: 14px 20px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s;
+  background: var(--accent);
+  color: white;
 }
-#charts { padding:20px; }
-.stat-row {
-  display:flex;
-  justify-content:space-between;
-  margin-bottom:10px;
-  padding:10px;
-  border-radius:8px;
-  background:var(--bg);
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(37,99,235,0.2);
 }
+
+.btn-sm {
+  padding: 10px 16px;
+  font-size: 14px;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.badge {
+  padding: 6px 12px;
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.badge-success {
+  background: rgba(16,185,129,0.15);
+  color: #10b981;
+}
+
+.badge-warning {
+  background: rgba(245,158,11,0.15);
+  color: #f59e0b;
+}
+
+.badge-danger {
+  background: rgba(239,68,68,0.15);
+  color: #ef4444;
+}
+
+.badge-info {
+  background: rgba(37,99,235,0.15);
+  color: #2563eb;
+}
+
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: rgba(37,99,235,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.stat-icon i {
+  font-size: 24px;
+  color: var(--accent);
+}
+
+.stat-number {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
 .stat-label {
-  font-weight:bold;
+  font-size: 14px;
+  color: var(--text-light);
 }
-.stat-value {
-  font-weight:bold;
+
+.table-responsive {
+  overflow-x: auto;
+  margin-top: 16px;
+  border-radius: 12px;
 }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  text-align: left;
+  padding: 16px;
+  background: var(--bg);
+  font-weight: 600;
+  color: var(--text);
+  border-bottom: 2px solid var(--border);
+}
+
+td {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+tr:hover td {
+  background: var(--hover);
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.product-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: all 0.2s;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
+}
+
+.stock-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--border);
+  border-radius: 4px;
+  margin: 16px 0;
+  overflow: hidden;
+}
+
+.stock-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+
+.calendar-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 0 4px;
+}
+
+.calendar-weekday {
+  text-align: center;
+  font-weight: 600;
+  color: var(--text-light);
+  font-size: 14px;
+  padding: 8px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.calendar-day {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 8px;
+  min-height: 100px;
+}
+
+.calendar-day-number {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--accent);
+}
+
+.calendar-event {
+  background: rgba(37,99,235,0.1);
+  color: var(--accent);
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  margin-top: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.clients-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.client-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+
+@media (max-width: 1024px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 16px;
+  }
+  
+  .logo h1 {
+    display: none;
+  }
+  
+  .page-title {
+    font-size: 18px;
+  }
+  
+  .grid-4 {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .calendar-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+  
+  .calendar-header {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid-4 {
+    grid-template-columns: 1fr;
+  }
+  
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .clients-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .btn {
+    width: 100%;
+  }
+}
+
+.mb-2 { margin-bottom: 16px; }
+.mb-3 { margin-bottom: 24px; }
+.mt-2 { margin-top: 16px; }
+.text-center { text-align: center; }
+.w-100 { width: 100%; }
 </style>
 </head>
 
 <body>
+<div class="app">
+  <div class="overlay" id="overlay" onclick="closeMenu()"></div>
 
-<header>
-  <h1>📊 Gestion des gains - Victor & Arthur</h1>
-  <button onclick="toggleDark()">🌙</button>
-</header>
-
-<div class="person-toggle">
-  <button onclick="showPerson('victor')" id="victor-toggle" class="active">Victor</button>
-  <button onclick="showPerson('arthur')" id="arthur-toggle">Arthur</button>
-  <button onclick="showBoth()" id="both-toggle">Les deux</button>
-</div>
-
-<div class="form-container">
-  <div class="person-form victor">
-    <h3>👤 Victor - Gains</h3>
-    <form onsubmit="addGain(event, 'victor')">
-      <input type="date" id="victor-date" required>
-      <input type="number" id="victor-amount" placeholder="€ gagnés" required min="0" step="0.01">
-      <button type="submit" style="background:var(--victor-color)">Ajouter gain</button>
-    </form>
-    <div class="stats">
-      <div class="stat-row">
-        <span class="stat-label">Total Victor:</span>
-        <span class="stat-value" id="victor-total">0 €</span>
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <i class="fas fa-chart-line"></i>
+      <h2>Gestion Pro</h2>
+    </div>
+    
+    <div class="sidebar-menu">
+      <div class="sidebar-item active" onclick="switchTab('dashboard'); closeMenu()">
+        <i class="fas fa-home"></i>
+        <span>Tableau de bord</span>
+      </div>
+      <div class="sidebar-item" onclick="switchTab('products'); closeMenu()">
+        <i class="fas fa-box"></i>
+        <span>Produits</span>
+      </div>
+      <div class="sidebar-item" onclick="switchTab('inventory'); closeMenu()">
+        <i class="fas fa-warehouse"></i>
+        <span>Stocks</span>
+      </div>
+      <div class="sidebar-item" onclick="switchTab('sheets'); closeMenu()">
+        <i class="fas fa-file-alt"></i>
+        <span>Fiches produits</span>
+      </div>
+      <div class="sidebar-item" onclick="switchTab('calendar'); closeMenu()">
+        <i class="fas fa-calendar"></i>
+        <span>Calendrier</span>
+      </div>
+      <div class="sidebar-item" onclick="switchTab('stats'); closeMenu()">
+        <i class="fas fa-chart-pie"></i>
+        <span>Statistiques</span>
+      </div>
+      <div class="sidebar-item" onclick="switchTab('clients'); closeMenu()">
+        <i class="fas fa-users"></i>
+        <span>Clients</span>
+      </div>
+    </div>
+    
+    <div class="sidebar-footer">
+      <div class="sidebar-item" onclick="toggleDark(); closeMenu()">
+        <i class="fas fa-moon"></i>
+        <span>Mode sombre</span>
       </div>
     </div>
   </div>
 
-  <div class="person-form arthur">
-    <h3>👤 Arthur - Gains</h3>
-    <form onsubmit="addGain(event, 'arthur')">
-      <input type="date" id="arthur-date" required>
-      <input type="number" id="arthur-amount" placeholder="€ gagnés" required min="0" step="0.01">
-      <button type="submit" style="background:var(--arthur-color)">Ajouter gain</button>
-    </form>
-    <div class="stats">
-      <div class="stat-row">
-        <span class="stat-label">Total Arthur:</span>
-        <span class="stat-value" id="arthur-total">0 €</span>
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <button class="menu-btn" onclick="toggleMenu()">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="logo">
+        <i class="fas fa-chart-line"></i>
+        <h1>Gestion Pro</h1>
+      </div>
+      <span class="page-title" id="pageTitle">Tableau de bord</span>
+    </div>
+    <button class="theme-btn" onclick="toggleDark()">
+      <i class="fas fa-moon"></i>
+    </button>
+  </div>
+
+  <div class="main-content">
+    <!-- Tableau de bord -->
+    <div id="tab-dashboard" class="tab-content active">
+      <div class="grid-3" style="margin-bottom: 20px;">
+        <button onclick="showPerson('victor')" id="victor-toggle" class="btn active" style="background: var(--victor-color); opacity: 0.9;">
+          <i class="fas fa-user"></i> Victor
+        </button>
+        <button onclick="showPerson('arthur')" id="arthur-toggle" class="btn" style="background: var(--arthur-color); opacity: 0.9;">
+          <i class="fas fa-user"></i> Arthur
+        </button>
+        <button onclick="showBoth()" id="both-toggle" class="btn" style="background: var(--accent);">
+          <i class="fas fa-users"></i> Les deux
+        </button>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">
+            <i class="fas fa-user"></i> Victor - Ajouter un gain
+          </div>
+          <form onsubmit="addGain(event, 'victor')">
+            <div class="form-group">
+              <input type="date" id="victor-date" required>
+            </div>
+            <div class="form-group">
+              <input type="number" id="victor-amount" placeholder="Montant (€)" required min="0" step="0.01">
+            </div>
+            <div class="form-group">
+              <input type="text" id="victor-description" placeholder="Description">
+            </div>
+            <button type="submit" class="btn btn-block" style="background: var(--victor-color);">
+              <i class="fas fa-plus-circle"></i> Ajouter
+            </button>
+          </form>
+          <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+            <div style="display: flex; justify-content: space-between;">
+              <span style="font-weight: 600;">Total Victor:</span>
+              <span style="font-weight: 700; color: var(--victor-color);" id="victor-total">0 €</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <i class="fas fa-user"></i> Arthur - Ajouter un gain
+          </div>
+          <form onsubmit="addGain(event, 'arthur')">
+            <div class="form-group">
+              <input type="date" id="arthur-date" required>
+            </div>
+            <div class="form-group">
+              <input type="number" id="arthur-amount" placeholder="Montant (€)" required min="0" step="0.01">
+            </div>
+            <div class="form-group">
+              <input type="text" id="arthur-description" placeholder="Description">
+            </div>
+            <button type="submit" class="btn btn-block" style="background: var(--arthur-color);">
+              <i class="fas fa-plus-circle"></i> Ajouter
+            </button>
+          </form>
+          <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+            <div style="display: flex; justify-content: space-between;">
+              <span style="font-weight: 600;">Total Arthur:</span>
+              <span style="font-weight: 700; color: var(--arthur-color);" id="arthur-total">0 €</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-4">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-euro-sign"></i>
+          </div>
+          <div class="stat-number" id="total">0 €</div>
+          <div class="stat-label">Total combiné</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-calendar-day"></i>
+          </div>
+          <div class="stat-number" id="yesterday">0 €</div>
+          <div class="stat-label">Hier</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-calendar-week"></i>
+          </div>
+          <div class="stat-number" id="week">0 €</div>
+          <div class="stat-label">Cette semaine</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-calendar-alt"></i>
+          </div>
+          <div class="stat-number" id="month">0 €</div>
+          <div class="stat-label">Ce mois</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <div class="card-title" style="margin-bottom: 0;">
+            <i class="fas fa-chart-line"></i> Évolution des gains
+          </div>
+          <select id="period" onchange="drawChart()" style="width: auto; padding: 10px 16px;">
+            <option value="today">Aujourd'hui</option>
+            <option value="7">7 derniers jours</option>
+            <option value="30">30 derniers jours</option>
+            <option value="month">Ce mois</option>
+            <option value="year">Cette année</option>
+            <option value="all">Tout</option>
+          </select>
+        </div>
+        <div style="position: relative; height: 300px;">
+          <canvas id="chart"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <i class="fas fa-history"></i> Derniers gains
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Personne</th>
+                <th>Description</th>
+                <th>Montant</th>
+              </tr>
+            </thead>
+            <tbody id="history-table-body"></tbody>
+          </table>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
-<section class="dashboard">
-  <div class="card" onclick="openCharts()">
-    <h3>Total Combiné</h3>
-    <div id="total" class="amount">0 €</div>
-  </div>
-  <div class="card">
-    <h3>Hier</h3>
-    <div id="yesterday" class="amount">0 €</div>
-  </div>
-  <div class="card">
-    <h3>Semaine</h3>
-    <div id="week" class="amount">0 €</div>
-  </div>
-  <div class="card">
-    <h3>Mois</h3>
-    <div id="month" class="amount">0 €</div>
-  </div>
-  <div class="card">
-    <h3>Année</h3>
-    <div id="year" class="amount">0 €</div>
-  </div>
-</section>
-
-<section id="charts">
-  <div class="card">
-    <h3>Graphique des gains</h3>
-
-    <select id="period" onchange="drawChart()">
-      <option value="today">Aujourd'hui</option>
-      <option value="7">7 derniers jours</option>
-      <option value="30">30 derniers jours</option>
-      <option value="month">Ce mois</option>
-      <option value="year">Cette année</option>
-      <option value="all">Tout</option>
-    </select>
-
-    <canvas id="chart" height="300"></canvas>
-  </div>
-</section>
-
-<script>
-// Données séparées pour Victor et Arthur
-let victorGains = JSON.parse(localStorage.getItem("victorGains") || "[]");
-let arthurGains = JSON.parse(localStorage.getItem("arthurGains") || "[]");
-let currentView = 'both'; // 'victor', 'arthur', or 'both'
-
-function addGain(e, person) {
-  e.preventDefault();
-  
-  const gain = {
-    date: document.getElementById(`${person}-date`).value,
-    amount: Number(document.getElementById(`${person}-amount`).value),
-    person: person
-  };
-  
-  if (person === 'victor') {
-    victorGains.push(gain);
-    localStorage.setItem("victorGains", JSON.stringify(victorGains));
-  } else {
-    arthurGains.push(gain);
-    localStorage.setItem("arthurGains", JSON.stringify(arthurGains));
-  }
-  
-  e.target.reset();
-  refresh();
-  drawChart();
-}
-
-function sum(gainsArray, filter) {
-  return gainsArray.filter(filter).reduce((s,g)=>s+g.amount,0);
-}
-
-function refresh() {
-  let now = new Date();
-  let yesterday = new Date(now); 
-  yesterday.setDate(now.getDate()-1);
-  
-  // Totaux individuels
-  const victorTotal = sum(victorGains, () => true);
-  const arthurTotal = sum(arthurGains, () => true);
-  
-  document.getElementById("victor-total").innerText = victorTotal.toFixed(2) + " €";
-  document.getElementById("arthur-total").innerText = arthurTotal.toFixed(2) + " €";
-  
-  // Totaux combinés
-  const allGains = [...victorGains, ...arthurGains];
-  
-  document.getElementById("total").innerText = (victorTotal + arthurTotal).toFixed(2) + " €";
-  document.getElementById("yesterday").innerText = 
-    sum(allGains, g => new Date(g.date).toDateString() === yesterday.toDateString()).toFixed(2) + " €";
-  document.getElementById("week").innerText = 
-    sum(allGains, g => (now - new Date(g.date)) / 86400000 <= 7).toFixed(2) + " €";
-  document.getElementById("month").innerText = 
-    sum(allGains, g => new Date(g.date).getMonth() === now.getMonth() && 
-                      new Date(g.date).getFullYear() === now.getFullYear()).toFixed(2) + " €";
-  document.getElementById("year").innerText = 
-    sum(allGains, g => new Date(g.date).getFullYear() === now.getFullYear()).toFixed(2) + " €";
-}
-
-// Initialisation du graphique
-let chart = new Chart(document.getElementById("chart").getContext('2d'), {
-  type: "line",
-  data: {
-    labels: [],
-    datasets: [
-      {
-        label: "Victor",
-        data: [],
-        borderColor: "var(--victor-color)",
-        backgroundColor: "rgba(37, 99, 235, 0.1)",
-        fill: true,
-        tension: 0.4,
-        borderWidth: 2
-      },
-      {
-        label: "Arthur",
-        data: [],
-        borderColor: "var(--arthur-color)",
-        backgroundColor: "rgba(16, 185, 129, 0.1)",
-        fill: true,
-        tension: 0.4,
-        borderWidth: 2
-      }
-    ]
-  },
-  options: {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'top',
-      }
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        title: {
-          display: true,
-          text: 'Montant (€)'
-        }
-      },
-      x: {
-        title: {
-          display: true,
-          text: 'Date'
-        }
-      }
-    }
-  }
-});
-
-function drawChart() {
-  const p = document.getElementById("period").value;
-  const now = new Date();
-  
-  // Préparer les données selon la vue courante
-  let dataToShow = {
-    victor: currentView === 'victor' || currentView === 'both',
-    arthur: currentView === 'arthur' || currentView === 'both'
-  };
-  
-  // Filtrer et grouper les données
-  let victorMap = {};
-  let arthurMap = {};
-  let allDates = new Set();
-  
-  [victorGains, arthurGains].forEach((gainsArray, index) => {
-    gainsArray.forEach(g => {
-      let d = new Date(g.date);
-      let shouldInclude = false;
+    <!-- Onglet Produits -->
+    <div id="tab-products" class="tab-content">
+      <div class="card">
+        <div class="card-title">
+          <i class="fas fa-box"></i> Ajouter un produit
+        </div>
+        <form onsubmit="addProduct(event)">
+          <div class="grid-3">
+            <input type="text" id="product-name" placeholder="Nom du produit" required>
+            <input type="number" id="product-price" placeholder="Prix (€)" step="0.01" required>
+            <input type="number" id="product-quantity" placeholder="Quantité" required>
+            <select id="product-category">
+              <option>Électronique</option>
+              <option>Vêtements</option>
+              <option>Alimentation</option>
+              <option>Maison</option>
+              <option>Autre</option>
+            </select>
+            <button type="submit" class="btn" style="background: var(--success);">
+              <i class="fas fa-save"></i> Ajouter
+            </button>
+          </div>
+        </form>
+      </div>
       
-      if (p === "today") shouldInclude = d.toDateString() === now.toDateString();
-      else if (p === "7") shouldInclude = (now - d) / 86400000 <= 7;
-      else if (p === "30") shouldInclude = (now - d) / 86400000 <= 30;
-      else if (p === "month") shouldInclude = d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-      else if (p === "year") shouldInclude = d.getFullYear() === now.getFullYear();
-      else if (p === "all") shouldInclude = true;
-      
-      if (shouldInclude) {
-        const dateKey = d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
-        allDates.add(dateKey);
-        
-        if (g.person === 'victor') {
-          victorMap[dateKey] = (victorMap[dateKey] || 0) + g.amount;
-        } else {
-          arthurMap[dateKey] = (arthurMap[dateKey] || 0) + g.amount;
-        }
-      }
-    });
-  });
-  
-  // Trier les dates
-  const sortedDates = Array.from(allDates).sort((a, b) => {
-    return new Date(a.split('/').reverse().join('-')) - new Date(b.split('/').reverse().join('-'));
-  });
-  
-  // Préparer les données pour le graphique
-  const victorData = sortedDates.map(date => victorMap[date] || 0);
-  const arthurData = sortedDates.map(date => arthurMap[date] || 0);
-  
-  // Mettre à jour le graphique
-  chart.data.labels = sortedDates;
-  chart.data.datasets[0].data = dataToShow.victor ? victorData : [];
-  chart.data.datasets[1].data = dataToShow.arthur ? arthurData : [];
-  chart.update();
-}
+      <div class="card">
+        <div class="card-title">
+          <i class="fas fa-boxes"></i> Catalogue produits
+        </div>
+        <div id="products-list" class="product-grid"></div>
+      </div>
+    </div>
 
-function showPerson(person) {
-  currentView = person;
-  
-  // Mettre à jour les boutons
-  document.getElementById('victor-toggle').classList.remove('active');
+    <!-- Onglet Stocks -->
+    <div id="tab-inventory" class="tab-content">
+      <div class="grid-4">
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-box"></i></div>
+          <div class="stat-number" id="total-products">0</div>
+          <div class="stat-label">Produits</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-cubes"></i></div>
+          <div class="stat-number" id="total-stock">0</div>
+          <div class="stat-label">Unités en stock</div>
+        </div>
+        <div class="stat-card">
+          <diElementById('victor-toggle').classList.remove('active');
   document.getElementById('arthur-toggle').classList.remove('active');
   document.getElementById('both-toggle').classList.remove('active');
   document.getElementById(`${person}-toggle`).classList.add('active');
