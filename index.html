@@ -2,14 +2,14 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Gestion Pro - Victor & Arthur (Supabase)</title>
+<title>Gestion Pro Elite - Victor & Arthur</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
 
 <style>
-/* ============ TON CSS EXISTANT (GARDÉ IDENTIQUE) ============ */
+/* ============ VARIABLES AVANCÉES ============ */
 :root {
   --bg: #f8fafc;
   --card: #ffffff;
@@ -23,9 +23,11 @@
   --success: #10b981;
   --warning: #f59e0b;
   --danger: #ef4444;
+  --info: #3b82f6;
   --sidebar-bg: #ffffff;
-  --shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
-  --radius: 16px;
+  --shadow: 0 20px 25px -5px rgba(0,0,0,0.05);
+  --radius: 20px;
+  --radius-sm: 12px;
 }
 
 body.dark {
@@ -39,7 +41,25 @@ body.dark {
   --border: #334155;
   --hover: #2d3a4f;
   --sidebar-bg: #1e293b;
-  --shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
+  --shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
+}
+
+/* ============ ANIMATIONS ============ */
+@keyframes slideIn {
+  from { transform: translateX(-20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+  100% { transform: translateY(0px); }
 }
 
 /* ============ RESET & BASE ============ */
@@ -48,13 +68,16 @@ body.dark {
   padding: 0;
   box-sizing: border-box;
   font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
-  transition: background-color 0.2s, color 0.2s, border-color 0.2s, transform 0.2s;
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              color 0.2s, 
+              border-color 0.2s, 
+              transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body {
   background: var(--bg);
   color: var(--text);
-  line-height: 1.5;
+  line-height: 1.6;
   overflow-x: hidden;
 }
 
@@ -65,10 +88,10 @@ body {
   flex-direction: column;
 }
 
-/* ============ TOP BAR ============ */
+/* ============ TOP BAR AMÉLIORÉ ============ */
 .top-bar {
   background: var(--card);
-  padding: 16px 20px;
+  padding: 12px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -77,110 +100,97 @@ body {
   top: 0;
   z-index: 20;
   box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+  background: rgba(var(--card-rgb), 0.8);
 }
 
 .top-bar-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
 }
 
 .menu-btn {
   background: transparent;
   color: var(--text);
   font-size: 22px;
-  padding: 10px;
-  border-radius: 12px;
+  padding: 12px;
+  border-radius: var(--radius-sm);
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  transition: all 0.3s;
 }
 
 .menu-btn:hover {
   background: var(--hover);
-  transform: scale(1.05);
+  transform: scale(1.1) rotate(90deg);
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .logo i {
-  font-size: 24px;
+  font-size: 28px;
   color: var(--accent);
+  animation: float 3s ease-in-out infinite;
 }
 
 .logo h1 {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 700;
   margin: 0;
+  background: linear-gradient(135deg, var(--accent), var(--victor-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .page-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 600;
   color: var(--text);
-  margin-left: 8px;
+  margin-left: 12px;
+  animation: slideIn 0.3s;
 }
 
 .theme-btn {
   background: var(--bg);
   color: var(--text);
   border: 1px solid var(--border);
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s;
 }
 
 .theme-btn:hover {
   background: var(--hover);
-  transform: rotate(15deg);
+  transform: rotate(180deg);
 }
 
-/* ============ MENU HAMBURGER OVERLAY ============ */
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.5);
-  backdrop-filter: blur(3px);
-  z-index: 98;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s;
-}
-
-.overlay.active {
-  opacity: 1;
-  visibility: visible;
-}
-
-/* ============ SIDEBAR MENU ============ */
+/* ============ SIDEBAR AMÉLIORÉ ============ */
 .sidebar {
   position: fixed;
   top: 0;
-  left: -300px;
-  width: 280px;
+  left: -320px;
+  width: 300px;
   height: 100vh;
   background: var(--sidebar-bg);
   border-right: 1px solid var(--border);
   z-index: 99;
-  transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
-  box-shadow: 5px 0 20px rgba(0,0,0,0.05);
+  box-shadow: 5px 0 30px rgba(0,0,0,0.1);
   overflow-y: auto;
 }
 
@@ -189,51 +199,70 @@ body {
 }
 
 .sidebar-header {
-  padding: 24px 20px;
+  padding: 30px 24px;
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 15px;
 }
 
 .sidebar-header i {
-  font-size: 28px;
+  font-size: 32px;
   color: var(--accent);
+  animation: pulse 2s infinite;
 }
 
 .sidebar-header h2 {
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 22px;
+  font-weight: 700;
   margin: 0;
 }
 
 .sidebar-menu {
   flex: 1;
-  padding: 20px 12px;
+  padding: 24px 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 
 .sidebar-item {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 14px 16px;
-  border-radius: 12px;
+  gap: 18px;
+  padding: 16px 18px;
+  border-radius: var(--radius-sm);
   color: var(--text);
   text-decoration: none;
-  transition: all 0.2s;
+  transition: all 0.3s;
   cursor: pointer;
   font-weight: 500;
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebar-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0;
+  background: var(--accent);
+  opacity: 0.1;
+  transition: width 0.3s;
+}
+
+.sidebar-item:hover::before {
+  width: 100%;
 }
 
 .sidebar-item i {
-  width: 22px;
+  width: 24px;
   text-align: center;
-  font-size: 18px;
+  font-size: 20px;
   color: var(--text-light);
-  transition: all 0.2s;
+  transition: all 0.3s;
 }
 
 .sidebar-item span {
@@ -241,16 +270,18 @@ body {
 }
 
 .sidebar-item:hover {
-  background: var(--hover);
+  transform: translateX(5px);
 }
 
 .sidebar-item:hover i {
   color: var(--accent);
+  transform: scale(1.2);
 }
 
 .sidebar-item.active {
   background: var(--accent);
   color: white;
+  box-shadow: 0 8px 16px rgba(37,99,235,0.3);
 }
 
 .sidebar-item.active i {
@@ -258,7 +289,7 @@ body {
 }
 
 .sidebar-footer {
-  padding: 20px 12px;
+  padding: 24px 16px;
   border-top: 1px solid var(--border);
   margin-top: auto;
 }
@@ -266,98 +297,109 @@ body {
 /* ============ CONTENU PRINCIPAL ============ */
 .main-content {
   flex: 1;
-  padding: 20px;
-  max-width: 1400px;
+  padding: 30px;
+  max-width: 1600px;
   margin: 0 auto;
   width: 100%;
+  animation: slideIn 0.4s;
 }
 
 /* ============ TABS ============ */
 .tab-content {
   display: none;
-  animation: fadeIn 0.3s;
+  animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .tab-content.active {
   display: block;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ============ CARDS ============ */
+/* ============ CARDS AMÉLIORÉES ============ */
 .card {
   background: var(--card);
   border-radius: var(--radius);
-  padding: 20px;
-  margin-bottom: 20px;
+  padding: 24px;
+  margin-bottom: 24px;
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(to bottom, var(--accent), transparent);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 30px 35px -10px rgba(0,0,0,0.1);
 }
 
 .card-title {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   color: var(--text);
 }
 
 .card-title i {
   color: var(--accent);
+  font-size: 24px;
 }
 
-/* ============ GRILLES ============ */
-.grid-2 {
+/* ============ GRILLES RESPONSIVES ============ */
+.grid-2, .grid-3, .grid-4 {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 24px;
 }
 
-.grid-3 {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
-}
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-3 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.grid-4 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
 
-.grid-4 {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-}
-
-/* ============ FORMULAIRES ============ */
+/* ============ FORMULAIRES AMÉLIORÉS ============ */
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
 input, select, textarea {
-  padding: 14px 16px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
+  padding: 16px 20px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
   background: var(--bg);
   color: var(--text);
   font-size: 15px;
   width: 100%;
-  transition: all 0.2s;
+  transition: all 0.3s;
+}
+
+input:hover, select:hover, textarea:hover {
+  border-color: var(--accent);
 }
 
 input:focus, select:focus, textarea:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+  box-shadow: 0 0 0 4px rgba(37,99,235,0.15);
+  transform: scale(1.02);
 }
 
 .btn {
-  padding: 14px 20px;
-  border-radius: 12px;
+  padding: 16px 24px;
+  border-radius: var(--radius-sm);
   border: none;
   font-weight: 600;
   font-size: 15px;
@@ -365,19 +407,39 @@ input:focus, select:focus, textarea:focus {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  transition: all 0.2s;
+  gap: 12px;
+  transition: all 0.3s;
   background: var(--accent);
   color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn:hover::after {
+  width: 300px;
+  height: 300px;
 }
 
 .btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(37,99,235,0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px rgba(37,99,235,0.3);
 }
 
 .btn-sm {
-  padding: 10px 16px;
+  padding: 12px 18px;
   font-size: 14px;
 }
 
@@ -385,269 +447,423 @@ input:focus, select:focus, textarea:focus {
   width: 100%;
 }
 
-/* ============ BADGES ============ */
+/* ============ BADGES AMÉLIORÉS ============ */
 .badge {
-  padding: 6px 12px;
+  padding: 8px 14px;
   border-radius: 30px;
   font-size: 12px;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  animation: slideIn 0.3s;
 }
 
 .badge-success {
   background: rgba(16,185,129,0.15);
   color: #10b981;
+  border: 1px solid rgba(16,185,129,0.3);
 }
 
 .badge-warning {
   background: rgba(245,158,11,0.15);
   color: #f59e0b;
+  border: 1px solid rgba(245,158,11,0.3);
 }
 
 .badge-danger {
   background: rgba(239,68,68,0.15);
   color: #ef4444;
+  border: 1px solid rgba(239,68,68,0.3);
 }
 
 .badge-info {
   background: rgba(37,99,235,0.15);
   color: #2563eb;
+  border: 1px solid rgba(37,99,235,0.3);
 }
 
-/* ============ STATS ============ */
+/* ============ STATISTIQUES AMÉLIORÉES ============ */
 .stat-card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 20px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent), var(--victor-color), var(--arthur-color));
+}
+
+.stat-card:hover {
+  transform: scale(1.05);
 }
 
 .stat-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 16px;
-  background: rgba(37,99,235,0.1);
+  width: 60px;
+  height: 60px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(37,99,235,0.1), rgba(37,99,235,0.2));
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .stat-icon i {
-  font-size: 24px;
+  font-size: 28px;
   color: var(--accent);
 }
 
 .stat-number {
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 4px;
+  font-size: 32px;
+  font-weight: 800;
+  margin-bottom: 6px;
+  background: linear-gradient(135deg, var(--text), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .stat-label {
   font-size: 14px;
   color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-/* ============ TABLEAUX ============ */
+/* ============ TABLEAUX MODERNES ============ */
 .table-responsive {
   overflow-x: auto;
-  margin-top: 16px;
-  border-radius: 12px;
+  margin-top: 20px;
+  border-radius: var(--radius-sm);
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
+  border-radius: var(--radius-sm);
 }
 
 th {
   text-align: left;
-  padding: 16px;
-  background: var(--bg);
+  padding: 18px;
+  background: linear-gradient(to bottom, var(--bg), var(--hover));
   font-weight: 600;
   color: var(--text);
-  border-bottom: 2px solid var(--border);
+  border-bottom: 3px solid var(--accent);
 }
 
 td {
-  padding: 16px;
+  padding: 18px;
   border-bottom: 1px solid var(--border);
+}
+
+tr {
+  transition: all 0.3s;
 }
 
 tr:hover td {
   background: var(--hover);
+  transform: scale(1.01);
 }
 
-/* ============ PRODUITS ============ */
+/* ============ PRODUITS AMÉLIORÉS ============ */
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
 }
 
 .product-card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 20px;
-  transition: all 0.2s;
+  padding: 24px;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
 }
 
 .product-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-8px) scale(1.02);
   box-shadow: var(--shadow);
+}
+
+.product-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent), transparent);
 }
 
 .stock-bar {
   width: 100%;
-  height: 8px;
+  height: 10px;
   background: var(--border);
-  border-radius: 4px;
+  border-radius: 5px;
   margin: 16px 0;
   overflow: hidden;
 }
 
 .stock-fill {
   height: 100%;
-  background: var(--accent);
-  border-radius: 4px;
-  transition: width 0.3s;
+  background: linear-gradient(90deg, var(--accent), var(--victor-color));
+  border-radius: 5px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ============ CALENDRIER ============ */
+/* ============ CALENDRIER INTERACTIF ============ */
 .calendar-header {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
-  margin-bottom: 8px;
-  padding: 0 4px;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding: 0 5px;
 }
 
 .calendar-weekday {
   text-align: center;
-  font-weight: 600;
-  color: var(--text-light);
+  font-weight: 700;
+  color: var(--accent);
   font-size: 14px;
-  padding: 8px;
+  padding: 12px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
 }
 
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
+  gap: 10px;
 }
 
 .calendar-day {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 12px 8px;
-  min-height: 100px;
+  border-radius: var(--radius-sm);
+  padding: 15px 10px;
+  min-height: 120px;
+  transition: all 0.3s;
+}
+
+.calendar-day:hover {
+  transform: scale(1.05);
+  background: var(--hover);
+  cursor: pointer;
 }
 
 .calendar-day-number {
-  font-weight: 600;
-  margin-bottom: 8px;
+  font-weight: 700;
+  margin-bottom: 10px;
   color: var(--accent);
+  font-size: 18px;
 }
 
 .calendar-event {
-  background: rgba(37,99,235,0.1);
+  background: linear-gradient(135deg, rgba(37,99,235,0.1), rgba(37,99,235,0.2));
   color: var(--accent);
-  padding: 6px 8px;
-  border-radius: 6px;
-  font-size: 11px;
-  margin-top: 4px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  margin-top: 6px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  border-left: 3px solid var(--accent);
+  animation: slideIn 0.3s;
 }
 
-/* ============ CLIENTS ============ */
+/* ============ CLIENTS AMÉLIORÉS ============ */
 .clients-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
 }
 
 .client-card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 20px;
+  padding: 24px;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.client-card:hover {
+  transform: translateY(-5px) rotate(1deg);
+  box-shadow: var(--shadow);
+}
+
+/* ============ MODALES ============ */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(5px);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 30px;
+  max-width: 500px;
+  width: 90%;
+  animation: slideIn 0.4s;
+  border: 1px solid var(--border);
+}
+
+/* ============ TOAST NOTIFICATIONS ============ */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: var(--success);
+  color: white;
+  padding: 16px 24px;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  z-index: 1001;
+  animation: slideIn 0.3s;
+  display: none;
+  align-items: center;
+  gap: 12px;
+}
+
+.toast.show {
+  display: flex;
+}
+
+.toast.error {
+  background: var(--danger);
+}
+
+.toast.warning {
+  background: var(--warning);
+}
+
+/* ============ LOADER ============ */
+.loader {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1002;
+}
+
+.loader.show {
+  display: block;
+}
+
+.loader i {
+  font-size: 40px;
+  color: var(--accent);
+  animation: pulse 1s infinite;
+}
+
+/* ============ PROGRESS BAR ============ */
+.progress-container {
+  width: 100%;
+  height: 4px;
+  background: var(--border);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1003;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--victor-color), var(--arthur-color));
+  width: 0%;
+  transition: width 0.3s;
 }
 
 /* ============ RESPONSIVE ============ */
 @media (max-width: 1024px) {
-  .grid-2 {
-    grid-template-columns: 1fr;
-  }
+  .grid-2 { grid-template-columns: 1fr; }
+  .main-content { padding: 20px; }
 }
 
 @media (max-width: 768px) {
-  .main-content {
-    padding: 16px;
-  }
-  
-  .logo h1 {
-    display: none;
-  }
-  
-  .page-title {
-    font-size: 18px;
-  }
-  
-  .grid-4 {
-    grid-template-columns: 1fr 1fr;
-  }
-  
-  .calendar-grid {
-    grid-template-columns: repeat(1, 1fr);
-  }
-  
-  .calendar-header {
-    display: none;
-  }
+  .grid-4 { grid-template-columns: 1fr 1fr; }
+  .calendar-grid { grid-template-columns: repeat(1, 1fr); }
+  .calendar-header { display: none; }
+  .logo h1 { display: none; }
+  .page-title { font-size: 18px; }
 }
 
 @media (max-width: 480px) {
-  .grid-4 {
-    grid-template-columns: 1fr;
-  }
-  
-  .product-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .clients-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .btn {
-    width: 100%;
-  }
+  .grid-4 { grid-template-columns: 1fr; }
+  .product-grid { grid-template-columns: 1fr; }
+  .clients-grid { grid-template-columns: 1fr; }
+  .btn { width: 100%; }
 }
 
 /* ============ UTILS ============ */
 .mb-2 { margin-bottom: 16px; }
 .mb-3 { margin-bottom: 24px; }
+.mb-4 { margin-bottom: 32px; }
 .mt-2 { margin-top: 16px; }
+.mt-3 { margin-top: 24px; }
 .text-center { text-align: center; }
 .w-100 { width: 100%; }
+.d-flex { display: flex; }
+.align-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap: 16px; }
+.gap-3 { gap: 24px; }
 </style>
 </head>
 
 <body>
 <div class="app">
+  <!-- Progress Bar -->
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <!-- Loader -->
+  <div class="loader" id="loader">
+    <i class="fas fa-circle-notch fa-spin"></i>
+  </div>
+
+  <!-- Toast Notifications -->
+  <div class="toast" id="toast">
+    <i class="fas fa-check-circle"></i>
+    <span id="toastMessage">Action réussie !</span>
+  </div>
+
   <!-- Overlay pour fermer le menu -->
-  <div class="overlay" id="overlay" onclick="window.closeMenu()"></div>
+  <div class="overlay" id="overlay" onclick="closeMenu()"></div>
 
   <!-- Menu Hamburger Sidebar -->
   <div class="sidebar" id="sidebar">
@@ -657,40 +873,57 @@ tr:hover td {
     </div>
     
     <div class="sidebar-menu">
-      <div class="sidebar-item active" onclick="window.switchTab('dashboard'); window.closeMenu()">
+      <div class="sidebar-item active" onclick="switchTab('dashboard'); closeMenu()">
         <i class="fas fa-home"></i>
         <span>Tableau de bord</span>
+        <span class="badge" id="dashboardBadge" style="display: none;">!</span>
       </div>
-      <div class="sidebar-item" onclick="window.switchTab('products'); window.closeMenu()">
+      <div class="sidebar-item" onclick="switchTab('products'); closeMenu()">
         <i class="fas fa-box"></i>
         <span>Produits</span>
+        <span class="badge badge-danger" id="productBadge" style="display: none;"></span>
       </div>
-      <div class="sidebar-item" onclick="window.switchTab('inventory'); window.closeMenu()">
+      <div class="sidebar-item" onclick="switchTab('inventory'); closeMenu()">
         <i class="fas fa-warehouse"></i>
         <span>Stocks</span>
+        <span class="badge badge-danger" id="inventoryBadge" style="display: none;"></span>
       </div>
-      <div class="sidebar-item" onclick="window.switchTab('sheets'); window.closeMenu()">
+      <div class="sidebar-item" onclick="switchTab('sheets'); closeMenu()">
         <i class="fas fa-file-alt"></i>
         <span>Fiches produits</span>
       </div>
-      <div class="sidebar-item" onclick="window.switchTab('calendar'); window.closeMenu()">
+      <div class="sidebar-item" onclick="switchTab('calendar'); closeMenu()">
         <i class="fas fa-calendar"></i>
         <span>Calendrier</span>
+        <span class="badge badge-info" id="calendarBadge" style="display: none;"></span>
       </div>
-      <div class="sidebar-item" onclick="window.switchTab('stats'); window.closeMenu()">
+      <div class="sidebar-item" onclick="switchTab('stats'); closeMenu()">
         <i class="fas fa-chart-pie"></i>
         <span>Statistiques</span>
       </div>
-      <div class="sidebar-item" onclick="window.switchTab('clients'); window.closeMenu()">
+      <div class="sidebar-item" onclick="switchTab('clients'); closeMenu()">
         <i class="fas fa-users"></i>
         <span>Clients</span>
+        <span class="badge" id="clientsBadge" style="display: none;"></span>
+      </div>
+      <div class="sidebar-item" onclick="switchTab('import'); closeMenu()">
+        <i class="fas fa-file-import"></i>
+        <span>Import/Export</span>
+      </div>
+      <div class="sidebar-item" onclick="switchTab('reports'); closeMenu()">
+        <i class="fas fa-file-pdf"></i>
+        <span>Rapports</span>
       </div>
     </div>
     
     <div class="sidebar-footer">
-      <div class="sidebar-item" onclick="window.toggleDark(); window.closeMenu()">
+      <div class="sidebar-item" onclick="toggleDark(); closeMenu()">
         <i class="fas fa-moon"></i>
         <span>Mode sombre</span>
+      </div>
+      <div class="sidebar-item" onclick="showSettings()">
+        <i class="fas fa-cog"></i>
+        <span>Paramètres</span>
       </div>
     </div>
   </div>
@@ -698,7 +931,7 @@ tr:hover td {
   <!-- Top Bar -->
   <div class="top-bar">
     <div class="top-bar-left">
-      <button class="menu-btn" onclick="window.toggleMenu()">
+      <button class="menu-btn" onclick="toggleMenu()">
         <i class="fas fa-bars"></i>
       </button>
       <div class="logo">
@@ -707,35 +940,44 @@ tr:hover td {
       </div>
       <span class="page-title" id="pageTitle">Tableau de bord</span>
     </div>
-    <button class="theme-btn" onclick="window.toggleDark()">
-      <i class="fas fa-moon"></i>
-    </button>
+    <div class="d-flex align-center gap-2">
+      <button class="theme-btn" onclick="quickAddGain()">
+        <i class="fas fa-plus-circle"></i>
+      </button>
+      <button class="theme-btn" onclick="toggleDark()">
+        <i class="fas fa-moon"></i>
+      </button>
+    </div>
   </div>
 
   <!-- Contenu Principal -->
   <div class="main-content">
-    <!-- Tableau de bord -->
+    <!-- Tableau de bord amélioré -->
     <div id="tab-dashboard" class="tab-content active">
-      <!-- Sélecteur de personne -->
+      <!-- Sélecteur de personne avec stats -->
       <div class="grid-3" style="margin-bottom: 20px;">
-        <button onclick="window.showPerson('victor')" id="victor-toggle" class="btn active" style="background: var(--victor-color); opacity: 0.9;">
+        <button onclick="showPerson('victor')" id="victor-toggle" class="btn active" style="background: var(--victor-color);">
           <i class="fas fa-user"></i> Victor
+          <span class="badge" id="victorQuickStats">0 €</span>
         </button>
-        <button onclick="window.showPerson('arthur')" id="arthur-toggle" class="btn" style="background: var(--arthur-color); opacity: 0.9;">
+        <button onclick="showPerson('arthur')" id="arthur-toggle" class="btn" style="background: var(--arthur-color);">
           <i class="fas fa-user"></i> Arthur
+          <span class="badge" id="arthurQuickStats">0 €</span>
         </button>
-        <button onclick="window.showBoth()" id="both-toggle" class="btn" style="background: var(--accent);">
+        <button onclick="showBoth()" id="both-toggle" class="btn" style="background: var(--accent);">
           <i class="fas fa-users"></i> Les deux
+          <span class="badge" id="bothQuickStats">0 €</span>
         </button>
       </div>
 
-      <!-- Formulaire gains -->
+      <!-- Formulaire gains amélioré -->
       <div class="grid-2">
         <div class="card">
           <div class="card-title">
             <i class="fas fa-user"></i> Victor - Ajouter un gain
+            <span class="badge badge-info">Aujourd'hui</span>
           </div>
-          <form onsubmit="window.addGain(event, 'victor')">
+          <form onsubmit="addGain(event, 'victor')">
             <div class="form-group">
               <input type="date" id="victor-date" required>
             </div>
@@ -745,14 +987,21 @@ tr:hover td {
             <div class="form-group">
               <input type="text" id="victor-description" placeholder="Description">
             </div>
+            <div class="form-group">
+              <select id="victor-category">
+                <option value="vente">Vente</option>
+                <option value="prestation">Prestation</option>
+                <option value="autre">Autre</option>
+              </select>
+            </div>
             <button type="submit" class="btn btn-block" style="background: var(--victor-color);">
               <i class="fas fa-plus-circle"></i> Ajouter
             </button>
           </form>
-          <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+          <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--border);">
             <div style="display: flex; justify-content: space-between;">
               <span style="font-weight: 600;">Total Victor:</span>
-              <span style="font-weight: 700; color: var(--victor-color);" id="victor-total">0 €</span>
+              <span style="font-weight: 700; font-size: 24px; color: var(--victor-color);" id="victor-total">0 €</span>
             </div>
           </div>
         </div>
@@ -760,8 +1009,9 @@ tr:hover td {
         <div class="card">
           <div class="card-title">
             <i class="fas fa-user"></i> Arthur - Ajouter un gain
+            <span class="badge badge-success">Aujourd'hui</span>
           </div>
-          <form onsubmit="window.addGain(event, 'arthur')">
+          <form onsubmit="addGain(event, 'arthur')">
             <div class="form-group">
               <input type="date" id="arthur-date" required>
             </div>
@@ -771,20 +1021,27 @@ tr:hover td {
             <div class="form-group">
               <input type="text" id="arthur-description" placeholder="Description">
             </div>
+            <div class="form-group">
+              <select id="arthur-category">
+                <option value="vente">Vente</option>
+                <option value="prestation">Prestation</option>
+                <option value="autre">Autre</option>
+              </select>
+            </div>
             <button type="submit" class="btn btn-block" style="background: var(--arthur-color);">
               <i class="fas fa-plus-circle"></i> Ajouter
             </button>
           </form>
-          <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+          <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--border);">
             <div style="display: flex; justify-content: space-between;">
               <span style="font-weight: 600;">Total Arthur:</span>
-              <span style="font-weight: 700; color: var(--arthur-color);" id="arthur-total">0 €</span>
+              <span style="font-weight: 700; font-size: 24px; color: var(--arthur-color);" id="arthur-total">0 €</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Stats rapides -->
+      <!-- Stats rapides améliorées -->
       <div class="grid-4">
         <div class="stat-card">
           <div class="stat-icon">
@@ -816,30 +1073,43 @@ tr:hover td {
         </div>
       </div>
 
-      <!-- Graphique -->
+      <!-- Graphique amélioré -->
       <div class="card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
           <div class="card-title" style="margin-bottom: 0;">
             <i class="fas fa-chart-line"></i> Évolution des gains
           </div>
-          <select id="period" onchange="window.drawChart()" style="width: auto; padding: 10px 16px;">
-            <option value="today">Aujourd'hui</option>
-            <option value="7">7 derniers jours</option>
-            <option value="30">30 derniers jours</option>
-            <option value="month">Ce mois</option>
-            <option value="year">Cette année</option>
-            <option value="all">Tout</option>
-          </select>
+          <div class="d-flex gap-2">
+            <select id="period" onchange="drawChart()" style="width: auto; padding: 12px 20px;">
+              <option value="today">Aujourd'hui</option>
+              <option value="7" selected>7 derniers jours</option>
+              <option value="30">30 derniers jours</option>
+              <option value="month">Ce mois</option>
+              <option value="year">Cette année</option>
+              <option value="all">Tout</option>
+            </select>
+            <button onclick="exportChart()" class="btn-sm" style="background: var(--success);">
+              <i class="fas fa-download"></i>
+            </button>
+          </div>
         </div>
-        <div style="position: relative; height: 300px;">
+        <div style="position: relative; height: 350px;">
           <canvas id="chart"></canvas>
         </div>
       </div>
 
-      <!-- Historique -->
+      <!-- Historique avec filtres -->
       <div class="card">
-        <div class="card-title">
-          <i class="fas fa-history"></i> Derniers gains
+        <div class="d-flex justify-between align-center mb-3">
+          <div class="card-title" style="margin-bottom: 0;">
+            <i class="fas fa-history"></i> Derniers gains
+          </div>
+          <div class="d-flex gap-2">
+            <input type="text" id="historySearch" placeholder="Rechercher..." onkeyup="filterHistory()" style="width: 200px;">
+            <button onclick="exportHistory()" class="btn-sm" style="background: var(--success);">
+              <i class="fas fa-file-export"></i> Export
+            </button>
+          </div>
         </div>
         <div class="table-responsive">
           <table>
@@ -847,9 +1117,10 @@ tr:hover td {
               <tr>
                 <th>Date</th>
                 <th>Personne</th>
+                <th>Catégorie</th>
                 <th>Description</th>
                 <th>Montant</th>
-                <th>Action</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody id="history-table-body"></tbody>
@@ -858,13 +1129,13 @@ tr:hover td {
       </div>
     </div>
 
-    <!-- Onglet Produits -->
+    <!-- Onglet Produits amélioré -->
     <div id="tab-products" class="tab-content">
       <div class="card">
         <div class="card-title">
           <i class="fas fa-box"></i> Ajouter un produit
         </div>
-        <form onsubmit="window.addProduct(event)">
+        <form onsubmit="addProduct(event)">
           <div class="grid-3">
             <input type="text" id="product-name" placeholder="Nom du produit" required>
             <input type="number" id="product-price" placeholder="Prix (€)" step="0.01" required>
@@ -874,8 +1145,12 @@ tr:hover td {
               <option>Vêtements</option>
               <option>Alimentation</option>
               <option>Maison</option>
+              <option>Sports</option>
+              <option>Livres</option>
+              <option>Jouets</option>
               <option>Autre</option>
             </select>
+            <input type="text" id="product-sku" placeholder="SKU (référence)">
             <button type="submit" class="btn" style="background: var(--success);">
               <i class="fas fa-save"></i> Ajouter
             </button>
@@ -884,14 +1159,26 @@ tr:hover td {
       </div>
       
       <div class="card">
-        <div class="card-title">
-          <i class="fas fa-boxes"></i> Catalogue produits
+        <div class="d-flex justify-between align-center mb-3">
+          <div class="card-title" style="margin-bottom: 0;">
+            <i class="fas fa-boxes"></i> Catalogue produits
+          </div>
+          <div class="d-flex gap-2">
+            <select id="productFilter" onchange="filterProducts()" style="width: 150px;">
+              <option value="all">Toutes catégories</option>
+              <option value="Électronique">Électronique</option>
+              <option value="Vêtements">Vêtements</option>
+              <option value="Alimentation">Alimentation</option>
+              <option value="Maison">Maison</option>
+            </select>
+            <input type="text" id="productSearch" placeholder="Rechercher..." onkeyup="filterProducts()">
+          </div>
         </div>
         <div id="products-list" class="product-grid"></div>
       </div>
     </div>
 
-    <!-- Onglet Stocks -->
+    <!-- Onglet Stocks amélioré -->
     <div id="tab-inventory" class="tab-content">
       <div class="grid-4">
         <div class="stat-card">
@@ -917,20 +1204,28 @@ tr:hover td {
       </div>
       
       <div class="card">
-        <div class="card-title">
-          <i class="fas fa-clipboard-list"></i> État des stocks
+        <div class="d-flex justify-between align-center mb-3">
+          <div class="card-title" style="margin-bottom: 0;">
+            <i class="fas fa-clipboard-list"></i> État des stocks
+          </div>
+          <div>
+            <button onclick="alertLowStock()" class="btn-sm" style="background: var(--warning);">
+              <i class="fas fa-bell"></i> Alerte stock faible
+            </button>
+          </div>
         </div>
         <div class="table-responsive">
           <table>
             <thead>
               <tr>
                 <th>Produit</th>
+                <th>SKU</th>
                 <th>Catégorie</th>
                 <th>Prix</th>
                 <th>Quantité</th>
                 <th>Valeur</th>
                 <th>Statut</th>
-                <th>Action</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody id="stock-table-body"></tbody>
@@ -949,13 +1244,13 @@ tr:hover td {
       </div>
     </div>
 
-    <!-- Onglet Calendrier -->
+    <!-- Onglet Calendrier amélioré -->
     <div id="tab-calendar" class="tab-content">
       <div class="card">
         <div class="card-title">
           <i class="fas fa-calendar-plus"></i> Ajouter un événement
         </div>
-        <form onsubmit="window.addEvent(event)">
+        <form onsubmit="addEvent(event)">
           <div class="grid-3">
             <input type="text" id="event-title" placeholder="Titre" required>
             <input type="date" id="event-date" required>
@@ -965,6 +1260,12 @@ tr:hover td {
               <option value="arthur">Arthur</option>
             </select>
             <input type="text" id="event-time" placeholder="Heure (ex: 14:30)">
+            <select id="event-type">
+              <option value="rdv">Rendez-vous</option>
+              <option value="livraison">Livraison</option>
+              <option value="reunion">Réunion</option>
+              <option value="autre">Autre</option>
+            </select>
             <button type="submit" class="btn">
               <i class="fas fa-plus"></i> Ajouter
             </button>
@@ -973,8 +1274,14 @@ tr:hover td {
       </div>
       
       <div class="card">
-        <div class="card-title">
-          <i class="fas fa-calendar"></i> Mars 2026
+        <div class="d-flex justify-between align-center mb-3">
+          <div class="card-title" style="margin-bottom: 0;">
+            <i class="fas fa-calendar"></i> Mars 2026
+          </div>
+          <div>
+            <button onclick="previousMonth()" class="btn-sm"><i class="fas fa-chevron-left"></i></button>
+            <button onclick="nextMonth()" class="btn-sm"><i class="fas fa-chevron-right"></i></button>
+          </div>
         </div>
         <div class="calendar-header">
           <div class="calendar-weekday">Lun</div>
@@ -999,8 +1306,9 @@ tr:hover td {
                 <th>Date</th>
                 <th>Heure</th>
                 <th>Titre</th>
+                <th>Type</th>
                 <th>Personne</th>
-                <th>Action</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody id="events-table-body"></tbody>
@@ -1009,7 +1317,7 @@ tr:hover td {
       </div>
     </div>
 
-    <!-- Onglet Statistiques -->
+    <!-- Onglet Statistiques amélioré -->
     <div id="tab-stats" class="tab-content">
       <div class="grid-4">
         <div class="stat-card">
@@ -1039,7 +1347,7 @@ tr:hover td {
           <div class="card-title">
             <i class="fas fa-chart-pie"></i> Répartition des gains
           </div>
-          <div style="position: relative; height: 250px;">
+          <div style="position: relative; height: 300px;">
             <canvas id="pie-chart"></canvas>
           </div>
         </div>
@@ -1047,24 +1355,51 @@ tr:hover td {
           <div class="card-title">
             <i class="fas fa-chart-bar"></i> Performance mensuelle
           </div>
-          <div style="position: relative; height: 250px;">
+          <div style="position: relative; height: 300px;">
             <canvas id="monthly-chart"></canvas>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">
+          <i class="fas fa-trophy"></i> Objectifs
+        </div>
+        <div class="grid-2">
+          <div>
+            <h3>Victor - Objectif mensuel: 2000 €</h3>
+            <div class="progress-container" style="position: relative; margin-top: 10px;">
+              <div class="progress-bar" id="victor-progress" style="width: 0%;"></div>
+            </div>
+            <p id="victor-goal">0 € / 2000 €</p>
+          </div>
+          <div>
+            <h3>Arthur - Objectif mensuel: 2000 €</h3>
+            <div class="progress-container" style="position: relative; margin-top: 10px;">
+              <div class="progress-bar" id="arthur-progress" style="width: 0%; background: var(--arthur-color);"></div>
+            </div>
+            <p id="arthur-goal">0 € / 2000 €</p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Onglet Clients -->
+    <!-- Onglet Clients amélioré -->
     <div id="tab-clients" class="tab-content">
       <div class="card">
         <div class="card-title">
           <i class="fas fa-user-plus"></i> Ajouter un client
         </div>
-        <form onsubmit="window.addClient(event)">
+        <form onsubmit="addClient(event)">
           <div class="grid-3">
             <input type="text" id="client-name" placeholder="Nom complet" required>
             <input type="email" id="client-email" placeholder="Email">
             <input type="text" id="client-phone" placeholder="Téléphone">
+            <input type="text" id="client-company" placeholder="Entreprise">
+            <select id="client-type">
+              <option value="particulier">Particulier</option>
+              <option value="professionnel">Professionnel</option>
+            </select>
             <button type="submit" class="btn" style="background: var(--success);">
               <i class="fas fa-user-plus"></i> Ajouter
             </button>
@@ -1073,405 +1408,502 @@ tr:hover td {
       </div>
       
       <div class="card">
-        <div class="card-title">
-          <i class="fas fa-users"></i> Liste des clients
+        <div class="d-flex justify-between align-center mb-3">
+          <div class="card-title" style="margin-bottom: 0;">
+            <i class="fas fa-users"></i> Liste des clients
+          </div>
+          <input type="text" id="clientSearch" placeholder="Rechercher un client..." onkeyup="filterClients()">
         </div>
         <div id="clients-list" class="clients-grid"></div>
       </div>
+    </div>
+
+    <!-- Nouvel Onglet Import/Export -->
+    <div id="tab-import" class="tab-content">
+      <div class="card">
+        <div class="card-title">
+          <i class="fas fa-file-import"></i> Import/Export de données
+        </div>
+        <div class="grid-2">
+          <div>
+            <h3>Exporter</h3>
+            <button onclick="exportData('csv')" class="btn btn-block mb-2">
+              <i class="fas fa-file-csv"></i> Exporter en CSV
+            </button>
+            <button onclick="exportData('json')" class="btn btn-block mb-2">
+              <i class="fas fa-file-code"></i> Exporter en JSON
+            </button>
+            <button onclick="exportData('pdf')" class="btn btn-block">
+              <i class="fas fa-file-pdf"></i> Exporter en PDF
+            </button>
+          </div>
+          <div>
+            <h3>Importer</h3>
+            <input type="file" id="importFile" accept=".json,.csv" class="mb-2">
+            <button onclick="importData()" class="btn btn-block">
+              <i class="fas fa-file-import"></i> Importer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nouvel Onglet Rapports -->
+    <div id="tab-reports" class="tab-content">
+      <div class="card">
+        <div class="card-title">
+          <i class="fas fa-file-pdf"></i> Générer des rapports
+        </div>
+        <div class="grid-3">
+          <div class="stat-card" onclick="generateReport('daily')">
+            <i class="fas fa-calendar-day" style="font-size: 32px;"></i>
+            <h3>Rapport journalier</h3>
+            <p>Gains du jour</p>
+          </div>
+          <div class="stat-card" onclick="generateReport('weekly')">
+            <i class="fas fa-calendar-week" style="font-size: 32px;"></i>
+            <h3>Rapport hebdomadaire</h3>
+            <p>Gains de la semaine</p>
+          </div>
+          <div class="stat-card" onclick="generateReport('monthly')">
+            <i class="fas fa-calendar-alt" style="font-size: 32px;"></i>
+            <h3>Rapport mensuel</h3>
+            <p>Gains du mois</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Paramètres -->
+  <div class="modal" id="settingsModal">
+    <div class="modal-content">
+      <h2>Paramètres</h2>
+      <div class="form-group">
+        <label>Devise</label>
+        <select id="currencySetting" onchange="updateSettings()">
+          <option value="€">Euro (€)</option>
+          <option value="$">Dollar ($)</option>
+          <option value="£">Livre (£)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Notifications</label>
+        <select id="notificationsSetting" onchange="updateSettings()">
+          <option value="all">Toutes</option>
+          <option value="important">Importantes uniquement</option>
+          <option value="none">Désactivées</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Rafraîchissement auto</label>
+        <select id="refreshSetting" onchange="updateSettings()">
+          <option value="0">Désactivé</option>
+          <option value="30">30 secondes</option>
+          <option value="60">1 minute</option>
+          <option value="300">5 minutes</option>
+        </select>
+      </div>
+      <button onclick="closeSettings()" class="btn btn-block">Fermer</button>
     </div>
   </div>
 </div>
 
 <script>
-// ============================================
-// SUPABASE CONFIGURATION - CONNEXION DIRECTE
-// ============================================
-const SUPABASE_URL = 'https://pytjwprzgljaeqfoixac.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_secret_b3jpz6DlJRYG4grwkYPayg_SqxHVoAo';
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-// ============================================
-// DONNÉES GLOBALES (VIDES AU DÉPART)
-// ============================================
-let victorGains = [];
-let arthurGains = [];
-let products = [];
-let events = [];
-let clients = [];
+// ============ DONNÉES ============
+let victorGains = JSON.parse(localStorage.getItem("victorGains") || "[]");
+let arthurGains = JSON.parse(localStorage.getItem("arthurGains") || "[]");
+let products = JSON.parse(localStorage.getItem("products") || "[]");
+let events = JSON.parse(localStorage.getItem("events") || "[]");
+let clients = JSON.parse(localStorage.getItem("clients") || "[]");
+let categories = JSON.parse(localStorage.getItem("categories") || '["vente","prestation","autre"]');
 let currentView = 'both';
+let settings = JSON.parse(localStorage.getItem("settings") || '{"currency":"€","notifications":"all","refresh":0}');
+let autoRefreshInterval = null;
 
-// ============================================
-// CHARGEMENT DES DONNÉES DEPUIS SUPABASE
-// ============================================
-async function loadAllData() {
-  try {
-    // Charger les gains
-    const { data: gainsData, error: gainsError } = await supabase
-      .from('gains')
-      .select('*')
-      .order('date', { ascending: false });
-    
-    if (!gainsError) {
-      victorGains = gainsData.filter(g => g.person === 'victor') || [];
-      arthurGains = gainsData.filter(g => g.person === 'arthur') || [];
-    } else {
-      console.error('Erreur chargement gains:', gainsError);
-    }
+// ============ INITIALISATION ============
+const today = new Date().toISOString().split('T')[0];
+if(document.getElementById('victor-date')) document.getElementById('victor-date').value = today;
+if(document.getElementById('arthur-date')) document.getElementById('arthur-date').value = today;
+if(document.getElementById('event-date')) document.getElementById('event-date').value = today;
 
-    // Charger les produits
-    const { data: productsData, error: productsError } = await supabase
-      .from('products')
-      .select('*')
-      .order('name');
-    
-    if (!productsError) products = productsData || [];
+// Charts
+let chart, pieChart, monthlyChart;
 
-    // Charger les événements
-    const { data: eventsData, error: eventsError } = await supabase
-      .from('events')
-      .select('*')
-      .order('event_date');
-    
-    if (!eventsError) events = eventsData || [];
+// ============ NOUVELLES FONCTIONS AMÉLIORÉES ============
 
-    // Charger les clients
-    const { data: clientsData, error: clientsError } = await supabase
-      .from('clients')
-      .select('*')
-      .order('name');
-    
-    if (!clientsError) clients = clientsData || [];
+// Fonction de notification
+function showToast(message, type = 'success') {
+  const toast = document.getElementById('toast');
+  const toastMessage = document.getElementById('toastMessage');
+  toast.className = 'toast';
+  if (type === 'error') toast.classList.add('error');
+  if (type === 'warning') toast.classList.add('warning');
+  toast.classList.add('show');
+  toastMessage.textContent = message;
+  
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3000);
+}
 
-    console.log('Données chargées depuis Supabase');
-  } catch (e) {
-    console.error('Erreur chargement:', e);
+// Loader
+function showLoader(show = true) {
+  const loader = document.getElementById('loader');
+  if (show) {
+    loader.classList.add('show');
+  } else {
+    loader.classList.remove('show');
   }
 }
 
-// ============================================
-// FONCTIONS GAINS (SUPABASE)
-// ============================================
-async function addGain(e, person) {
-  e.preventDefault();
-  
-  const gain = {
-    date: document.getElementById(`${person}-date`).value,
-    amount: Number(document.getElementById(`${person}-amount`).value),
-    description: document.getElementById(`${person}-description`).value || "Gain",
-    person: person
-  };
-  
-  const { error } = await supabase
-    .from('gains')
-    .insert([gain]);
-  
-  if (error) {
-    console.error('Erreur ajout gain:', error);
-    alert('Erreur: ' + error.message);
-  } else {
-    await loadAllData();
+// Progress bar
+function updateProgressBar(percent) {
+  const bar = document.getElementById('progressBar');
+  bar.style.width = percent + '%';
+}
+
+// Quick add gain
+function quickAddGain() {
+  const amount = prompt("Montant du gain (€):");
+  if (amount) {
+    const person = confirm("Pour Victor ? OK pour Victor, Annuler pour Arthur") ? 'victor' : 'arthur';
+    const gain = {
+      date: today,
+      amount: Number(amount),
+      description: "Saisie rapide",
+      person: person,
+      category: "autre"
+    };
+    
+    if (person === 'victor') {
+      victorGains.push(gain);
+      localStorage.setItem("victorGains", JSON.stringify(victorGains));
+    } else {
+      arthurGains.push(gain);
+      localStorage.setItem("arthurGains", JSON.stringify(arthurGains));
+    }
+    
     refresh();
     drawChart();
     updateStats();
     updateHistory();
-    e.target.reset();
-    document.getElementById(`${person}-date`).value = new Date().toISOString().split('T')[0];
+    showToast(`Gain de ${amount}€ ajouté pour ${person}`);
   }
 }
 
-async function deleteGain(id) {
-  if (confirm('Supprimer ce gain ?')) {
-    const { error } = await supabase
-      .from('gains')
-      .delete()
-      .match({ id });
+// Export functions
+function exportChart() {
+  const canvas = document.getElementById('chart');
+  const link = document.createElement('a');
+  link.download = 'graphique-gains.png';
+  link.href = canvas.toDataURL();
+  link.click();
+  showToast("Graphique exporté !");
+}
+
+function exportData(format) {
+  showLoader(true);
+  
+  setTimeout(() => {
+    const data = {
+      victorGains,
+      arthurGains,
+      products,
+      events,
+      clients
+    };
     
-    if (!error) {
-      await loadAllData();
+    if (format === 'json') {
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `gestion-pro-${today}.json`;
+      a.click();
+    } else if (format === 'csv') {
+      let csv = "Type,Date,Personne,Montant,Description\n";
+      
+      [...victorGains.map(g => ({...g, type: 'Gain'})), 
+       ...arthurGains.map(g => ({...g, type: 'Gain'}))]
+        .forEach(g => {
+          csv += `${g.type},${g.date},${g.person},${g.amount},${g.description}\n`;
+        });
+      
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `gestion-pro-${today}.csv`;
+      a.click();
+    } else if (format === 'pdf') {
+      window.print();
+    }
+    
+    showLoader(false);
+    showToast(`Données exportées en ${format.toUpperCase()}`);
+  }, 500);
+}
+
+function importData() {
+  const fileInput = document.getElementById('importFile');
+  const file = fileInput.files[0];
+  
+  if (!file) {
+    showToast("Veuillez sélectionner un fichier", "error");
+    return;
+  }
+  
+  showLoader(true);
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      
+      if (data.victorGains) victorGains = data.victorGains;
+      if (data.arthurGains) arthurGains = data.arthurGains;
+      if (data.products) products = data.products;
+      if (data.events) events = data.events;
+      if (data.clients) clients = data.clients;
+      
+      localStorage.setItem("victorGains", JSON.stringify(victorGains));
+      localStorage.setItem("arthurGains", JSON.stringify(arthurGains));
+      localStorage.setItem("products", JSON.stringify(products));
+      localStorage.setItem("events", JSON.stringify(events));
+      localStorage.setItem("clients", JSON.stringify(clients));
+      
       refresh();
       drawChart();
-      updateStats();
-      updateHistory();
+      updateProducts();
+      updateStock();
+      updateCalendar();
+      updateClients();
+      
+      showToast("Données importées avec succès !");
+    } catch (error) {
+      showToast("Erreur lors de l'import", "error");
     }
+    
+    showLoader(false);
+  };
+  
+  reader.readAsText(file);
+}
+
+// Filtres
+function filterHistory() {
+  const search = document.getElementById('historySearch').value.toLowerCase();
+  const all = [...victorGains.map(g=>({...g, person:'Victor'})), 
+               ...arthurGains.map(g=>({...g, person:'Arthur'}))]
+    .sort((a,b)=>new Date(b.date)-new Date(a.date));
+  
+  const filtered = search ? all.filter(g => 
+    g.description?.toLowerCase().includes(search) ||
+    g.person.toLowerCase().includes(search) ||
+    g.amount.toString().includes(search)
+  ) : all;
+  
+  document.getElementById('history-table-body').innerHTML = filtered.slice(0,20).map(g => 
+    `<tr>
+      <td>${g.date}</td>
+      <td><span class="badge ${g.person==='Victor'?'badge-info':'badge-success'}">${g.person}</span></td>
+      <td><span class="badge">${g.category || 'autre'}</span></td>
+      <td>${g.description||'-'}</td>
+      <td><strong>${g.amount.toFixed(2)} €</strong></td>
+      <td>
+        <button onclick="deleteGain(${g.id}, '${g.person.toLowerCase()}')" class="btn-sm" style="background: var(--danger);">
+          <i class="fas fa-trash"></i>
+        </button>
+      </td>
+    </tr>`
+  ).join('');
+}
+
+function filterProducts() {
+  const search = document.getElementById('productSearch')?.value.toLowerCase() || '';
+  const category = document.getElementById('productFilter')?.value || 'all';
+  
+  const filtered = products.filter(p => 
+    (category === 'all' || p.category === category) &&
+    (p.name.toLowerCase().includes(search) || p.sku?.toLowerCase().includes(search))
+  );
+  
+  document.getElementById('products-list').innerHTML = filtered.map(p => `
+    <div class="product-card">
+      <div style="display: flex; justify-content: space-between; align-items: start;">
+        <h3 style="margin: 0 0 10px 0;">${p.name}</h3>
+        <span class="badge badge-info">${p.category}</span>
+      </div>
+      <div style="font-size: 24px; font-weight: 700; margin: 10px 0; color: var(--accent);">
+        ${p.price.toFixed(2)} €
+      </div>
+      <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+        <span><i class="fas fa-cubes"></i> Stock:</span>
+        <span style="font-weight: 600;">${p.quantity}</span>
+      </div>
+      <div class="stock-bar">
+        <div class="stock-fill" style="width: ${Math.min(100, p.quantity)}%"></div>
+      </div>
+      <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button onclick="editProduct(${p.id})" class="btn-sm" style="background: var(--warning); flex: 1;">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button onclick="deleteProduct(${p.id})" class="btn-sm" style="background: var(--danger); flex: 1;">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterClients() {
+  const search = document.getElementById('clientSearch')?.value.toLowerCase() || '';
+  
+  const filtered = clients.filter(c => 
+    c.name.toLowerCase().includes(search) ||
+    c.email?.toLowerCase().includes(search) ||
+    c.phone?.includes(search)
+  );
+  
+  document.getElementById('clients-list').innerHTML = filtered.map(c => `
+    <div class="client-card">
+      <div style="display: flex; justify-content: space-between; align-items: start;">
+        <h3 style="margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px;">
+          <i class="fas fa-user-circle" style="color: var(--accent);"></i> ${c.name}
+        </h3>
+        <button onclick="deleteClient(${c.id})" class="btn-sm" style="background: var(--danger);">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <p style="margin: 8px 0; display: flex; align-items: center; gap: 10px;">
+        <i class="fas fa-envelope" style="color: var(--text-light);"></i> ${c.email || 'Non renseigné'}
+      </p>
+      <p style="margin: 8px 0; display: flex; align-items: center; gap: 10px;">
+        <i class="fas fa-phone" style="color: var(--text-light);"></i> ${c.phone || 'Non renseigné'}
+      </p>
+      <p style="margin: 8px 0; display: flex; align-items: center; gap: 10px;">
+        <i class="fas fa-building" style="color: var(--text-light);"></i> ${c.company || 'Non renseigné'}
+      </p>
+    </div>
+  `).join('');
+}
+
+// Alertes stock faible
+function alertLowStock() {
+  const lowStock = products.filter(p => p.quantity < 10);
+  if (lowStock.length > 0) {
+    let message = "Produits en stock faible :\n";
+    lowStock.forEach(p => {
+      message += `- ${p.name}: ${p.quantity} unités\n`;
+    });
+    alert(message);
+  } else {
+    showToast("Aucun produit en stock faible !");
   }
 }
 
-// ============================================
-// FONCTIONS PRODUITS (SUPABASE)
-// ============================================
-async function addProduct(e) {
+// Gestion des gains avec catégories
+function addGain(e, person) {
   e.preventDefault();
+  const gain = {
+    id: Date.now(),
+    date: document.getElementById(`${person}-date`).value,
+    amount: Number(document.getElementById(`${person}-amount`).value),
+    description: document.getElementById(`${person}-description`).value || "Gain",
+    person: person,
+    category: document.getElementById(`${person}-category`)?.value || "autre"
+  };
   
+  if (person === 'victor') { 
+    victorGains.push(gain); 
+    localStorage.setItem("victorGains", JSON.stringify(victorGains)); 
+  } else { 
+    arthurGains.push(gain); 
+    localStorage.setItem("arthurGains", JSON.stringify(arthurGains)); 
+  }
+  
+  e.target.reset();
+  document.getElementById(`${person}-date`).value = today;
+  
+  refresh(); 
+  drawChart(); 
+  updateStats(); 
+  updateHistory();
+  showToast(`Gain de ${gain.amount}€ ajouté !`);
+}
+
+function deleteGain(id, person) {
+  if (person === 'victor') {
+    victorGains = victorGains.filter(g => g.id !== id);
+    localStorage.setItem("victorGains", JSON.stringify(victorGains));
+  } else {
+    arthurGains = arthurGains.filter(g => g.id !== id);
+    localStorage.setItem("arthurGains", JSON.stringify(arthurGains));
+  }
+  
+  refresh();
+  drawChart();
+  updateStats();
+  updateHistory();
+  showToast("Gain supprimé", "warning");
+}
+
+// Produits améliorés
+function addProduct(e) {
+  e.preventDefault();
   const product = {
+    id: Date.now(),
     name: document.getElementById('product-name').value,
     price: Number(document.getElementById('product-price').value),
     quantity: Number(document.getElementById('product-quantity').value),
-    category: document.getElementById('product-category').value
+    category: document.getElementById('product-category').value,
+    sku: document.getElementById('product-sku').value || `SKU-${Date.now()}`,
+    createdAt: today
   };
   
-  const { error } = await supabase
-    .from('products')
-    .insert([product]);
+  products.push(product);
+  localStorage.setItem("products", JSON.stringify(products));
+  e.target.reset();
   
-  if (error) {
-    console.error('Erreur ajout produit:', error);
-    alert('Erreur: ' + error.message);
-  } else {
-    await loadAllData();
-    updateProducts();
-    updateStock();
-    updateSheets();
-    e.target.reset();
-  }
-}
-
-async function updateProductQuantity(id, newQuantity) {
-  const { error } = await supabase
-    .from('products')
-    .update({ quantity: newQuantity })
-    .match({ id });
-  
-  if (!error) {
-    await loadAllData();
-    updateProducts();
-    updateStock();
-    updateSheets();
-  }
-}
-
-async function deleteProduct(id) {
-  if (confirm('Supprimer ce produit ?')) {
-    const { error } = await supabase
-      .from('products')
-      .delete()
-      .match({ id });
-    
-    if (!error) {
-      await loadAllData();
-      updateProducts();
-      updateStock();
-      updateSheets();
-    }
-  }
-}
-
-// Remplacer editProduct et addStock par updateProductQuantity
-function editProduct(id) {
-  const p = products.find(p => p.id === id);
-  const q = prompt("Nouvelle quantité:", p.quantity);
-  if (q) {
-    updateProductQuantity(id, Number(q));
-  }
-}
-
-function addStock(id) {
-  const p = products.find(p => p.id === id);
-  updateProductQuantity(id, p.quantity + 1);
-}
-
-// ============================================
-// FONCTIONS ÉVÉNEMENTS (SUPABASE)
-// ============================================
-async function addEvent(e) {
-  e.preventDefault();
-  
-  const event = {
-    title: document.getElementById('event-title').value,
-    event_date: document.getElementById('event-date').value,
-    event_time: document.getElementById('event-time').value || null,
-    person: document.getElementById('event-person').value
-  };
-  
-  const { error } = await supabase
-    .from('events')
-    .insert([event]);
-  
-  if (error) {
-    console.error('Erreur ajout événement:', error);
-    alert('Erreur: ' + error.message);
-  } else {
-    await loadAllData();
-    updateCalendar();
-    updateEventsList();
-    e.target.reset();
-    document.getElementById('event-date').value = new Date().toISOString().split('T')[0];
-  }
-}
-
-async function deleteEvent(id) {
-  if (confirm('Supprimer cet événement ?')) {
-    const { error } = await supabase
-      .from('events')
-      .delete()
-      .match({ id });
-    
-    if (!error) {
-      await loadAllData();
-      updateCalendar();
-      updateEventsList();
-    }
-  }
-}
-
-// ============================================
-// FONCTIONS CLIENTS (SUPABASE)
-// ============================================
-async function addClient(e) {
-  e.preventDefault();
-  
-  const client = {
-    name: document.getElementById('client-name').value,
-    email: document.getElementById('client-email').value || null,
-    phone: document.getElementById('client-phone').value || null
-  };
-  
-  const { error } = await supabase
-    .from('clients')
-    .insert([client]);
-  
-  if (error) {
-    console.error('Erreur ajout client:', error);
-    alert('Erreur: ' + error.message);
-  } else {
-    await loadAllData();
-    updateClients();
-    e.target.reset();
-  }
-}
-
-async function deleteClient(id) {
-  if (confirm('Supprimer ce client ?')) {
-    const { error } = await supabase
-      .from('clients')
-      .delete()
-      .match({ id });
-    
-    if (!error) {
-      await loadAllData();
-      updateClients();
-    }
-  }
-}
-
-// ============================================
-// FONCTIONS DE CALCUL
-// ============================================
-function sum(gainsArray, filter) {
-  return gainsArray.filter(filter).reduce((s, g) => s + (Number(g.amount) || 0), 0);
-}
-
-// ============================================
-// RAFRAÎCHISSEMENT DE L'AFFICHAGE
-// ============================================
-function refresh() {
-  const now = new Date();
-  const yesterday = new Date(now);
-  yesterday.setDate(now.getDate() - 1);
-  
-  const victorTotal = sum(victorGains, () => true);
-  const arthurTotal = sum(arthurGains, () => true);
-  const allGains = [...victorGains, ...arthurGains];
-  
-  if (document.getElementById("victor-total")) {
-    document.getElementById("victor-total").innerText = victorTotal.toFixed(2) + " €";
-  }
-  if (document.getElementById("arthur-total")) {
-    document.getElementById("arthur-total").innerText = arthurTotal.toFixed(2) + " €";
-  }
-  if (document.getElementById("total")) {
-    document.getElementById("total").innerText = (victorTotal + arthurTotal).toFixed(2) + " €";
-  }
-  if (document.getElementById("yesterday")) {
-    document.getElementById("yesterday").innerText = 
-      sum(allGains, g => new Date(g.date).toDateString() === yesterday.toDateString()).toFixed(2) + " €";
-  }
-  if (document.getElementById("week")) {
-    document.getElementById("week").innerText = 
-      sum(allGains, g => (now - new Date(g.date)) / 86400000 <= 7).toFixed(2) + " €";
-  }
-  if (document.getElementById("month")) {
-    document.getElementById("month").innerText = 
-      sum(allGains, g => {
-        const d = new Date(g.date);
-        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-      }).toFixed(2) + " €";
-  }
-}
-
-// ============================================
-// FONCTIONS D'AFFICHAGE
-// ============================================
-function updateHistory() {
-  const all = [...victorGains.map(g => ({ ...g, person: 'Victor' })), 
-               ...arthurGains.map(g => ({ ...g, person: 'Arthur' }))]
-    .sort((a, b) => new Date(b.date) - new Date(a.date))
-    .slice(0, 10);
-  
-  if (document.getElementById('history-table-body')) {
-    document.getElementById('history-table-body').innerHTML = all.map(g => 
-      `<tr>
-        <td>${g.date}</td>
-        <td><span class="badge ${g.person === 'Victor' ? 'badge-info' : 'badge-success'}">${g.person}</span></td>
-        <td>${g.description || '-'}</td>
-        <td><strong>${Number(g.amount).toFixed(2)} €</strong></td>
-        <td>
-          <button onclick="window.deleteGain(${g.id})" class="btn-sm" style="background: var(--danger);">
-            <i class="fas fa-trash"></i>
-          </button>
-        </td>
-      </tr>`
-    ).join('');
-  }
+  updateProducts();
+  updateStock();
+  updateSheets();
+  showToast(`Produit ${product.name} ajouté !`);
 }
 
 function updateProducts() {
-  if (document.getElementById('products-list')) {
-    document.getElementById('products-list').innerHTML = products.map(p => `
-      <div class="product-card">
-        <div style="display: flex; justify-content: space-between; align-items: start;">
-          <h3 style="margin: 0 0 10px 0;">${p.name}</h3>
-          <span class="badge badge-info">${p.category}</span>
-        </div>
-        <div style="font-size: 24px; font-weight: 700; margin: 10px 0; color: var(--accent);">
-          ${Number(p.price).toFixed(2)} €
-        </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-          <span><i class="fas fa-cubes"></i> Stock:</span>
-          <span style="font-weight: 600;">${p.quantity}</span>
-        </div>
-        <div class="stock-bar">
-          <div class="stock-fill" style="width: ${Math.min(100, p.quantity)}%"></div>
-        </div>
-        <div style="display: flex; gap: 10px; margin-top: 20px;">
-          <button onclick="window.editProduct(${p.id})" class="btn btn-sm" style="background: var(--warning); flex: 1;">
-            <i class="fas fa-edit"></i> Modifier
-          </button>
-          <button onclick="window.deleteProduct(${p.id})" class="btn btn-sm" style="background: var(--danger); flex: 1;">
-            <i class="fas fa-trash"></i> Suppr.
-          </button>
-        </div>
-      </div>
-    `).join('');
+  if(document.getElementById('products-list')) {
+    filterProducts();
   }
 }
 
 function updateStock() {
   const totalProducts = products.length;
-  const totalStock = products.reduce((s, p) => s + (p.quantity || 0), 0);
-  const lowStock = products.filter(p => p.quantity < 10).length;
-  const stockValue = products.reduce((s, p) => s + ((p.price || 0) * (p.quantity || 0)), 0);
+  const totalStock = products.reduce((s,p)=>s+p.quantity,0);
+  const lowStock = products.filter(p=>p.quantity<10).length;
+  const stockValue = products.reduce((s,p)=>s+(p.price*p.quantity),0);
   
-  if (document.getElementById('total-products')) document.getElementById('total-products').innerText = totalProducts;
-  if (document.getElementById('total-stock')) document.getElementById('total-stock').innerText = totalStock;
-  if (document.getElementById('low-stock')) document.getElementById('low-stock').innerText = lowStock;
-  if (document.getElementById('stock-value')) document.getElementById('stock-value').innerHTML = stockValue.toFixed(2) + ' €';
+  if(document.getElementById('total-products')) document.getElementById('total-products').innerText = totalProducts;
+  if(document.getElementById('total-stock')) document.getElementById('total-stock').innerText = totalStock;
+  if(document.getElementById('low-stock')) document.getElementById('low-stock').innerText = lowStock;
+  if(document.getElementById('stock-value')) document.getElementById('stock-value').innerHTML = stockValue.toFixed(2) + ' €';
   
-  if (document.getElementById('stock-table-body')) {
+  // Mettre à jour les badges
+  if(lowStock > 0) {
+    document.getElementById('inventoryBadge').style.display = 'inline';
+    document.getElementById('inventoryBadge').innerText = lowStock;
+  } else {
+    document.getElementById('inventoryBadge').style.display = 'none';
+  }
+  
+  if(document.getElementById('stock-table-body')) {
     document.getElementById('stock-table-body').innerHTML = products.map(p => `
       <tr>
         <td><strong>${p.name}</strong></td>
+        <td><span class="badge">${p.sku || '-'}</span></td>
         <td>${p.category}</td>
-        <td>${Number(p.price).toFixed(2)} €</td>
+        <td>${p.price.toFixed(2)} €</td>
         <td>
           <span class="badge ${p.quantity < 5 ? 'badge-danger' : p.quantity < 10 ? 'badge-warning' : 'badge-success'}">
             ${p.quantity}
@@ -1484,60 +1916,63 @@ function updateStock() {
             '<span class="badge badge-success">OK</span>'}
         </td>
         <td>
-          <button onclick="window.addStock(${p.id})" class="btn-sm" style="background: var(--success); padding: 8px 12px;">
-            <i class="fas fa-plus"></i>
-          </button>
+          <div style="display: flex; gap: 5px;">
+            <button onclick="addStock(${p.id})" class="btn-sm" style="background: var(--success);">
+              <i class="fas fa-plus"></i>
+            </button>
+            <button onclick="removeStock(${p.id})" class="btn-sm" style="background: var(--warning);">
+              <i class="fas fa-minus"></i>
+            </button>
+          </div>
         </td>
       </tr>
     `).join('');
   }
 }
 
-function updateSheets() {
-  if (document.getElementById('product-sheets')) {
-    document.getElementById('product-sheets').innerHTML = products.map(p => `
-      <div class="product-card">
-        <h3 style="color: var(--accent); margin-top: 0;">${p.name}</h3>
-        <p><i class="fas fa-tag"></i> <strong>Catégorie:</strong> ${p.category}</p>
-        <p><i class="fas fa-euro-sign"></i> <strong>Prix:</strong> ${Number(p.price).toFixed(2)} €</p>
-        <p><i class="fas fa-cubes"></i> <strong>Stock:</strong> ${p.quantity} unités</p>
-        <p><i class="fas fa-chart-line"></i> <strong>Valeur:</strong> ${(p.price * p.quantity).toFixed(2)} €</p>
-        <div class="stock-bar">
-          <div class="stock-fill ${p.quantity < 5 ? 'critical' : p.quantity < 10 ? 'low' : ''}" 
-               style="width: ${Math.min(100, p.quantity)}%"></div>
-        </div>
-      </div>
-    `).join('');
+function removeStock(id) {
+  const p = products.find(p=>p.id===id);
+  if(p.quantity > 0) {
+    p.quantity -= 1;
+    localStorage.setItem("products", JSON.stringify(products));
+    updateProducts();
+    updateStock();
+    updateSheets();
   }
 }
 
+// Calendrier amélioré
+let currentMonth = 2; // Mars
+let currentYear = 2026;
+
 function updateCalendar() {
-  if (!document.getElementById('calendar-view')) return;
+  if(!document.getElementById('calendar-view')) return;
   
   let html = '';
-  const firstDay = new Date(2026, 2, 1).getDay();
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const firstDay = new Date(currentYear, currentMonth, 1).getDay();
   let firstDayIndex = firstDay === 0 ? 6 : firstDay - 1;
   
-  for (let i = 0; i < firstDayIndex; i++) {
+  for(let i = 0; i < firstDayIndex; i++) {
     html += '<div class="calendar-day" style="background: transparent; border: none;"></div>';
   }
   
-  for (let d = 1; d <= 31; d++) {
-    const dateStr = `2026-03-${d.toString().padStart(2, '0')}`;
-    const dayEvents = events.filter(e => e.event_date === dateStr);
+  for(let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${currentYear}-${(currentMonth+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
+    const dayEvents = events.filter(e => e.date === dateStr);
     
-    html += `<div class="calendar-day">`;
+    html += `<div class="calendar-day" onclick="showDayEvents('${dateStr}')">`;
     html += `<div class="calendar-day-number">${d}</div>`;
     
-    dayEvents.slice(0, 3).forEach(e => {
+    dayEvents.slice(0, 2).forEach(e => {
       html += `<div class="calendar-event" style="background: ${e.person === 'victor' ? 'rgba(37,99,235,0.1)' : e.person === 'arthur' ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)'}">
-                <i class="fas fa-calendar-check"></i> ${e.title}
+                <i class="fas fa-calendar-check"></i> ${e.time ? e.time : ''} ${e.title}
                </div>`;
     });
     
-    if (dayEvents.length > 3) {
-      html += `<div style="font-size: 11px; color: var(--text-light); margin-top: 4px;">
-                +${dayEvents.length - 3}...
+    if(dayEvents.length > 2) {
+      html += `<div style="font-size: 11px; color: var(--accent); margin-top: 4px;">
+                +${dayEvents.length - 2}...
                </div>`;
     }
     
@@ -1545,142 +1980,328 @@ function updateCalendar() {
   }
   
   document.getElementById('calendar-view').innerHTML = html;
+  document.querySelector('.card .card-title i.fa-calendar').parentElement.innerHTML = 
+    `<i class="fas fa-calendar"></i> ${getMonthName(currentMonth)} ${currentYear}`;
+}
+
+function getMonthName(month) {
+  const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
+                  'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+  return months[month];
+}
+
+function previousMonth() {
+  currentMonth--;
+  if(currentMonth < 0) {
+    currentMonth = 11;
+    currentYear--;
+  }
+  updateCalendar();
+}
+
+function nextMonth() {
+  currentMonth++;
+  if(currentMonth > 11) {
+    currentMonth = 0;
+    currentYear++;
+  }
+  updateCalendar();
+}
+
+function showDayEvents(date) {
+  const dayEvents = events.filter(e => e.date === date);
+  let message = `Événements du ${date}:\n`;
+  if(dayEvents.length === 0) {
+    message += "Aucun événement";
+  } else {
+    dayEvents.forEach(e => {
+      message += `\n- ${e.time || '00:00'} - ${e.title} (${e.person})`;
+    });
+  }
+  alert(message);
+}
+
+function addEvent(e) {
+  e.preventDefault();
+  const event = {
+    id: Date.now(),
+    title: document.getElementById('event-title').value,
+    date: document.getElementById('event-date').value,
+    time: document.getElementById('event-time').value,
+    person: document.getElementById('event-person').value,
+    type: document.getElementById('event-type').value
+  };
+  
+  events.push(event);
+  localStorage.setItem("events", JSON.stringify(events));
+  e.target.reset();
+  document.getElementById('event-date').value = today;
+  
+  updateCalendar();
+  updateEventsList();
+  showToast(`Événement "${event.title}" ajouté !`);
 }
 
 function updateEventsList() {
-  if (document.getElementById('events-table-body')) {
-    document.getElementById('events-table-body').innerHTML = events
-      .sort((a, b) => a.event_date.localeCompare(b.event_date))
-      .map(e => `
-        <tr>
-          <td>${e.event_date}</td>
-          <td>${e.event_time || '-'}</td>
-          <td>${e.title}</td>
-          <td>
-            <span class="badge ${e.person === 'victor' ? 'badge-info' : e.person === 'arthur' ? 'badge-success' : 'badge-warning'}">
-              ${e.person}
-            </span>
-          </td>
-          <td>
-            <button onclick="window.deleteEvent(${e.id})" style="background: var(--danger); padding: 8px 12px;" class="btn-sm">
-              <i class="fas fa-trash"></i>
-            </button>
-          </td>
-        </tr>
-      `).join('');
-  }
-}
-
-function updateClients() {
-  if (document.getElementById('clients-list')) {
-    document.getElementById('clients-list').innerHTML = clients.map(c => `
-      <div class="client-card">
-        <div style="display: flex; justify-content: space-between; align-items: start;">
-          <h3 style="margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px;">
-            <i class="fas fa-user-circle" style="color: var(--accent);"></i> ${c.name}
-          </h3>
-          <button onclick="window.deleteClient(${c.id})" style="background: var(--danger); padding: 8px 12px;" class="btn-sm">
-            <i class="fas fa-times"></i>
+  if(document.getElementById('events-table-body')) {
+    const sortedEvents = events.sort((a,b)=>a.date.localeCompare(b.date) || (a.time || '').localeCompare(b.time || ''));
+    document.getElementById('events-table-body').innerHTML = sortedEvents.map(e => `
+      <tr>
+        <td>${e.date}</td>
+        <td>${e.time || '-'}</td>
+        <td>${e.title}</td>
+        <td><span class="badge">${e.type || 'autre'}</span></td>
+        <td>
+          <span class="badge ${e.person === 'victor' ? 'badge-info' : e.person === 'arthur' ? 'badge-success' : 'badge-warning'}">
+            ${e.person}
+          </span>
+        </td>
+        <td>
+          <button onclick="deleteEvent(${e.id})" class="btn-sm" style="background: var(--danger);">
+            <i class="fas fa-trash"></i>
           </button>
-        </div>
-        <p style="margin: 8px 0; display: flex; align-items: center; gap: 10px;">
-          <i class="fas fa-envelope" style="color: var(--text-light);"></i> ${c.email || 'Non renseigné'}
-        </p>
-        <p style="margin: 8px 0; display: flex; align-items: center; gap: 10px;">
-          <i class="fas fa-phone" style="color: var(--text-light);"></i> ${c.phone || 'Non renseigné'}
-        </p>
-      </div>
+        </td>
+      </tr>
     `).join('');
+    
+    document.getElementById('calendarBadge').style.display = events.length > 0 ? 'inline' : 'none';
+    document.getElementById('calendarBadge').innerText = events.length;
   }
 }
 
+// Statistiques améliorées
 function updateStats() {
-  const victorTotal = sum(victorGains, () => true);
-  const arthurTotal = sum(arthurGains, () => true);
-  const allGains = [...victorGains, ...arthurGains];
+  const victorTotal = sum(victorGains, ()=>true);
+  const arthurTotal = sum(arthurGains, ()=>true);
+  const total = victorTotal + arthurTotal;
   
-  if (document.getElementById('stats-total')) {
-    document.getElementById('stats-total').innerHTML = (victorTotal + arthurTotal).toFixed(2) + ' €';
-  }
-  if (document.getElementById('stats-victor')) {
-    document.getElementById('stats-victor').innerHTML = victorTotal.toFixed(2) + ' €';
-  }
-  if (document.getElementById('stats-arthur')) {
-    document.getElementById('stats-arthur').innerHTML = arthurTotal.toFixed(2) + ' €';
+  if(document.getElementById('stats-total')) document.getElementById('stats-total').innerHTML = total.toFixed(2)+' €';
+  if(document.getElementById('stats-victor')) document.getElementById('stats-victor').innerHTML = victorTotal.toFixed(2)+' €';
+  if(document.getElementById('stats-arthur')) document.getElementById('stats-arthur').innerHTML = arthurTotal.toFixed(2)+' €';
+  
+  const all = [...victorGains,...arthurGains];
+  const uniqueDays = new Set(all.map(g=>g.date)).size;
+  const avg = uniqueDays ? total / uniqueDays : 0;
+  if(document.getElementById('stats-average')) document.getElementById('stats-average').innerHTML = avg.toFixed(2)+' €';
+  
+  // Mettre à jour les objectifs
+  const now = new Date();
+  const victorMonthTotal = sum(victorGains, g => 
+    new Date(g.date).getMonth() === now.getMonth() && 
+    new Date(g.date).getFullYear() === now.getFullYear()
+  );
+  const arthurMonthTotal = sum(arthurGains, g => 
+    new Date(g.date).getMonth() === now.getMonth() && 
+    new Date(g.date).getFullYear() === now.getFullYear()
+  );
+  
+  if(document.getElementById('victor-progress')) {
+    const victorPercent = (victorMonthTotal / 2000) * 100;
+    document.getElementById('victor-progress').style.width = Math.min(100, victorPercent) + '%';
+    document.getElementById('victor-goal').innerHTML = `${victorMonthTotal.toFixed(2)} € / 2000 €`;
   }
   
-  const uniqueDays = new Set(allGains.map(g => g.date)).size;
-  const avg = uniqueDays ? (victorTotal + arthurTotal) / uniqueDays : 0;
-  if (document.getElementById('stats-average')) {
-    document.getElementById('stats-average').innerHTML = avg.toFixed(2) + ' €';
+  if(document.getElementById('arthur-progress')) {
+    const arthurPercent = (arthurMonthTotal / 2000) * 100;
+    document.getElementById('arthur-progress').style.width = Math.min(100, arthurPercent) + '%';
+    document.getElementById('arthur-goal').innerHTML = `${arthurMonthTotal.toFixed(2)} € / 2000 €`;
   }
   
-  if (pieChart) {
+  if(pieChart) {
     pieChart.data.datasets[0].data = [victorTotal, arthurTotal];
     pieChart.update();
   }
   
-  if (monthlyChart) {
-    const monthData = [1200, 1500, victorTotal + arthurTotal, 800, 950, 1100];
+  if(monthlyChart) {
+    const monthData = [];
+    for(let i = 0; i < 6; i++) {
+      const month = new Date().getMonth() - i;
+      const year = new Date().getFullYear();
+      const monthTotal = sum(all, g => 
+        new Date(g.date).getMonth() === month && 
+        new Date(g.date).getFullYear() === year
+      );
+      monthData.unshift(monthTotal);
+    }
     monthlyChart.data.datasets[0].data = monthData;
     monthlyChart.update();
   }
 }
 
-// ============================================
-// FONCTIONS GRAPHIQUES
-// ============================================
-function drawChart() {
-  if (!chart) return;
+// Rapports
+function generateReport(type) {
+  showLoader(true);
   
-  const p = document.getElementById("period")?.value || "all";
-  const now = new Date();
-  let victorMap = {}, arthurMap = {}, allDates = new Set();
-  
-  [...victorGains, ...arthurGains].forEach(g => {
-    const d = new Date(g.date);
-    let include = p === "today" ? d.toDateString() === now.toDateString() :
-                 p === "7" ? (now - d) / 86400000 <= 7 :
-                 p === "30" ? (now - d) / 86400000 <= 30 :
-                 p === "month" ? d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear() :
-                 p === "year" ? d.getFullYear() === now.getFullYear() : true;
+  setTimeout(() => {
+    const now = new Date();
+    let total = 0;
+    let period = '';
     
-    if (include) {
-      const key = d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
-      allDates.add(key);
-      if (g.person === 'victor') {
-        victorMap[key] = (victorMap[key] || 0) + Number(g.amount);
-      } else {
-        arthurMap[key] = (arthurMap[key] || 0) + Number(g.amount);
-      }
+    if(type === 'daily') {
+      total = sum([...victorGains, ...arthurGains], g => g.date === today);
+      period = today;
+    } else if(type === 'weekly') {
+      total = sum([...victorGains, ...arthurGains], g => (now - new Date(g.date)) / 86400000 <= 7);
+      period = '7 derniers jours';
+    } else if(type === 'monthly') {
+      total = sum([...victorGains, ...arthurGains], g => 
+        new Date(g.date).getMonth() === now.getMonth() && 
+        new Date(g.date).getFullYear() === now.getFullYear()
+      );
+      period = getMonthName(now.getMonth());
     }
-  });
-  
-  const sortedDates = Array.from(allDates).sort((a, b) => 
-    new Date(a.split('/').reverse().join('-')) - new Date(b.split('/').reverse().join('-'))
-  );
-  
-  chart.data.labels = sortedDates;
-  chart.data.datasets[0].data = (currentView === 'victor' || currentView === 'both') ? 
-    sortedDates.map(d => victorMap[d] || 0) : [];
-  chart.data.datasets[1].data = (currentView === 'arthur' || currentView === 'both') ? 
-    sortedDates.map(d => arthurMap[d] || 0) : [];
-  chart.update();
+    
+    const report = `
+      RAPPORT - ${period.toUpperCase()}
+      ================================
+      Date: ${today}
+      Période: ${period}
+      Total des gains: ${total.toFixed(2)} €
+      Victor: ${sum(victorGains, () => true).toFixed(2)} €
+      Arthur: ${sum(arthurGains, () => true).toFixed(2)} €
+      Nombre de transactions: ${victorGains.length + arthurGains.length}
+    `;
+    
+    const blob = new Blob([report], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `rapport-${type}-${today}.txt`;
+    a.click();
+    
+    showLoader(false);
+    showToast(`Rapport ${type} généré !`);
+  }, 500);
 }
 
-// ============================================
-// FONCTIONS UI
-// ============================================
-function showPerson(person) {
-  currentView = person;
-  if (document.getElementById('victor-toggle')) document.getElementById('victor-toggle').classList.remove('active');
-  if (document.getElementById('arthur-toggle')) document.getElementById('arthur-toggle').classList.remove('active');
-  if (document.getElementById('both-toggle')) document.getElementById('both-toggle').classList.remove('active');
-  if (document.getElementById(`${person}-toggle`)) document.getElementById(`${person}-toggle`).classList.add('active');
-  drawChart();
+// Paramètres
+function showSettings() {
+  document.getElementById('settingsModal').classList.add('active');
+  document.getElementById('currencySetting').value = settings.currency;
+  document.getElementById('notificationsSetting').value = settings.notifications;
+  document.getElementById('refreshSetting').value = settings.refresh;
 }
 
-function showBoth() { showPerson('both'); }
+function closeSettings() {
+  document.getElementById('settingsModal').classList.remove('active');
+}
+
+function updateSettings() {
+  settings = {
+    currency: document.getElementById('currencySetting').value,
+    notifications: document.getElementById('notificationsSetting').value,
+    refresh: document.getElementById('refreshSetting').value
+  };
+  
+  localStorage.setItem("settings", JSON.stringify(settings));
+  
+  // Mettre à jour l'auto-refresh
+  if(autoRefreshInterval) clearInterval(autoRefreshInterval);
+  if(settings.refresh > 0) {
+    autoRefreshInterval = setInterval(() => {
+      refresh();
+      drawChart();
+      updateStats();
+      showToast("Données rafraîchies", "info");
+    }, settings.refresh * 1000);
+  }
+  
+  showToast("Paramètres enregistrés");
+}
+
+// ============ FONCTIONS EXISTANTES AMÉLIORÉES ============
+
+function initCharts() {
+  if(document.getElementById('chart')) {
+    chart = new Chart(document.getElementById("chart"), {
+      type: "line",
+      data: { 
+        labels: [], 
+        datasets: [
+          { 
+            label: "Victor", 
+            data: [], 
+            borderColor: "var(--victor-color)", 
+            backgroundColor: "rgba(37,99,235,0.05)", 
+            fill: true, 
+            tension: 0.4,
+            borderWidth: 3,
+            pointRadius: 4,
+            pointHoverRadius: 8
+          },
+          { 
+            label: "Arthur", 
+            data: [], 
+            borderColor: "var(--arthur-color)", 
+            backgroundColor: "rgba(16,185,129,0.05)", 
+            fill: true, 
+            tension: 0.4,
+            borderWidth: 3,
+            pointRadius: 4,
+            pointHoverRadius: 8
+          }
+        ]
+      },
+      options: { 
+        responsive: true, 
+        maintainAspectRatio: false,
+        plugins: { 
+          legend: { position: 'top' },
+          tooltip: { enabled: true }
+        }, 
+        scales: { 
+          y: { 
+            beginAtZero: true, 
+            title: { display: true, text: 'Montant (€)' } 
+          } 
+        } 
+      }
+    });
+  }
+
+  if(document.getElementById("pie-chart")) {
+    pieChart = new Chart(document.getElementById("pie-chart"), { 
+      type: "pie", 
+      data: { 
+        labels: ["Victor", "Arthur"], 
+        datasets: [{ 
+          data: [0,0], 
+          backgroundColor: ["var(--victor-color)", "var(--arthur-color)"],
+          borderWidth: 0
+        }] 
+      },
+      options: { 
+        responsive: true, 
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom' }
+        }
+      }
+    });
+  }
+
+  if(document.getElementById("monthly-chart")) {
+    monthlyChart = new Chart(document.getElementById("monthly-chart"), { 
+      type: "bar", 
+      data: { 
+        labels: ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin"], 
+        datasets: [{ 
+          label: "Gains 2026", 
+          data: [0,0,0,0,0,0], 
+          backgroundColor: "var(--accent)",
+          borderRadius: 8
+        }] 
+      },
+      options: { 
+        responsive: true, 
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        }
+      }
+    });
+  }
+}
 
 function toggleMenu() {
   document.getElementById('sidebar').classList.toggle('open');
@@ -1692,10 +2313,171 @@ function closeMenu() {
   document.getElementById('overlay').classList.remove('active');
 }
 
+function sum(gainsArray, filter) { 
+  return gainsArray.filter(filter).reduce((s,g)=>s+g.amount,0); 
+}
+
+function refresh() {
+  let now = new Date(), yesterday = new Date(now); 
+  yesterday.setDate(now.getDate()-1);
+  const victorTotal = sum(victorGains, () => true), arthurTotal = sum(arthurGains, () => true);
+  
+  if(document.getElementById("victor-total")) document.getElementById("victor-total").innerHTML = victorTotal.toFixed(2) + " €";
+  if(document.getElementById("arthur-total")) document.getElementById("arthur-total").innerHTML = arthurTotal.toFixed(2) + " €";
+  if(document.getElementById("victorQuickStats")) document.getElementById("victorQuickStats").innerHTML = victorTotal.toFixed(2) + " €";
+  if(document.getElementById("arthurQuickStats")) document.getElementById("arthurQuickStats").innerHTML = arthurTotal.toFixed(2) + " €";
+  if(document.getElementById("bothQuickStats")) document.getElementById("bothQuickStats").innerHTML = (victorTotal + arthurTotal).toFixed(2) + " €";
+  
+  const allGains = [...victorGains, ...arthurGains];
+  if(document.getElementById("total")) document.getElementById("total").innerHTML = (victorTotal + arthurTotal).toFixed(2) + " €";
+  if(document.getElementById("yesterday")) document.getElementById("yesterday").innerHTML = sum(allGains, g => new Date(g.date).toDateString() === yesterday.toDateString()).toFixed(2) + " €";
+  if(document.getElementById("week")) document.getElementById("week").innerHTML = sum(allGains, g => (now - new Date(g.date)) / 86400000 <= 7).toFixed(2) + " €";
+  if(document.getElementById("month")) document.getElementById("month").innerHTML = sum(allGains, g => new Date(g.date).getMonth() === now.getMonth() && new Date(g.date).getFullYear() === now.getFullYear()).toFixed(2) + " €";
+  
+  updateProgressBar((victorTotal + arthurTotal) / 1000);
+}
+
+function drawChart() {
+  if(!chart) return;
+  const p = document.getElementById("period")?.value || "7", now = new Date();
+  let victorMap = {}, arthurMap = {}, allDates = new Set();
+  
+  [...victorGains, ...arthurGains].forEach(g => {
+    let d = new Date(g.date);
+    let include = p==="today" ? d.toDateString()===now.toDateString() :
+                 p==="7" ? (now-d)/86400000<=7 :
+                 p==="30" ? (now-d)/86400000<=30 :
+                 p==="month" ? d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear() :
+                 p==="year" ? d.getFullYear()===now.getFullYear() : true;
+    if (include) {
+      const key = d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit' });
+      allDates.add(key);
+      if (g.person==='victor') victorMap[key] = (victorMap[key]||0) + g.amount;
+      else arthurMap[key] = (arthurMap[key]||0) + g.amount;
+    }
+  });
+  
+  const sortedDates = Array.from(allDates).sort((a,b) => new Date(a.split('/').reverse().join('-')) - new Date(b.split('/').reverse().join('')));
+  chart.data.labels = sortedDates;
+  chart.data.datasets[0].data = (currentView==='victor'||currentView==='both') ? sortedDates.map(d=>victorMap[d]||0) : [];
+  chart.data.datasets[1].data = (currentView==='arthur'||currentView==='both') ? sortedDates.map(d=>arthurMap[d]||0) : [];
+  chart.update();
+}
+
+function showPerson(person) {
+  currentView = person;
+  document.querySelectorAll('#victor-toggle, #arthur-toggle, #both-toggle').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  if(document.getElementById(`${person}-toggle`)) {
+    document.getElementById(`${person}-toggle`).classList.add('active');
+  }
+  drawChart();
+}
+
+function showBoth() { showPerson('both'); }
+
+function updateHistory() {
+  const all = [...victorGains.map(g=>({...g, person:'Victor'})), ...arthurGains.map(g=>({...g, person:'Arthur'}))]
+    .sort((a,b)=>new Date(b.date)-new Date(a.date));
+  
+  filterHistory();
+}
+
+function updateSheets() {
+  if(document.getElementById('product-sheets')) {
+    document.getElementById('product-sheets').innerHTML = products.map(p => `
+      <div class="product-card">
+        <h3 style="color: var(--accent); margin-top: 0;">${p.name}</h3>
+        <p><i class="fas fa-tag"></i> <strong>Catégorie:</strong> ${p.category}</p>
+        <p><i class="fas fa-euro-sign"></i> <strong>Prix:</strong> ${p.price.toFixed(2)} €</p>
+        <p><i class="fas fa-cubes"></i> <strong>Stock:</strong> ${p.quantity} unités</p>
+        <p><i class="fas fa-chart-line"></i> <strong>Valeur:</strong> ${(p.price*p.quantity).toFixed(2)} €</p>
+        <p><i class="fas fa-barcode"></i> <strong>SKU:</strong> ${p.sku || '-'}</p>
+        <div class="stock-bar">
+          <div class="stock-fill" style="width: ${Math.min(100, p.quantity)}%"></div>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+function deleteProduct(id) { 
+  products = products.filter(p=>p.id!==id); 
+  localStorage.setItem("products", JSON.stringify(products)); 
+  updateProducts(); 
+  updateStock(); 
+  updateSheets();
+  showToast("Produit supprimé", "warning");
+}
+
+function editProduct(id) { 
+  const p = products.find(p=>p.id===id); 
+  const q = prompt("Nouvelle quantité:", p.quantity); 
+  if(q) { 
+    p.quantity = Number(q); 
+    localStorage.setItem("products", JSON.stringify(products)); 
+    updateProducts(); 
+    updateStock(); 
+    updateSheets();
+    showToast("Stock mis à jour");
+  } 
+}
+
+function addStock(id) { 
+  const p = products.find(p=>p.id===id); 
+  p.quantity += 1; 
+  localStorage.setItem("products", JSON.stringify(products)); 
+  updateProducts(); 
+    updateStock(); 
+  updateSheets();
+  showToast("Stock +1");
+}
+
+function deleteEvent(id) { 
+  events = events.filter(e=>e.id!==id); 
+  localStorage.setItem("events", JSON.stringify(events)); 
+  updateCalendar(); 
+  updateEventsList();
+  showToast("Événement supprimé", "warning");
+}
+
+function addClient(e) {
+  e.preventDefault();
+  const client = {
+    id: Date.now(),
+    name: document.getElementById('client-name').value,
+    email: document.getElementById('client-email').value,
+    phone: document.getElementById('client-phone').value,
+    company: document.getElementById('client-company').value,
+    type: document.getElementById('client-type').value,
+    createdAt: today
+  };
+  
+  clients.push(client);
+  localStorage.setItem("clients", JSON.stringify(clients));
+  e.target.reset();
+  
+  updateClients();
+  showToast(`Client ${client.name} ajouté !`);
+}
+
+function updateClients() {
+  filterClients();
+  document.getElementById('clientsBadge').style.display = clients.length > 0 ? 'inline' : 'none';
+  document.getElementById('clientsBadge').innerText = clients.length;
+}
+
+function deleteClient(id) { 
+  clients = clients.filter(c=>c.id!==id); 
+  localStorage.setItem("clients", JSON.stringify(clients)); 
+  updateClients();
+  showToast("Client supprimé", "warning");
+}
+
 function switchTab(tabName) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  const tab = document.getElementById(`tab-${tabName}`);
-  if (tab) tab.classList.add('active');
+  document.getElementById(`tab-${tabName}`).classList.add('active');
   
   const titles = {
     'dashboard': 'Tableau de bord',
@@ -1704,140 +2486,88 @@ function switchTab(tabName) {
     'sheets': 'Fiches produits',
     'calendar': 'Calendrier',
     'stats': 'Statistiques',
-    'clients': 'Clients'
+    'clients': 'Clients',
+    'import': 'Import/Export',
+    'reports': 'Rapports'
   };
+  document.getElementById('pageTitle').innerText = titles[tabName];
   
-  const titleEl = document.getElementById('pageTitle');
-  if (titleEl) titleEl.innerText = titles[tabName];
+  document.querySelectorAll('.sidebar-item').forEach((item, index) => {
+    item.classList.remove('active');
+    if(item.querySelector('span')?.innerText === titles[tabName]) {
+      item.classList.add('active');
+    }
+  });
   
-  document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+  updateProgressBar(100);
+  setTimeout(() => updateProgressBar(0), 200);
   
-  // Activer l'élément de menu correspondant
-  const activeMenuItem = Array.from(document.querySelectorAll('.sidebar-item')).find(
-    item => item.innerHTML.includes(titles[tabName])
-  );
-  if (activeMenuItem) activeMenuItem.classList.add('active');
-  
-  // Rafraîchir l'onglet si nécessaire
-  if (tabName === 'stats') updateStats();
-  if (tabName === 'calendar') { updateCalendar(); updateEventsList(); }
-  if (tabName === 'products') updateProducts();
-  if (tabName === 'inventory') updateStock();
-  if (tabName === 'sheets') updateSheets();
-  if (tabName === 'clients') updateClients();
+  if(tabName === 'stats') updateStats();
+  if(tabName === 'calendar') { updateCalendar(); updateEventsList(); }
+  if(tabName === 'products') updateProducts();
+  if(tabName === 'inventory') updateStock();
+  if(tabName === 'sheets') updateSheets();
+  if(tabName === 'clients') updateClients();
 }
 
 function toggleDark() {
   document.body.classList.toggle("dark");
-  if (chart) chart.update();
-  if (pieChart) pieChart.update();
-  if (monthlyChart) monthlyChart.update();
+  if(chart) {
+    chart.options.scales.y.grid.color = getComputedStyle(document.body).getPropertyValue('--border');
+    chart.update();
+  }
+  if(pieChart) pieChart.update();
+  if(monthlyChart) monthlyChart.update();
+  
+  const icon = document.querySelector('.theme-btn i');
+  if(document.body.classList.contains('dark')) {
+    icon.className = 'fas fa-sun';
+  } else {
+    icon.className = 'fas fa-moon';
+  }
 }
 
-// ============================================
-// INITIALISATION DES GRAPHIQUES
-// ============================================
-let chart, pieChart, monthlyChart;
-
-function initCharts() {
-  if (document.getElementById('chart')) {
-    chart = new Chart(document.getElementById("chart"), {
-      type: "line",
-      data: { 
-        labels: [], 
-        datasets: [
-          { label: "Victor", data: [], borderColor: "var(--victor-color)", backgroundColor: "rgba(37,99,235,0.05)", fill: true, tension: 0.4 },
-          { label: "Arthur", data: [], borderColor: "var(--arthur-color)", backgroundColor: "rgba(16,185,129,0.05)", fill: true, tension: 0.4 }
-        ]
-      },
-      options: { 
-        responsive: true, 
-        maintainAspectRatio: false,
-        plugins: { legend: { position: 'top' } }, 
-        scales: { y: { beginAtZero: true, title: { display: true, text: 'Montant (€)' } } } 
+// ============ INITIALISATION AMÉLIORÉE ============
+window.onload = function() {
+  showLoader(true);
+  
+  setTimeout(() => {
+    initCharts();
+    refresh();
+    drawChart();
+    updateHistory();
+    updateProducts();
+    updateStock();
+    updateSheets();
+    updateCalendar();
+    updateEventsList();
+    updateStats();
+    updateClients();
+    
+    // Appliquer les paramètres
+    updateSettings();
+    
+    // Fermer le menu si on clique en dehors
+    document.addEventListener('click', function(e) {
+      if(!e.target.closest('.sidebar') && !e.target.closest('.menu-btn')) {
+        closeMenu();
       }
     });
-  }
-
-  if (document.getElementById("pie-chart")) {
-    pieChart = new Chart(document.getElementById("pie-chart"), { 
-      type: "pie", 
-      data: { labels: ["Victor", "Arthur"], datasets: [{ data: [0,0], backgroundColor: ["var(--victor-color)", "var(--arthur-color)"] }] },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
-  }
-
-  if (document.getElementById("monthly-chart")) {
-    monthlyChart = new Chart(document.getElementById("monthly-chart"), { 
-      type: "bar", 
-      data: { labels: ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin"], 
-              datasets: [{ label: "Gains 2026", data: [0,0,0,0,0,0], backgroundColor: "var(--accent)" }] },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
-  }
-}
-
-// ============================================
-// INITIALISATION PRINCIPALE
-// ============================================
-window.onload = async function() {
-  console.log('Démarrage de l\'application avec Supabase...');
-  
-  // Initialiser les dates
-  const today = new Date().toISOString().split('T')[0];
-  if (document.getElementById('victor-date')) document.getElementById('victor-date').value = today;
-  if (document.getElementById('arthur-date')) document.getElementById('arthur-date').value = today;
-  if (document.getElementById('event-date')) document.getElementById('event-date').value = today;
-  
-  // Initialiser les graphiques
-  initCharts();
-  
-  // Charger les données depuis Supabase
-  await loadAllData();
-  
-  // Rafraîchir l'affichage
-  refresh();
-  drawChart();
-  updateHistory();
-  updateProducts();
-  updateStock();
-  updateSheets();
-  updateCalendar();
-  updateEventsList();
-  updateStats();
-  updateClients();
-  
-  // Fermer le menu si on clique en dehors
-  document.addEventListener('click', function(e) {
-    if (!e.target.closest('.sidebar') && !e.target.closest('.menu-btn')) {
-      closeMenu();
-    }
-  });
-  
-  console.log('Application prête !');
+    
+    // Sauvegarde automatique toutes les minutes
+    setInterval(() => {
+      localStorage.setItem("victorGains", JSON.stringify(victorGains));
+      localStorage.setItem("arthurGains", JSON.stringify(arthurGains));
+      localStorage.setItem("products", JSON.stringify(products));
+      localStorage.setItem("events", JSON.stringify(events));
+      localStorage.setItem("clients", JSON.stringify(clients));
+      console.log("Sauvegarde automatique effectuée");
+    }, 60000);
+    
+    showLoader(false);
+    showToast("Application chargée !");
+  }, 500);
 };
-
-// ============================================
-// RENDRE TOUTES LES FONCTIONS GLOBALES
-// ============================================
-window.addGain = addGain;
-window.deleteGain = deleteGain;
-window.addProduct = addProduct;
-window.updateProductQuantity = updateProductQuantity;
-window.deleteProduct = deleteProduct;
-window.editProduct = editProduct;
-window.addStock = addStock;
-window.addEvent = addEvent;
-window.deleteEvent = deleteEvent;
-window.addClient = addClient;
-window.deleteClient = deleteClient;
-window.showPerson = showPerson;
-window.showBoth = showBoth;
-window.toggleMenu = toggleMenu;
-window.closeMenu = closeMenu;
-window.switchTab = switchTab;
-window.toggleDark = toggleDark;
-window.drawChart = drawChart;
 </script>
 
 </body>
