@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Gestion Pro Elite - Version Complete</title>
+<title>Gestion Pro Elite - Victor & Arthur</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -18,7 +18,6 @@
   --accent: #2563eb;
   --victor-color: #2563eb;
   --arthur-color: #10b981;
-  --admin-color: #8b5cf6;
   --border: #e2e8f0;
   --hover: #f1f5f9;
   --success: #10b981;
@@ -39,7 +38,6 @@ body.dark {
   --accent: #38bdf8;
   --victor-color: #3b82f6;
   --arthur-color: #10b981;
-  --admin-color: #a78bfa;
   --border: #334155;
   --hover: #2d3a4f;
   --sidebar-bg: #1e293b;
@@ -360,7 +358,7 @@ body {
 }
 
 /* ============ GRILLES RESPONSIVES ============ */
-.grid-2, .grid-3, .grid-4, .grid-5 {
+.grid-2, .grid-3, .grid-4 {
   display: grid;
   gap: 24px;
 }
@@ -368,7 +366,6 @@ body {
 .grid-2 { grid-template-columns: repeat(2, 1fr); }
 .grid-3 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
 .grid-4 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-.grid-5 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
 
 /* ============ FORMULAIRES AMÉLIORÉS ============ */
 .form-group {
@@ -486,12 +483,6 @@ input:focus, select:focus, textarea:focus {
   border: 1px solid rgba(37,99,235,0.3);
 }
 
-.badge-admin {
-  background: rgba(139,92,246,0.15);
-  color: #8b5cf6;
-  border: 1px solid rgba(139,92,246,0.3);
-}
-
 /* ============ STATISTIQUES AMÉLIORÉES ============ */
 .stat-card {
   background: var(--card);
@@ -505,7 +496,6 @@ input:focus, select:focus, textarea:focus {
   transition: all 0.3s;
   position: relative;
   overflow: hidden;
-  cursor: pointer;
 }
 
 .stat-card::before {
@@ -520,7 +510,6 @@ input:focus, select:focus, textarea:focus {
 
 .stat-card:hover {
   transform: scale(1.05);
-  box-shadow: var(--shadow);
 }
 
 .stat-icon {
@@ -721,27 +710,6 @@ tr:hover td {
   box-shadow: var(--shadow);
 }
 
-/* ============ LOGIN ADMIN ============ */
-.login-container {
-  max-width: 400px;
-  margin: 50px auto;
-  padding: 30px;
-  background: var(--card);
-  border-radius: var(--radius);
-  border: 2px solid var(--border);
-  box-shadow: var(--shadow);
-}
-
-.login-container h2 {
-  text-align: center;
-  margin-bottom: 30px;
-  color: var(--accent);
-}
-
-.login-container input {
-  margin-bottom: 20px;
-}
-
 /* ============ MODALES ============ */
 .modal {
   display: none;
@@ -770,8 +738,6 @@ tr:hover td {
   width: 90%;
   animation: slideIn 0.4s;
   border: 1px solid var(--border);
-  max-height: 80vh;
-  overflow-y: auto;
 }
 
 /* ============ TOAST NOTIFICATIONS ============ */
@@ -875,16 +841,6 @@ tr:hover td {
 .justify-between { justify-content: space-between; }
 .gap-2 { gap: 16px; }
 .gap-3 { gap: 24px; }
-
-/* ============ COULEURS PERSONNALISÉES ============ */
-.color-picker {
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  border: 2px solid var(--border);
-  border-radius: 50%;
-  cursor: pointer;
-}
 </style>
 </head>
 
@@ -922,16 +878,6 @@ tr:hover td {
         <span>Tableau de bord</span>
         <span class="badge" id="dashboardBadge" style="display: none;">!</span>
       </div>
-      <div class="sidebar-item" onclick="switchTab('transactions'); closeMenu()">
-        <i class="fas fa-exchange-alt"></i>
-        <span>Transactions</span>
-        <span class="badge badge-info" id="transactionBadge" style="display: none;">!</span>
-      </div>
-      <div class="sidebar-item" onclick="switchTab('boxes'); closeMenu()">
-        <i class="fas fa-cube"></i>
-        <span>Boxes / Lots</span>
-        <span class="badge badge-success" id="boxBadge" style="display: none;">!</span>
-      </div>
       <div class="sidebar-item" onclick="switchTab('products'); closeMenu()">
         <i class="fas fa-box"></i>
         <span>Produits</span>
@@ -968,11 +914,6 @@ tr:hover td {
         <i class="fas fa-file-pdf"></i>
         <span>Rapports</span>
       </div>
-      <div class="sidebar-item" onclick="switchTab('admin'); closeMenu()">
-        <i class="fas fa-crown" style="color: var(--admin-color);"></i>
-        <span>Administration</span>
-        <span class="badge badge-admin" id="adminBadge" style="display: none;">Admin</span>
-      </div>
     </div>
     
     <div class="sidebar-footer">
@@ -983,10 +924,6 @@ tr:hover td {
       <div class="sidebar-item" onclick="showSettings()">
         <i class="fas fa-cog"></i>
         <span>Paramètres</span>
-      </div>
-      <div class="sidebar-item" onclick="logout()" id="logoutBtn" style="display: none;">
-        <i class="fas fa-sign-out-alt"></i>
-        <span>Déconnexion</span>
       </div>
     </div>
   </div>
@@ -1004,9 +941,6 @@ tr:hover td {
       <span class="page-title" id="pageTitle">Tableau de bord</span>
     </div>
     <div class="d-flex align-center gap-2">
-      <span id="userDisplay" style="display: none; padding: 8px 16px; background: var(--accent); color: white; border-radius: var(--radius-sm);">
-        <i class="fas fa-user-shield"></i> Admin
-      </span>
       <button class="theme-btn" onclick="quickAddGain()">
         <i class="fas fa-plus-circle"></i>
       </button>
@@ -1018,7 +952,7 @@ tr:hover td {
 
   <!-- Contenu Principal -->
   <div class="main-content">
-    <!-- Tableau de bord amélioré (ANCIENNE VERSION CONSERVÉE) -->
+    <!-- Tableau de bord amélioré -->
     <div id="tab-dashboard" class="tab-content active">
       <!-- Sélecteur de personne avec stats -->
       <div class="grid-3" style="margin-bottom: 20px;">
@@ -1195,165 +1129,7 @@ tr:hover td {
       </div>
     </div>
 
-    <!-- NOUVEL ONGLET TRANSACTIONS -->
-    <div id="tab-transactions" class="tab-content">
-      <div class="grid-4">
-        <div class="stat-card" onclick="showTransactionStats('all')">
-          <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
-          <div class="stat-number" id="transactions-total">0 €</div>
-          <div class="stat-label">CA Total</div>
-        </div>
-        <div class="stat-card" onclick="showTransactionStats('margin')">
-          <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
-          <div class="stat-number" id="transactions-margin">0 €</div>
-          <div class="stat-label">Marge Totale</div>
-        </div>
-        <div class="stat-card" onclick="showTransactionStats('count')">
-          <div class="stat-icon"><i class="fas fa-calculator"></i></div>
-          <div class="stat-number" id="transactions-count">0</div>
-          <div class="stat-label">Transactions</div>
-        </div>
-        <div class="stat-card" onclick="showTransactionStats('margin-rate')">
-          <div class="stat-icon"><i class="fas fa-percent"></i></div>
-          <div class="stat-number" id="transactions-margin-rate">0%</div>
-          <div class="stat-label">Taux de marge</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">
-          <i class="fas fa-plus-circle"></i> Nouvelle transaction
-        </div>
-        <form onsubmit="addTransaction(event)">
-          <div class="grid-3">
-            <select id="transaction-person" required>
-              <option value="victor">Victor</option>
-              <option value="arthur">Arthur</option>
-              <option value="commun">Commun</option>
-            </select>
-            <select id="transaction-product" required onchange="updateTransactionPrice()">
-              <option value="">Sélectionner un produit</option>
-            </select>
-            <input type="number" id="transaction-quantity" placeholder="Quantité" min="1" value="1" required onchange="updateTransactionPrice()">
-            <input type="number" id="transaction-price" placeholder="Prix de vente (€)" step="0.01" required>
-            <input type="number" id="transaction-cost" placeholder="Coût d'achat (€)" step="0.01" readonly>
-            <input type="date" id="transaction-date" required>
-          </div>
-          <div class="grid-2" style="margin-top: 20px;">
-            <div>
-              <strong>Marge unitaire: <span id="transaction-margin-unit">0.00 €</span></strong>
-            </div>
-            <div>
-              <strong>Marge totale: <span id="transaction-margin-total">0.00 €</span></strong>
-            </div>
-          </div>
-          <button type="submit" class="btn btn-block mt-3" style="background: var(--success);">
-            <i class="fas fa-check"></i> Valider la transaction
-          </button>
-        </form>
-      </div>
-
-      <div class="card">
-        <div class="d-flex justify-between align-center mb-3">
-          <div class="card-title" style="margin-bottom: 0;">
-            <i class="fas fa-list"></i> Historique des transactions
-          </div>
-          <div class="d-flex gap-2">
-            <select id="transactionFilter" onchange="filterTransactions()">
-              <option value="all">Toutes</option>
-              <option value="victor">Victor</option>
-              <option value="arthur">Arthur</option>
-              <option value="commun">Commun</option>
-            </select>
-            <input type="text" id="transactionSearch" placeholder="Rechercher..." onkeyup="filterTransactions()">
-          </div>
-        </div>
-        <div class="table-responsive">
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Personne</th>
-                <th>Produit</th>
-                <th>Qté</th>
-                <th>Prix vente</th>
-                <th>Coût achat</th>
-                <th>Marge</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="transactions-list"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- NOUVEL ONGLET BOXES / LOTS -->
-    <div id="tab-boxes" class="tab-content">
-      <div class="grid-3">
-        <div class="stat-card">
-          <div class="stat-icon"><i class="fas fa-cubes"></i></div>
-          <div class="stat-number" id="boxes-total">0</div>
-          <div class="stat-label">Boxes créées</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon"><i class="fas fa-euro-sign"></i></div>
-          <div class="stat-number" id="boxes-revenue">0 €</div>
-          <div class="stat-label">CA Boxes</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
-          <div class="stat-number" id="boxes-margin">0 €</div>
-          <div class="stat-label">Marge Boxes</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">
-          <i class="fas fa-cube"></i> Créer une box / lot
-        </div>
-        <form onsubmit="addBox(event)">
-          <div class="grid-2">
-            <input type="text" id="box-name" placeholder="Nom de la box" required>
-            <input type="number" id="box-price" placeholder="Prix de vente (€)" step="0.01" required>
-            <input type="number" id="box-cost" placeholder="Coût total (€)" step="0.01" readonly>
-            <input type="date" id="box-date" required>
-          </div>
-          <div class="card mt-3">
-            <h3>Produits dans la box</h3>
-            <div id="box-products-list"></div>
-            <div class="grid-3 mt-3">
-              <select id="box-product-select">
-                <option value="">Sélectionner un produit</option>
-              </select>
-              <input type="number" id="box-product-quantity" placeholder="Quantité" min="1" value="1">
-              <button type="button" onclick="addProductToBox()" class="btn-sm" style="background: var(--success);">
-                <i class="fas fa-plus"></i> Ajouter à la box
-              </button>
-            </div>
-          </div>
-          <div class="mt-3">
-            <strong>Récapitulatif:</strong>
-            <div>Coût total: <span id="box-total-cost">0.00 €</span></div>
-            <div>Prix de vente: <span id="box-total-price">0.00 €</span></div>
-            <div>Marge: <span id="box-total-margin">0.00 €</span></div>
-            <div>Taux de marge: <span id="box-margin-rate">0%</span></div>
-          </div>
-          <button type="submit" class="btn btn-block mt-3" style="background: var(--success);">
-            <i class="fas fa-save"></i> Créer la box
-          </button>
-        </form>
-      </div>
-
-      <div class="card">
-        <div class="card-title">
-          <i class="fas fa-cubes"></i> Boxes créées
-        </div>
-        <div id="boxes-grid" class="product-grid"></div>
-      </div>
-    </div>
-
-    <!-- Onglet Produits amélioré (ANCIEN) -->
+    <!-- Onglet Produits amélioré -->
     <div id="tab-products" class="tab-content">
       <div class="card">
         <div class="card-title">
@@ -1362,9 +1138,8 @@ tr:hover td {
         <form onsubmit="addProduct(event)">
           <div class="grid-3">
             <input type="text" id="product-name" placeholder="Nom du produit" required>
-            <input type="number" id="product-price" placeholder="Prix de vente (€)" step="0.01" required>
-            <input type="number" id="product-cost" placeholder="Prix d'achat (€)" step="0.01" required>
-            <input type="number" id="product-quantity" placeholder="Quantité en stock" required>
+            <input type="number" id="product-price" placeholder="Prix (€)" step="0.01" required>
+            <input type="number" id="product-quantity" placeholder="Quantité" required>
             <select id="product-category">
               <option>Électronique</option>
               <option>Vêtements</option>
@@ -1376,10 +1151,10 @@ tr:hover td {
               <option>Autre</option>
             </select>
             <input type="text" id="product-sku" placeholder="SKU (référence)">
+            <button type="submit" class="btn" style="background: var(--success);">
+              <i class="fas fa-save"></i> Ajouter
+            </button>
           </div>
-          <button type="submit" class="btn btn-block mt-3" style="background: var(--success);">
-            <i class="fas fa-save"></i> Ajouter
-          </button>
         </form>
       </div>
       
@@ -1403,7 +1178,7 @@ tr:hover td {
       </div>
     </div>
 
-    <!-- Onglet Stocks amélioré (ANCIEN) -->
+    <!-- Onglet Stocks amélioré -->
     <div id="tab-inventory" class="tab-content">
       <div class="grid-4">
         <div class="stat-card">
@@ -1446,11 +1221,9 @@ tr:hover td {
                 <th>Produit</th>
                 <th>SKU</th>
                 <th>Catégorie</th>
-                <th>Prix vente</th>
-                <th>Prix achat</th>
+                <th>Prix</th>
                 <th>Quantité</th>
                 <th>Valeur</th>
-                <th>Marge</th>
                 <th>Statut</th>
                 <th>Actions</th>
               </tr>
@@ -1461,7 +1234,7 @@ tr:hover td {
       </div>
     </div>
 
-    <!-- Onglet Fiches produits (ANCIEN) -->
+    <!-- Onglet Fiches produits -->
     <div id="tab-sheets" class="tab-content">
       <div class="card">
         <div class="card-title">
@@ -1471,7 +1244,7 @@ tr:hover td {
       </div>
     </div>
 
-    <!-- Onglet Calendrier amélioré (ANCIEN) -->
+    <!-- Onglet Calendrier amélioré -->
     <div id="tab-calendar" class="tab-content">
       <div class="card">
         <div class="card-title">
@@ -1544,7 +1317,7 @@ tr:hover td {
       </div>
     </div>
 
-    <!-- Onglet Statistiques amélioré (ANCIEN) -->
+    <!-- Onglet Statistiques amélioré -->
     <div id="tab-stats" class="tab-content">
       <div class="grid-4">
         <div class="stat-card">
@@ -1594,16 +1367,16 @@ tr:hover td {
         </div>
         <div class="grid-2">
           <div>
-            <h3>Victor - Objectif mensuel: <span id="victor-goal-amount">2000</span> €</h3>
-            <div class="progress-container" style="position: relative; margin-top: 10px; height: 20px; background: var(--border);">
-              <div class="progress-bar" id="victor-progress" style="width: 0%; height: 100%;"></div>
+            <h3>Victor - Objectif mensuel: 2000 €</h3>
+            <div class="progress-container" style="position: relative; margin-top: 10px;">
+              <div class="progress-bar" id="victor-progress" style="width: 0%;"></div>
             </div>
             <p id="victor-goal">0 € / 2000 €</p>
           </div>
           <div>
-            <h3>Arthur - Objectif mensuel: <span id="arthur-goal-amount">2000</span> €</h3>
-            <div class="progress-container" style="position: relative; margin-top: 10px; height: 20px; background: var(--border);">
-              <div class="progress-bar" id="arthur-progress" style="width: 0%; height: 100%; background: var(--arthur-color);"></div>
+            <h3>Arthur - Objectif mensuel: 2000 €</h3>
+            <div class="progress-container" style="position: relative; margin-top: 10px;">
+              <div class="progress-bar" id="arthur-progress" style="width: 0%; background: var(--arthur-color);"></div>
             </div>
             <p id="arthur-goal">0 € / 2000 €</p>
           </div>
@@ -1611,7 +1384,7 @@ tr:hover td {
       </div>
     </div>
 
-    <!-- Onglet Clients amélioré (ANCIEN) -->
+    <!-- Onglet Clients amélioré -->
     <div id="tab-clients" class="tab-content">
       <div class="card">
         <div class="card-title">
@@ -1645,7 +1418,7 @@ tr:hover td {
       </div>
     </div>
 
-    <!-- Onglet Import/Export (ANCIEN) -->
+    <!-- Nouvel Onglet Import/Export -->
     <div id="tab-import" class="tab-content">
       <div class="card">
         <div class="card-title">
@@ -1675,7 +1448,7 @@ tr:hover td {
       </div>
     </div>
 
-    <!-- Onglet Rapports (ANCIEN) -->
+    <!-- Nouvel Onglet Rapports -->
     <div id="tab-reports" class="tab-content">
       <div class="card">
         <div class="card-title">
@@ -1696,125 +1469,6 @@ tr:hover td {
             <i class="fas fa-calendar-alt" style="font-size: 32px;"></i>
             <h3>Rapport mensuel</h3>
             <p>Gains du mois</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Onglet Administration (NOUVEAU) -->
-    <div id="tab-admin" class="tab-content">
-      <!-- Login Admin -->
-      <div id="adminLogin" class="login-container">
-        <h2><i class="fas fa-crown"></i> Administration</h2>
-        <input type="text" id="adminUsername" placeholder="Nom d'utilisateur" value="admin">
-        <input type="password" id="adminPassword" placeholder="Mot de passe">
-        <button onclick="adminLogin()" class="btn btn-block">Se connecter</button>
-      </div>
-
-      <!-- Panneau d'administration (caché par défaut) -->
-      <div id="adminPanel" style="display: none;">
-        <div class="grid-4">
-          <div class="stat-card" onclick="showAdminSection('users')">
-            <div class="stat-icon"><i class="fas fa-users-cog"></i></div>
-            <div class="stat-number" id="total-users">2</div>
-            <div class="stat-label">Utilisateurs</div>
-          </div>
-          <div class="stat-card" onclick="showAdminSection('goals')">
-            <div class="stat-icon"><i class="fas fa-bullseye"></i></div>
-            <div class="stat-number" id="active-goals">2</div>
-            <div class="stat-label">Objectifs actifs</div>
-          </div>
-          <div class="stat-card" onclick="showAdminSection('settings')">
-            <div class="stat-icon"><i class="fas fa-sliders-h"></i></div>
-            <div class="stat-number">Config</div>
-            <div class="stat-label">Paramètres</div>
-          </div>
-          <div class="stat-card" onclick="showAdminSection('backup')">
-            <div class="stat-icon"><i class="fas fa-database"></i></div>
-            <div class="stat-number">Sauvegarde</div>
-            <div class="stat-label">Données</div>
-          </div>
-        </div>
-
-        <!-- Gestion des utilisateurs -->
-        <div id="admin-users" class="card">
-          <div class="card-title">
-            <i class="fas fa-users"></i> Gestion des utilisateurs
-          </div>
-          <form onsubmit="addUser(event)">
-            <div class="grid-3">
-              <input type="text" id="new-username" placeholder="Nom d'utilisateur" required>
-              <input type="password" id="new-password" placeholder="Mot de passe" required>
-              <input type="color" id="new-user-color" class="color-picker" value="#2563eb">
-            </div>
-            <div class="grid-3">
-              <input type="number" id="user-monthly-goal" placeholder="Objectif mensuel (€)" value="2000">
-              <select id="user-role">
-                <option value="user">Utilisateur</option>
-                <option value="admin">Administrateur</option>
-              </select>
-              <button type="submit" class="btn" style="background: var(--success);">
-                <i class="fas fa-user-plus"></i> Ajouter
-              </button>
-            </div>
-          </form>
-          
-          <div class="table-responsive mt-3">
-            <table>
-              <thead>
-                <tr>
-                  <th>Utilisateur</th>
-                  <th>Rôle</th>
-                  <th>Couleur</th>
-                  <th>Objectif</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="users-list"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Gestion des objectifs -->
-        <div id="admin-goals" class="card">
-          <div class="card-title">
-            <i class="fas fa-bullseye"></i> Objectifs personnalisés
-          </div>
-          <form onsubmit="addGoal(event)">
-            <div class="grid-3">
-              <select id="goal-user" required>
-                <option value="victor">Victor</option>
-                <option value="arthur">Arthur</option>
-              </select>
-              <input type="number" id="goal-amount" placeholder="Montant objectif (€)" required>
-              <select id="goal-period">
-                <option value="monthly">Mensuel</option>
-                <option value="weekly">Hebdomadaire</option>
-                <option value="yearly">Annuel</option>
-              </select>
-            </div>
-            <button type="submit" class="btn btn-block mt-3">Définir l'objectif</button>
-          </form>
-          <div id="goals-list" class="mt-3"></div>
-        </div>
-
-        <!-- Sauvegarde des données -->
-        <div id="admin-backup" class="card">
-          <div class="card-title">
-            <i class="fas fa-database"></i> Sauvegarde et restauration
-          </div>
-          <div class="grid-2">
-            <div>
-              <button onclick="backupData()" class="btn btn-block" style="background: var(--success);">
-                <i class="fas fa-save"></i> Sauvegarder
-              </button>
-            </div>
-            <div>
-              <input type="file" id="restoreFile" accept=".json">
-              <button onclick="restoreData()" class="btn btn-block mt-2" style="background: var(--warning);">
-                <i class="fas fa-undo"></i> Restaurer
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -1856,601 +1510,214 @@ tr:hover td {
 </div>
 
 <script>
-// ============ DONNÉES ÉTENDUES ============
+// ============ DONNÉES ============
 let victorGains = JSON.parse(localStorage.getItem("victorGains") || "[]");
 let arthurGains = JSON.parse(localStorage.getItem("arthurGains") || "[]");
 let products = JSON.parse(localStorage.getItem("products") || "[]");
 let events = JSON.parse(localStorage.getItem("events") || "[]");
 let clients = JSON.parse(localStorage.getItem("clients") || "[]");
-let transactions = JSON.parse(localStorage.getItem("transactions") || "[]");
-let boxes = JSON.parse(localStorage.getItem("boxes") || "[]");
-let users = JSON.parse(localStorage.getItem("users") || '[{"username":"victor","password":"","color":"#2563eb","role":"user","goal":2000},{"username":"arthur","password":"","color":"#10b981","role":"user","goal":2000}]');
-let goals = JSON.parse(localStorage.getItem("goals") || '[]');
-let settings = JSON.parse(localStorage.getItem("settings") || '{"currency":"€","notifications":"all","refresh":0}');
-let currentUser = null;
+let categories = JSON.parse(localStorage.getItem("categories") || '["vente","prestation","autre"]');
 let currentView = 'both';
+let settings = JSON.parse(localStorage.getItem("settings") || '{"currency":"€","notifications":"all","refresh":0}');
 let autoRefreshInterval = null;
-let currentMonth = 2; // Mars
-let currentYear = 2026;
-
-// Charts
-let chart, pieChart, monthlyChart;
 
 // ============ INITIALISATION ============
 const today = new Date().toISOString().split('T')[0];
 if(document.getElementById('victor-date')) document.getElementById('victor-date').value = today;
 if(document.getElementById('arthur-date')) document.getElementById('arthur-date').value = today;
 if(document.getElementById('event-date')) document.getElementById('event-date').value = today;
-if(document.getElementById('transaction-date')) document.getElementById('transaction-date').value = today;
-if(document.getElementById('box-date')) document.getElementById('box-date').value = today;
 
-// ============ FONCTIONS ADMIN ============
-function adminLogin() {
-  const username = document.getElementById('adminUsername').value;
-  const password = document.getElementById('adminPassword').value;
+// Charts
+let chart, pieChart, monthlyChart;
+
+// ============ NOUVELLES FONCTIONS AMÉLIORÉES ============
+
+// Fonction de notification
+function showToast(message, type = 'success') {
+  const toast = document.getElementById('toast');
+  const toastMessage = document.getElementById('toastMessage');
+  toast.className = 'toast';
+  if (type === 'error') toast.classList.add('error');
+  if (type === 'warning') toast.classList.add('warning');
+  toast.classList.add('show');
+  toastMessage.textContent = message;
   
-  if(username === 'admin' && password === 'admin123') {
-    currentUser = { username: 'admin', role: 'admin', color: '#8b5cf6' };
-    document.getElementById('adminLogin').style.display = 'none';
-    document.getElementById('adminPanel').style.display = 'block';
-    document.getElementById('userDisplay').style.display = 'inline';
-    document.getElementById('logoutBtn').style.display = 'flex';
-    document.querySelector('.sidebar-item[onclick*="admin"] .badge').style.display = 'inline';
-    showToast('Connexion admin réussie', 'success');
-    loadAdminData();
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3000);
+}
+
+// Loader
+function showLoader(show = true) {
+  const loader = document.getElementById('loader');
+  if (show) {
+    loader.classList.add('show');
   } else {
-    showToast('Identifiants incorrects', 'error');
+    loader.classList.remove('show');
   }
 }
 
-function logout() {
-  currentUser = null;
-  document.getElementById('adminLogin').style.display = 'block';
-  document.getElementById('adminPanel').style.display = 'none';
-  document.getElementById('userDisplay').style.display = 'none';
-  document.getElementById('logoutBtn').style.display = 'none';
-  document.querySelector('.sidebar-item[onclick*="admin"] .badge').style.display = 'none';
-  showToast('Déconnexion réussie', 'info');
+// Progress bar
+function updateProgressBar(percent) {
+  const bar = document.getElementById('progressBar');
+  bar.style.width = percent + '%';
 }
 
-function addUser(e) {
-  e.preventDefault();
-  const newUser = {
-    id: Date.now(),
-    username: document.getElementById('new-username').value,
-    password: document.getElementById('new-password').value,
-    color: document.getElementById('new-user-color').value,
-    goal: Number(document.getElementById('user-monthly-goal').value),
-    role: document.getElementById('user-role').value,
-    createdAt: today
-  };
+// Quick add gain
+function quickAddGain() {
+  const amount = prompt("Montant du gain (€):");
+  if (amount) {
+    const person = confirm("Pour Victor ? OK pour Victor, Annuler pour Arthur") ? 'victor' : 'arthur';
+    const gain = {
+      date: today,
+      amount: Number(amount),
+      description: "Saisie rapide",
+      person: person,
+      category: "autre"
+    };
+    
+    if (person === 'victor') {
+      victorGains.push(gain);
+      localStorage.setItem("victorGains", JSON.stringify(victorGains));
+    } else {
+      arthurGains.push(gain);
+      localStorage.setItem("arthurGains", JSON.stringify(arthurGains));
+    }
+    
+    refresh();
+    drawChart();
+    updateStats();
+    updateHistory();
+    showToast(`Gain de ${amount}€ ajouté pour ${person}`);
+  }
+}
+
+// Export functions
+function exportChart() {
+  const canvas = document.getElementById('chart');
+  const link = document.createElement('a');
+  link.download = 'graphique-gains.png';
+  link.href = canvas.toDataURL();
+  link.click();
+  showToast("Graphique exporté !");
+}
+
+function exportData(format) {
+  showLoader(true);
   
-  users.push(newUser);
-  localStorage.setItem("users", JSON.stringify(users));
-  updateUsersList();
-  showToast(`Utilisateur ${newUser.username} ajouté`);
-  e.target.reset();
+  setTimeout(() => {
+    const data = {
+      victorGains,
+      arthurGains,
+      products,
+      events,
+      clients
+    };
+    
+    if (format === 'json') {
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `gestion-pro-${today}.json`;
+      a.click();
+    } else if (format === 'csv') {
+      let csv = "Type,Date,Personne,Montant,Description\n";
+      
+      [...victorGains.map(g => ({...g, type: 'Gain'})), 
+       ...arthurGains.map(g => ({...g, type: 'Gain'}))]
+        .forEach(g => {
+          csv += `${g.type},${g.date},${g.person},${g.amount},${g.description}\n`;
+        });
+      
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `gestion-pro-${today}.csv`;
+      a.click();
+    } else if (format === 'pdf') {
+      window.print();
+    }
+    
+    showLoader(false);
+    showToast(`Données exportées en ${format.toUpperCase()}`);
+  }, 500);
 }
 
-function updateUsersList() {
-  if(document.getElementById('users-list')) {
-    document.getElementById('users-list').innerHTML = users.map(u => `
-      <tr>
-        <td><span style="color: ${u.color}; font-weight: 600;">${u.username}</span></td>
-        <td><span class="badge ${u.role === 'admin' ? 'badge-admin' : 'badge-info'}">${u.role}</span></td>
-        <td><div style="width: 30px; height: 30px; background: ${u.color}; border-radius: 50%;"></div></td>
-        <td>${u.goal || 2000} €</td>
-        <td>
-          <button onclick="deleteUser(${u.id})" class="btn-sm" style="background: var(--danger);">
-            <i class="fas fa-trash"></i>
-          </button>
-        </td>
-      </tr>
-    `).join('');
-    document.getElementById('total-users').innerText = users.length;
-  }
-}
-
-function deleteUser(id) {
-  if(id && users.find(u => u.id === id)?.username !== 'admin') {
-    users = users.filter(u => u.id !== id);
-    localStorage.setItem("users", JSON.stringify(users));
-    updateUsersList();
-    showToast('Utilisateur supprimé', 'warning');
-  } else {
-    showToast('Impossible de supprimer admin', 'error');
-  }
-}
-
-function addGoal(e) {
-  e.preventDefault();
-  const goal = {
-    id: Date.now(),
-    user: document.getElementById('goal-user').value,
-    amount: Number(document.getElementById('goal-amount').value),
-    period: document.getElementById('goal-period').value,
-    createdAt: today
-  };
+function importData() {
+  const fileInput = document.getElementById('importFile');
+  const file = fileInput.files[0];
   
-  goals.push(goal);
-  localStorage.setItem("goals", JSON.stringify(goals));
-  updateGoalsList();
-  showToast('Objectif ajouté');
-  e.target.reset();
-}
-
-function updateGoalsList() {
-  if(document.getElementById('goals-list')) {
-    document.getElementById('goals-list').innerHTML = goals.map(g => `
-      <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid var(--border);">
-        <span><strong>${g.user}</strong> - ${g.amount}€ (${g.period})</span>
-        <button onclick="deleteGoal(${g.id})" class="btn-sm" style="background: var(--danger);">
-          <i class="fas fa-trash"></i>
-        </button>
-      </div>
-    `).join('');
-    document.getElementById('active-goals').innerText = goals.length;
-  }
-}
-
-function deleteGoal(id) {
-  goals = goals.filter(g => g.id !== id);
-  localStorage.setItem("goals", JSON.stringify(goals));
-  updateGoalsList();
-  showToast('Objectif supprimé', 'warning');
-}
-
-function backupData() {
-  const data = {
-    victorGains,
-    arthurGains,
-    products,
-    transactions,
-    boxes,
-    users,
-    goals,
-    events,
-    clients,
-    settings
-  };
-  
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `backup-gestion-pro-${today}.json`;
-  a.click();
-  showToast('Sauvegarde effectuée');
-}
-
-function restoreData() {
-  const file = document.getElementById('restoreFile').files[0];
-  if(!file) {
-    showToast('Sélectionnez un fichier', 'error');
+  if (!file) {
+    showToast("Veuillez sélectionner un fichier", "error");
     return;
   }
+  
+  showLoader(true);
   
   const reader = new FileReader();
   reader.onload = function(e) {
     try {
       const data = JSON.parse(e.target.result);
       
-      victorGains = data.victorGains || victorGains;
-      arthurGains = data.arthurGains || arthurGains;
-      products = data.products || products;
-      transactions = data.transactions || transactions;
-      boxes = data.boxes || boxes;
-      users = data.users || users;
-      goals = data.goals || goals;
+      if (data.victorGains) victorGains = data.victorGains;
+      if (data.arthurGains) arthurGains = data.arthurGains;
+      if (data.products) products = data.products;
+      if (data.events) events = data.events;
+      if (data.clients) clients = data.clients;
       
       localStorage.setItem("victorGains", JSON.stringify(victorGains));
       localStorage.setItem("arthurGains", JSON.stringify(arthurGains));
       localStorage.setItem("products", JSON.stringify(products));
-      localStorage.setItem("transactions", JSON.stringify(transactions));
-      localStorage.setItem("boxes", JSON.stringify(boxes));
-      localStorage.setItem("users", JSON.stringify(users));
-      localStorage.setItem("goals", JSON.stringify(goals));
+      localStorage.setItem("events", JSON.stringify(events));
+      localStorage.setItem("clients", JSON.stringify(clients));
       
-      refreshAll();
-      showToast('Données restaurées avec succès');
-    } catch(error) {
-      showToast('Erreur lors de la restauration', 'error');
+      refresh();
+      drawChart();
+      updateProducts();
+      updateStock();
+      updateCalendar();
+      updateClients();
+      
+      showToast("Données importées avec succès !");
+    } catch (error) {
+      showToast("Erreur lors de l'import", "error");
     }
+    
+    showLoader(false);
   };
+  
   reader.readAsText(file);
 }
 
-function showAdminSection(section) {
-  document.getElementById('admin-users').style.display = section === 'users' ? 'block' : 'none';
-  document.getElementById('admin-goals').style.display = section === 'goals' ? 'block' : 'none';
-  document.getElementById('admin-backup').style.display = section === 'backup' ? 'block' : 'none';
-}
-
-function loadAdminData() {
-  updateUsersList();
-  updateGoalsList();
-}
-
-// ============ FONCTIONS TRANSACTIONS ============
-function updateTransactionPrice() {
-  const productId = document.getElementById('transaction-product').value;
-  const product = products.find(p => p.id == productId);
-  const quantity = Number(document.getElementById('transaction-quantity').value) || 1;
+// Filtres
+function filterHistory() {
+  const search = document.getElementById('historySearch').value.toLowerCase();
+  const all = [...victorGains.map(g=>({...g, person:'Victor'})), 
+               ...arthurGains.map(g=>({...g, person:'Arthur'}))]
+    .sort((a,b)=>new Date(b.date)-new Date(a.date));
   
-  if(product) {
-    document.getElementById('transaction-price').value = product.price.toFixed(2);
-    document.getElementById('transaction-cost').value = product.cost.toFixed(2);
-    
-    const marginUnit = product.price - product.cost;
-    const marginTotal = marginUnit * quantity;
-    
-    document.getElementById('transaction-margin-unit').innerText = marginUnit.toFixed(2) + ' €';
-    document.getElementById('transaction-margin-total').innerText = marginTotal.toFixed(2) + ' €';
-  }
-}
-
-function addTransaction(e) {
-  e.preventDefault();
+  const filtered = search ? all.filter(g => 
+    g.description?.toLowerCase().includes(search) ||
+    g.person.toLowerCase().includes(search) ||
+    g.amount.toString().includes(search)
+  ) : all;
   
-  const productId = document.getElementById('transaction-product').value;
-  const product = products.find(p => p.id == productId);
-  const quantity = Number(document.getElementById('transaction-quantity').value);
-  const price = Number(document.getElementById('transaction-price').value);
-  const cost = product.cost;
-  
-  const transaction = {
-    id: Date.now(),
-    person: document.getElementById('transaction-person').value,
-    productId: productId,
-    productName: product.name,
-    quantity: quantity,
-    price: price,
-    cost: cost,
-    margin: (price - cost) * quantity,
-    date: document.getElementById('transaction-date').value,
-    createdAt: new Date().toISOString()
-  };
-  
-  // Mettre à jour le stock
-  const productIndex = products.findIndex(p => p.id == productId);
-  if(products[productIndex].quantity >= quantity) {
-    products[productIndex].quantity -= quantity;
-    
-    transactions.push(transaction);
-    localStorage.setItem("transactions", JSON.stringify(transactions));
-    localStorage.setItem("products", JSON.stringify(products));
-    
-    // Ajouter aux gains selon la personne
-    if(transaction.person === 'victor') {
-      victorGains.push({
-        id: Date.now() + 1,
-        date: transaction.date,
-        amount: transaction.price * transaction.quantity,
-        description: `Vente: ${transaction.productName} x${transaction.quantity}`,
-        person: 'victor',
-        category: 'vente'
-      });
-      localStorage.setItem("victorGains", JSON.stringify(victorGains));
-    } else if(transaction.person === 'arthur') {
-      arthurGains.push({
-        id: Date.now() + 2,
-        date: transaction.date,
-        amount: transaction.price * transaction.quantity,
-        description: `Vente: ${transaction.productName} x${transaction.quantity}`,
-        person: 'arthur',
-        category: 'vente'
-      });
-      localStorage.setItem("arthurGains", JSON.stringify(arthurGains));
-    } else if(transaction.person === 'commun') {
-      // Partager équitablement
-      const halfAmount = (transaction.price * transaction.quantity) / 2;
-      victorGains.push({
-        id: Date.now() + 1,
-        date: transaction.date,
-        amount: halfAmount,
-        description: `Vente commune: ${transaction.productName} x${transaction.quantity}`,
-        person: 'victor',
-        category: 'vente'
-      });
-      arthurGains.push({
-        id: Date.now() + 2,
-        date: transaction.date,
-        amount: halfAmount,
-        description: `Vente commune: ${transaction.productName} x${transaction.quantity}`,
-        person: 'arthur',
-        category: 'vente'
-      });
-      localStorage.setItem("victorGains", JSON.stringify(victorGains));
-      localStorage.setItem("arthurGains", JSON.stringify(arthurGains));
-    }
-    
-    updateProductSelects();
-    updateTransactionsStats();
-    filterTransactions();
-    refreshAll();
-    showToast(`Transaction ajoutée - Marge: ${transaction.margin.toFixed(2)}€`);
-    e.target.reset();
-    document.getElementById('transaction-date').value = today;
-  } else {
-    showToast('Stock insuffisant !', 'error');
-  }
-}
-
-function updateTransactionsStats() {
-  const total = transactions.reduce((sum, t) => sum + (t.price * t.quantity), 0);
-  const margin = transactions.reduce((sum, t) => sum + t.margin, 0);
-  const marginRate = total > 0 ? (margin / total * 100) : 0;
-  
-  if(document.getElementById('transactions-total')) document.getElementById('transactions-total').innerHTML = total.toFixed(2) + ' €';
-  if(document.getElementById('transactions-margin')) document.getElementById('transactions-margin').innerHTML = margin.toFixed(2) + ' €';
-  if(document.getElementById('transactions-count')) document.getElementById('transactions-count').innerHTML = transactions.length;
-  if(document.getElementById('transactions-margin-rate')) document.getElementById('transactions-margin-rate').innerHTML = marginRate.toFixed(1) + '%';
-  
-  document.getElementById('transactionBadge').style.display = transactions.length > 0 ? 'inline' : 'none';
-}
-
-function filterTransactions() {
-  const filter = document.getElementById('transactionFilter')?.value || 'all';
-  const search = document.getElementById('transactionSearch')?.value.toLowerCase() || '';
-  
-  let filtered = transactions;
-  
-  if(filter !== 'all') {
-    filtered = filtered.filter(t => t.person === filter);
-  }
-  
-  if(search) {
-    filtered = filtered.filter(t => 
-      t.productName.toLowerCase().includes(search) ||
-      t.person.toLowerCase().includes(search)
-    );
-  }
-  
-  filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
-  
-  if(document.getElementById('transactions-list')) {
-    document.getElementById('transactions-list').innerHTML = filtered.map(t => `
-      <tr>
-        <td>${t.date}</td>
-        <td><span class="badge" style="background: ${t.person === 'victor' ? 'var(--victor-color)' : t.person === 'arthur' ? 'var(--arthur-color)' : 'var(--warning)'}; color: white;">${t.person}</span></td>
-        <td>${t.productName} x${t.quantity}</td>
-        <td>${t.quantity}</td>
-        <td>${t.price.toFixed(2)} €</td>
-        <td>${t.cost.toFixed(2)} €</td>
-        <td><span class="badge ${t.margin > 0 ? 'badge-success' : 'badge-danger'}">${t.margin.toFixed(2)} €</span></td>
-        <td>
-          <button onclick="deleteTransaction(${t.id})" class="btn-sm" style="background: var(--danger);">
-            <i class="fas fa-trash"></i>
-          </button>
-        </td>
-      </tr>
-    `).join('');
-  }
-}
-
-function deleteTransaction(id) {
-  const transaction = transactions.find(t => t.id === id);
-  
-  // Restaurer le stock
-  const product = products.find(p => p.id == transaction.productId);
-  if(product) {
-    product.quantity += transaction.quantity;
-    localStorage.setItem("products", JSON.stringify(products));
-  }
-  
-  transactions = transactions.filter(t => t.id !== id);
-  localStorage.setItem("transactions", JSON.stringify(transactions));
-  
-  filterTransactions();
-  updateTransactionsStats();
-  refreshAll();
-  showToast('Transaction supprimée', 'warning');
-}
-
-function showTransactionStats(type) {
-  const total = transactions.reduce((sum, t) => sum + (t.price * t.quantity), 0);
-  const margin = transactions.reduce((sum, t) => sum + t.margin, 0);
-  
-  if(type === 'all') showToast(`CA Total: ${total.toFixed(2)}€`, 'info');
-  if(type === 'margin') showToast(`Marge Totale: ${margin.toFixed(2)}€`, 'info');
-  if(type === 'count') showToast(`Nombre de transactions: ${transactions.length}`, 'info');
-  if(type === 'margin-rate') {
-    const rate = total > 0 ? (margin / total * 100).toFixed(1) : 0;
-    showToast(`Taux de marge moyen: ${rate}%`, 'info');
-  }
-}
-
-// ============ FONCTIONS BOXES ============
-let currentBoxProducts = [];
-
-function updateProductSelects() {
-  const productSelect = document.getElementById('transaction-product');
-  const boxProductSelect = document.getElementById('box-product-select');
-  
-  if(productSelect) {
-    productSelect.innerHTML = '<option value="">Sélectionner un produit</option>' + 
-      products.map(p => `<option value="${p.id}" data-price="${p.price}" data-cost="${p.cost}">${p.name} - ${p.price}€ (Stock: ${p.quantity})</option>`).join('');
-  }
-  
-  if(boxProductSelect) {
-    boxProductSelect.innerHTML = '<option value="">Sélectionner un produit</option>' + 
-      products.map(p => `<option value="${p.id}">${p.name} - ${p.price}€ (Stock: ${p.quantity})</option>`).join('');
-  }
-}
-
-function addProductToBox() {
-  const productId = document.getElementById('box-product-select').value;
-  const quantity = Number(document.getElementById('box-product-quantity').value);
-  
-  if(!productId || quantity < 1) {
-    showToast('Sélectionnez un produit', 'error');
-    return;
-  }
-  
-  const product = products.find(p => p.id == productId);
-  
-  if(product.quantity < quantity) {
-    showToast('Stock insuffisant !', 'error');
-    return;
-  }
-  
-  currentBoxProducts.push({
-    productId: product.id,
-    name: product.name,
-    quantity: quantity,
-    price: product.price,
-    cost: product.cost
-  });
-  
-  updateBoxProductsList();
-  updateBoxTotals();
-}
-
-function updateBoxProductsList() {
-  const list = document.getElementById('box-products-list');
-  if(list) {
-    list.innerHTML = currentBoxProducts.map((p, index) => `
-      <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid var(--border);">
-        <span><strong>${p.name}</strong> x${p.quantity}</span>
-        <span>${(p.cost * p.quantity).toFixed(2)} €</span>
-        <button onclick="removeFromBox(${index})" class="btn-sm" style="background: var(--danger);">
-          <i class="fas fa-times"></i>
+  document.getElementById('history-table-body').innerHTML = filtered.slice(0,20).map(g => 
+    `<tr>
+      <td>${g.date}</td>
+      <td><span class="badge ${g.person==='Victor'?'badge-info':'badge-success'}">${g.person}</span></td>
+      <td><span class="badge">${g.category || 'autre'}</span></td>
+      <td>${g.description||'-'}</td>
+      <td><strong>${g.amount.toFixed(2)} €</strong></td>
+      <td>
+        <button onclick="deleteGain(${g.id}, '${g.person.toLowerCase()}')" class="btn-sm" style="background: var(--danger);">
+          <i class="fas fa-trash"></i>
         </button>
-      </div>
-    `).join('');
-  }
-}
-
-function removeFromBox(index) {
-  currentBoxProducts.splice(index, 1);
-  updateBoxProductsList();
-  updateBoxTotals();
-}
-
-function updateBoxTotals() {
-  const totalCost = currentBoxProducts.reduce((sum, p) => sum + (p.cost * p.quantity), 0);
-  const totalPrice = currentBoxProducts.reduce((sum, p) => sum + (p.price * p.quantity), 0);
-  const margin = totalPrice - totalCost;
-  const marginRate = totalPrice > 0 ? (margin / totalPrice * 100) : 0;
-  
-  document.getElementById('box-cost').value = totalCost.toFixed(2);
-  document.getElementById('box-total-cost').innerText = totalCost.toFixed(2) + ' €';
-  document.getElementById('box-total-price').innerText = totalPrice.toFixed(2) + ' €';
-  document.getElementById('box-total-margin').innerText = margin.toFixed(2) + ' €';
-  document.getElementById('box-margin-rate').innerText = marginRate.toFixed(1) + '%';
-}
-
-function addBox(e) {
-  e.preventDefault();
-  
-  if(currentBoxProducts.length === 0) {
-    showToast('Ajoutez au moins un produit', 'error');
-    return;
-  }
-  
-  const boxPrice = Number(document.getElementById('box-price').value);
-  const boxCost = Number(document.getElementById('box-cost').value);
-  
-  const box = {
-    id: Date.now(),
-    name: document.getElementById('box-name').value,
-    price: boxPrice,
-    cost: boxCost,
-    products: [...currentBoxProducts],
-    date: document.getElementById('box-date').value,
-    createdAt: new Date().toISOString()
-  };
-  
-  boxes.push(box);
-  localStorage.setItem("boxes", JSON.stringify(boxes));
-  
-  // Mettre à jour les stocks
-  box.products.forEach(p => {
-    const product = products.find(prod => prod.id == p.productId);
-    if(product) {
-      product.quantity -= p.quantity;
-    }
-  });
-  localStorage.setItem("products", JSON.stringify(products));
-  
-  // Vider la box courante
-  currentBoxProducts = [];
-  updateBoxProductsList();
-  updateBoxTotals();
-  updateBoxesList();
-  updateBoxesStats();
-  updateProductSelects();
-  
-  showToast(`Box "${box.name}" créée - Marge: ${(box.price - box.cost).toFixed(2)}€`);
-  e.target.reset();
-  document.getElementById('box-date').value = today;
-}
-
-function updateBoxesStats() {
-  const totalBoxes = boxes.length;
-  const revenue = boxes.reduce((sum, b) => sum + b.price, 0);
-  const margin = boxes.reduce((sum, b) => sum + (b.price - b.cost), 0);
-  
-  if(document.getElementById('boxes-total')) document.getElementById('boxes-total').innerText = totalBoxes;
-  if(document.getElementById('boxes-revenue')) document.getElementById('boxes-revenue').innerHTML = revenue.toFixed(2) + ' €';
-  if(document.getElementById('boxes-margin')) document.getElementById('boxes-margin').innerHTML = margin.toFixed(2) + ' €';
-  
-  document.getElementById('boxBadge').style.display = totalBoxes > 0 ? 'inline' : 'none';
-}
-
-function updateBoxesList() {
-  if(document.getElementById('boxes-grid')) {
-    document.getElementById('boxes-grid').innerHTML = boxes.map(b => `
-      <div class="product-card">
-        <h3 style="color: var(--accent);">${b.name}</h3>
-        <div style="font-size: 20px; font-weight: 700; margin: 10px 0;">
-          ${b.price.toFixed(2)} €
-        </div>
-        <div class="stock-bar">
-          <div class="stock-fill" style="width: ${(b.price / (b.cost || 1)) * 50}%"></div>
-        </div>
-        <p><strong>Coût:</strong> ${b.cost.toFixed(2)} €</p>
-        <p><strong>Marge:</strong> <span class="badge badge-success">${(b.price - b.cost).toFixed(2)} €</span></p>
-        <p><strong>Produits:</strong> ${b.products.length}</p>
-        <p><strong>Date:</strong> ${b.date}</p>
-        <button onclick="viewBoxDetails(${b.id})" class="btn btn-block mt-2">Détails</button>
-      </div>
-    `).join('');
-  }
-}
-
-function viewBoxDetails(id) {
-  const box = boxes.find(b => b.id === id);
-  let details = `Box: ${box.name}\nPrix: ${box.price}€\nCoût: ${box.cost}€\nMarge: ${(box.price - box.cost).toFixed(2)}€\n\nProduits:\n`;
-  box.products.forEach(p => {
-    details += `- ${p.name} x${p.quantity} (${(p.cost * p.quantity).toFixed(2)}€)\n`;
-  });
-  alert(details);
-}
-
-// ============ FONCTIONS PRODUITS AMÉLIORÉES ============
-function addProduct(e) {
-  e.preventDefault();
-  const product = {
-    id: Date.now(),
-    name: document.getElementById('product-name').value,
-    price: Number(document.getElementById('product-price').value),
-    cost: Number(document.getElementById('product-cost').value),
-    quantity: Number(document.getElementById('product-quantity').value),
-    category: document.getElementById('product-category').value,
-    sku: document.getElementById('product-sku').value || `SKU-${Date.now()}`,
-    createdAt: today
-  };
-  
-  products.push(product);
-  localStorage.setItem("products", JSON.stringify(products));
-  e.target.reset();
-  
-  updateProducts();
-  updateStock();
-  updateSheets();
-  updateProductSelects();
-  showToast(`Produit ${product.name} ajouté !`);
+      </td>
+    </tr>`
+  ).join('');
 }
 
 function filterProducts() {
@@ -2478,10 +1745,6 @@ function filterProducts() {
       <div class="stock-bar">
         <div class="stock-fill" style="width: ${Math.min(100, p.quantity)}%"></div>
       </div>
-      <div style="display: flex; justify-content: space-between; margin: 10px 0;">
-        <span>Achat: ${p.cost?.toFixed(2)} €</span>
-        <span>Marge: <span class="badge badge-success">${(p.price - (p.cost||0)).toFixed(2)} €</span></span>
-      </div>
       <div style="display: flex; gap: 10px; margin-top: 20px;">
         <button onclick="editProduct(${p.id})" class="btn-sm" style="background: var(--warning); flex: 1;">
           <i class="fas fa-edit"></i>
@@ -2492,12 +1755,127 @@ function filterProducts() {
       </div>
     </div>
   `).join('');
+}
+
+function filterClients() {
+  const search = document.getElementById('clientSearch')?.value.toLowerCase() || '';
   
-  document.getElementById('productBadge').style.display = filtered.length > 0 ? 'none' : 'inline';
+  const filtered = clients.filter(c => 
+    c.name.toLowerCase().includes(search) ||
+    c.email?.toLowerCase().includes(search) ||
+    c.phone?.includes(search)
+  );
+  
+  document.getElementById('clients-list').innerHTML = filtered.map(c => `
+    <div class="client-card">
+      <div style="display: flex; justify-content: space-between; align-items: start;">
+        <h3 style="margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px;">
+          <i class="fas fa-user-circle" style="color: var(--accent);"></i> ${c.name}
+        </h3>
+        <button onclick="deleteClient(${c.id})" class="btn-sm" style="background: var(--danger);">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <p style="margin: 8px 0; display: flex; align-items: center; gap: 10px;">
+        <i class="fas fa-envelope" style="color: var(--text-light);"></i> ${c.email || 'Non renseigné'}
+      </p>
+      <p style="margin: 8px 0; display: flex; align-items: center; gap: 10px;">
+        <i class="fas fa-phone" style="color: var(--text-light);"></i> ${c.phone || 'Non renseigné'}
+      </p>
+      <p style="margin: 8px 0; display: flex; align-items: center; gap: 10px;">
+        <i class="fas fa-building" style="color: var(--text-light);"></i> ${c.company || 'Non renseigné'}
+      </p>
+    </div>
+  `).join('');
+}
+
+// Alertes stock faible
+function alertLowStock() {
+  const lowStock = products.filter(p => p.quantity < 10);
+  if (lowStock.length > 0) {
+    let message = "Produits en stock faible :\n";
+    lowStock.forEach(p => {
+      message += `- ${p.name}: ${p.quantity} unités\n`;
+    });
+    alert(message);
+  } else {
+    showToast("Aucun produit en stock faible !");
+  }
+}
+
+// Gestion des gains avec catégories
+function addGain(e, person) {
+  e.preventDefault();
+  const gain = {
+    id: Date.now(),
+    date: document.getElementById(`${person}-date`).value,
+    amount: Number(document.getElementById(`${person}-amount`).value),
+    description: document.getElementById(`${person}-description`).value || "Gain",
+    person: person,
+    category: document.getElementById(`${person}-category`)?.value || "autre"
+  };
+  
+  if (person === 'victor') { 
+    victorGains.push(gain); 
+    localStorage.setItem("victorGains", JSON.stringify(victorGains)); 
+  } else { 
+    arthurGains.push(gain); 
+    localStorage.setItem("arthurGains", JSON.stringify(arthurGains)); 
+  }
+  
+  e.target.reset();
+  document.getElementById(`${person}-date`).value = today;
+  
+  refresh(); 
+  drawChart(); 
+  updateStats(); 
+  updateHistory();
+  showToast(`Gain de ${gain.amount}€ ajouté !`);
+}
+
+function deleteGain(id, person) {
+  if (person === 'victor') {
+    victorGains = victorGains.filter(g => g.id !== id);
+    localStorage.setItem("victorGains", JSON.stringify(victorGains));
+  } else {
+    arthurGains = arthurGains.filter(g => g.id !== id);
+    localStorage.setItem("arthurGains", JSON.stringify(arthurGains));
+  }
+  
+  refresh();
+  drawChart();
+  updateStats();
+  updateHistory();
+  showToast("Gain supprimé", "warning");
+}
+
+// Produits améliorés
+function addProduct(e) {
+  e.preventDefault();
+  const product = {
+    id: Date.now(),
+    name: document.getElementById('product-name').value,
+    price: Number(document.getElementById('product-price').value),
+    quantity: Number(document.getElementById('product-quantity').value),
+    category: document.getElementById('product-category').value,
+    sku: document.getElementById('product-sku').value || `SKU-${Date.now()}`,
+    createdAt: today
+  };
+  
+  products.push(product);
+  localStorage.setItem("products", JSON.stringify(products));
+  e.target.reset();
+  
+  updateProducts();
+  updateStock();
+  updateSheets();
+  showToast(`Produit ${product.name} ajouté !`);
 }
 
 function updateProducts() {
-  filterProducts();
+  if(document.getElementById('products-list')) {
+    filterProducts();
+  }
 }
 
 function updateStock() {
@@ -2511,6 +1889,7 @@ function updateStock() {
   if(document.getElementById('low-stock')) document.getElementById('low-stock').innerText = lowStock;
   if(document.getElementById('stock-value')) document.getElementById('stock-value').innerHTML = stockValue.toFixed(2) + ' €';
   
+  // Mettre à jour les badges
   if(lowStock > 0) {
     document.getElementById('inventoryBadge').style.display = 'inline';
     document.getElementById('inventoryBadge').innerText = lowStock;
@@ -2525,14 +1904,12 @@ function updateStock() {
         <td><span class="badge">${p.sku || '-'}</span></td>
         <td>${p.category}</td>
         <td>${p.price.toFixed(2)} €</td>
-        <td>${p.cost ? p.cost.toFixed(2) + ' €' : '-'}</td>
         <td>
           <span class="badge ${p.quantity < 5 ? 'badge-danger' : p.quantity < 10 ? 'badge-warning' : 'badge-success'}">
             ${p.quantity}
           </span>
         </td>
         <td>${(p.price * p.quantity).toFixed(2)} €</td>
-        <td><span class="badge badge-info">${(p.price - (p.cost||0)).toFixed(2)} €</span></td>
         <td>
           ${p.quantity < 5 ? '<span class="badge badge-danger">Critique</span>' : 
             p.quantity < 10 ? '<span class="badge badge-warning">Faible</span>' : 
@@ -2553,89 +1930,21 @@ function updateStock() {
   }
 }
 
-function updateSheets() {
-  if(document.getElementById('product-sheets')) {
-    document.getElementById('product-sheets').innerHTML = products.map(p => `
-      <div class="product-card">
-        <h3 style="color: var(--accent); margin-top: 0;">${p.name}</h3>
-        <p><i class="fas fa-tag"></i> <strong>Catégorie:</strong> ${p.category}</p>
-        <p><i class="fas fa-euro-sign"></i> <strong>Prix vente:</strong> ${p.price.toFixed(2)} €</p>
-        <p><i class="fas fa-euro-sign"></i> <strong>Prix achat:</strong> ${p.cost ? p.cost.toFixed(2) + ' €' : '-'}</p>
-        <p><i class="fas fa-cubes"></i> <strong>Stock:</strong> ${p.quantity} unités</p>
-        <p><i class="fas fa-chart-line"></i> <strong>Valeur:</strong> ${(p.price*p.quantity).toFixed(2)} €</p>
-        <p><i class="fas fa-barcode"></i> <strong>SKU:</strong> ${p.sku || '-'}</p>
-        <div class="stock-bar">
-          <div class="stock-fill" style="width: ${Math.min(100, p.quantity)}%"></div>
-        </div>
-      </div>
-    `).join('');
+function removeStock(id) {
+  const p = products.find(p=>p.id===id);
+  if(p.quantity > 0) {
+    p.quantity -= 1;
+    localStorage.setItem("products", JSON.stringify(products));
+    updateProducts();
+    updateStock();
+    updateSheets();
   }
 }
 
-function deleteProduct(id) { 
-  if(confirm('Supprimer ce produit ?')) {
-    products = products.filter(p=>p.id!==id); 
-    localStorage.setItem("products", JSON.stringify(products)); 
-    updateProducts(); 
-    updateStock(); 
-    updateSheets();
-    updateProductSelects();
-    showToast("Produit supprimé", "warning");
-  }
-}
+// Calendrier amélioré
+let currentMonth = 2; // Mars
+let currentYear = 2026;
 
-function editProduct(id) { 
-  const p = products.find(p=>p.id===id); 
-  const q = prompt("Nouvelle quantité:", p.quantity); 
-  if(q) { 
-    p.quantity = Number(q); 
-    localStorage.setItem("products", JSON.stringify(products)); 
-    updateProducts(); 
-    updateStock(); 
-    updateSheets();
-    updateProductSelects();
-    showToast("Stock mis à jour");
-  } 
-}
-
-function addStock(id) { 
-  const p = products.find(p=>p.id===id); 
-  p.quantity += 1; 
-  localStorage.setItem("products", JSON.stringify(products)); 
-  updateProducts(); 
-  updateStock(); 
-  updateSheets();
-  updateProductSelects();
-  showToast("Stock +1");
-}
-
-function removeStock(id) { 
-  const p = products.find(p=>p.id===id); 
-  if(p.quantity > 0) { 
-    p.quantity -= 1; 
-    localStorage.setItem("products", JSON.stringify(products)); 
-    updateProducts(); 
-    updateStock(); 
-    updateSheets();
-    updateProductSelects();
-    showToast("Stock -1");
-  } 
-}
-
-function alertLowStock() {
-  const lowStock = products.filter(p => p.quantity < 10);
-  if (lowStock.length > 0) {
-    let message = "Produits en stock faible :\n";
-    lowStock.forEach(p => {
-      message += `- ${p.name}: ${p.quantity} unités\n`;
-    });
-    alert(message);
-  } else {
-    showToast("Aucun produit en stock faible !");
-  }
-}
-
-// ============ FONCTIONS CALENDRIER ============
 function updateCalendar() {
   if(!document.getElementById('calendar-view')) return;
   
@@ -2671,7 +1980,7 @@ function updateCalendar() {
   }
   
   document.getElementById('calendar-view').innerHTML = html;
-  document.querySelector('#tab-calendar .card .card-title i.fa-calendar').parentElement.innerHTML = 
+  document.querySelector('.card .card-title i.fa-calendar').parentElement.innerHTML = 
     `<i class="fas fa-calendar"></i> ${getMonthName(currentMonth)} ${currentYear}`;
 }
 
@@ -2760,15 +2069,7 @@ function updateEventsList() {
   }
 }
 
-function deleteEvent(id) { 
-  events = events.filter(e=>e.id!==id); 
-  localStorage.setItem("events", JSON.stringify(events)); 
-  updateCalendar(); 
-  updateEventsList();
-  showToast("Événement supprimé", "warning");
-}
-
-// ============ FONCTIONS STATISTIQUES ============
+// Statistiques améliorées
 function updateStats() {
   const victorTotal = sum(victorGains, ()=>true);
   const arthurTotal = sum(arthurGains, ()=>true);
@@ -2794,22 +2095,16 @@ function updateStats() {
     new Date(g.date).getFullYear() === now.getFullYear()
   );
   
-  const victorGoal = users.find(u => u.username === 'victor')?.goal || 2000;
-  const arthurGoal = users.find(u => u.username === 'arthur')?.goal || 2000;
-  
-  if(document.getElementById('victor-goal-amount')) document.getElementById('victor-goal-amount').innerText = victorGoal;
-  if(document.getElementById('arthur-goal-amount')) document.getElementById('arthur-goal-amount').innerText = arthurGoal;
-  
   if(document.getElementById('victor-progress')) {
-    const victorPercent = (victorMonthTotal / victorGoal) * 100;
+    const victorPercent = (victorMonthTotal / 2000) * 100;
     document.getElementById('victor-progress').style.width = Math.min(100, victorPercent) + '%';
-    document.getElementById('victor-goal').innerHTML = `${victorMonthTotal.toFixed(2)} € / ${victorGoal} €`;
+    document.getElementById('victor-goal').innerHTML = `${victorMonthTotal.toFixed(2)} € / 2000 €`;
   }
   
   if(document.getElementById('arthur-progress')) {
-    const arthurPercent = (arthurMonthTotal / arthurGoal) * 100;
+    const arthurPercent = (arthurMonthTotal / 2000) * 100;
     document.getElementById('arthur-progress').style.width = Math.min(100, arthurPercent) + '%';
-    document.getElementById('arthur-goal').innerHTML = `${arthurMonthTotal.toFixed(2)} € / ${arthurGoal} €`;
+    document.getElementById('arthur-goal').innerHTML = `${arthurMonthTotal.toFixed(2)} € / 2000 €`;
   }
   
   if(pieChart) {
@@ -2819,94 +2114,21 @@ function updateStats() {
   
   if(monthlyChart) {
     const monthData = [];
-    const monthLabels = [];
-    for(let i = 5; i >= 0; i--) {
-      const d = new Date();
-      d.setMonth(d.getMonth() - i);
-      const month = d.getMonth();
-      const year = d.getFullYear();
+    for(let i = 0; i < 6; i++) {
+      const month = new Date().getMonth() - i;
+      const year = new Date().getFullYear();
       const monthTotal = sum(all, g => 
         new Date(g.date).getMonth() === month && 
         new Date(g.date).getFullYear() === year
       );
-      monthData.push(monthTotal);
-      monthLabels.push(d.toLocaleDateString('fr-FR', { month: 'short' }));
+      monthData.unshift(monthTotal);
     }
-    monthlyChart.data.labels = monthLabels;
     monthlyChart.data.datasets[0].data = monthData;
     monthlyChart.update();
   }
 }
 
-// ============ FONCTIONS CLIENTS ============
-function addClient(e) {
-  e.preventDefault();
-  const client = {
-    id: Date.now(),
-    name: document.getElementById('client-name').value,
-    email: document.getElementById('client-email').value,
-    phone: document.getElementById('client-phone').value,
-    company: document.getElementById('client-company').value,
-    type: document.getElementById('client-type').value,
-    createdAt: today
-  };
-  
-  clients.push(client);
-  localStorage.setItem("clients", JSON.stringify(clients));
-  e.target.reset();
-  
-  updateClients();
-  showToast(`Client ${client.name} ajouté !`);
-}
-
-function filterClients() {
-  const search = document.getElementById('clientSearch')?.value.toLowerCase() || '';
-  
-  const filtered = clients.filter(c => 
-    c.name.toLowerCase().includes(search) ||
-    c.email?.toLowerCase().includes(search) ||
-    c.phone?.includes(search)
-  );
-  
-  if(document.getElementById('clients-list')) {
-    document.getElementById('clients-list').innerHTML = filtered.map(c => `
-      <div class="client-card">
-        <div style="display: flex; justify-content: space-between; align-items: start;">
-          <h3 style="margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px;">
-            <i class="fas fa-user-circle" style="color: var(--accent);"></i> ${c.name}
-          </h3>
-          <button onclick="deleteClient(${c.id})" class="btn-sm" style="background: var(--danger);">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-        <p style="margin: 8px 0; display: flex; align-items: center; gap: 10px;">
-          <i class="fas fa-envelope" style="color: var(--text-light);"></i> ${c.email || 'Non renseigné'}
-        </p>
-        <p style="margin: 8px 0; display: flex; align-items: center; gap: 10px;">
-          <i class="fas fa-phone" style="color: var(--text-light);"></i> ${c.phone || 'Non renseigné'}
-        </p>
-        <p style="margin: 8px 0; display: flex; align-items: center; gap: 10px;">
-          <i class="fas fa-building" style="color: var(--text-light);"></i> ${c.company || 'Non renseigné'}
-        </p>
-      </div>
-    `).join('');
-  }
-}
-
-function updateClients() {
-  filterClients();
-  document.getElementById('clientsBadge').style.display = clients.length > 0 ? 'inline' : 'none';
-  document.getElementById('clientsBadge').innerText = clients.length;
-}
-
-function deleteClient(id) { 
-  clients = clients.filter(c=>c.id!==id); 
-  localStorage.setItem("clients", JSON.stringify(clients)); 
-  updateClients();
-  showToast("Client supprimé", "warning");
-}
-
-// ============ FONCTIONS RAPPORTS ============
+// Rapports
 function generateReport(type) {
   showLoader(true);
   
@@ -2952,99 +2174,43 @@ function generateReport(type) {
   }, 500);
 }
 
-// ============ FONCTIONS IMPORT/EXPORT ============
-function exportData(format) {
-  showLoader(true);
-  
-  setTimeout(() => {
-    const data = {
-      victorGains,
-      arthurGains,
-      products,
-      events,
-      clients,
-      transactions,
-      boxes,
-      users,
-      goals
-    };
-    
-    if (format === 'json') {
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `gestion-pro-${today}.json`;
-      a.click();
-    } else if (format === 'csv') {
-      let csv = "Type,Date,Personne,Montant,Description\n";
-      
-      [...victorGains.map(g => ({...g, type: 'Gain'})), 
-       ...arthurGains.map(g => ({...g, type: 'Gain'}))]
-        .forEach(g => {
-          csv += `${g.type},${g.date},${g.person},${g.amount},${g.description}\n`;
-        });
-      
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `gestion-pro-${today}.csv`;
-      a.click();
-    } else if (format === 'pdf') {
-      window.print();
-    }
-    
-    showLoader(false);
-    showToast(`Données exportées en ${format.toUpperCase()}`);
-  }, 500);
+// Paramètres
+function showSettings() {
+  document.getElementById('settingsModal').classList.add('active');
+  document.getElementById('currencySetting').value = settings.currency;
+  document.getElementById('notificationsSetting').value = settings.notifications;
+  document.getElementById('refreshSetting').value = settings.refresh;
 }
 
-function importData() {
-  const fileInput = document.getElementById('importFile');
-  const file = fileInput.files[0];
-  
-  if (!file) {
-    showToast("Veuillez sélectionner un fichier", "error");
-    return;
-  }
-  
-  showLoader(true);
-  
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const data = JSON.parse(e.target.result);
-      
-      if (data.victorGains) victorGains = data.victorGains;
-      if (data.arthurGains) arthurGains = data.arthurGains;
-      if (data.products) products = data.products;
-      if (data.events) events = data.events;
-      if (data.clients) clients = data.clients;
-      if (data.transactions) transactions = data.transactions;
-      if (data.boxes) boxes = data.boxes;
-      
-      localStorage.setItem("victorGains", JSON.stringify(victorGains));
-      localStorage.setItem("arthurGains", JSON.stringify(arthurGains));
-      localStorage.setItem("products", JSON.stringify(products));
-      localStorage.setItem("events", JSON.stringify(events));
-      localStorage.setItem("clients", JSON.stringify(clients));
-      localStorage.setItem("transactions", JSON.stringify(transactions));
-      localStorage.setItem("boxes", JSON.stringify(boxes));
-      
-      refreshAll();
-      showToast("Données importées avec succès !");
-    } catch (error) {
-      showToast("Erreur lors de l'import", "error");
-    }
-    
-    showLoader(false);
+function closeSettings() {
+  document.getElementById('settingsModal').classList.remove('active');
+}
+
+function updateSettings() {
+  settings = {
+    currency: document.getElementById('currencySetting').value,
+    notifications: document.getElementById('notificationsSetting').value,
+    refresh: document.getElementById('refreshSetting').value
   };
   
-  reader.readAsText(file);
+  localStorage.setItem("settings", JSON.stringify(settings));
+  
+  // Mettre à jour l'auto-refresh
+  if(autoRefreshInterval) clearInterval(autoRefreshInterval);
+  if(settings.refresh > 0) {
+    autoRefreshInterval = setInterval(() => {
+      refresh();
+      drawChart();
+      updateStats();
+      showToast("Données rafraîchies", "info");
+    }, settings.refresh * 1000);
+  }
+  
+  showToast("Paramètres enregistrés");
 }
 
-// ============ FONCTIONS DE BASE ============
+// ============ FONCTIONS EXISTANTES AMÉLIORÉES ============
+
 function initCharts() {
   if(document.getElementById('chart')) {
     chart = new Chart(document.getElementById("chart"), {
@@ -3118,10 +2284,10 @@ function initCharts() {
     monthlyChart = new Chart(document.getElementById("monthly-chart"), { 
       type: "bar", 
       data: { 
-        labels: [], 
+        labels: ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin"], 
         datasets: [{ 
           label: "Gains 2026", 
-          data: [], 
+          data: [0,0,0,0,0,0], 
           backgroundColor: "var(--accent)",
           borderRadius: 8
         }] 
@@ -3171,116 +2337,6 @@ function refresh() {
   updateProgressBar((victorTotal + arthurTotal) / 1000);
 }
 
-function refreshAll() {
-  refresh();
-  updateProducts();
-  updateStock();
-  updateTransactionsStats();
-  updateBoxesStats();
-  filterTransactions();
-  updateBoxesList();
-  updateUsersList();
-  updateGoalsList();
-  updateStats();
-  updateCalendar();
-  updateEventsList();
-  updateClients();
-  if(chart) drawChart();
-}
-
-function showToast(message, type = 'success') {
-  const toast = document.getElementById('toast');
-  const toastMessage = document.getElementById('toastMessage');
-  toast.className = 'toast';
-  if (type === 'error') toast.classList.add('error');
-  if (type === 'warning') toast.classList.add('warning');
-  toast.classList.add('show');
-  toastMessage.textContent = message;
-  
-  setTimeout(() => {
-    toast.classList.remove('show');
-  }, 3000);
-}
-
-function updateProgressBar(percent) {
-  const bar = document.getElementById('progressBar');
-  bar.style.width = Math.min(100, percent) + '%';
-}
-
-function showLoader(show = true) {
-  const loader = document.getElementById('loader');
-  if (show) {
-    loader.classList.add('show');
-  } else {
-    loader.classList.remove('show');
-  }
-}
-
-function quickAddGain() {
-  const amount = prompt("Montant du gain (€):");
-  if (amount) {
-    const person = confirm("Pour Victor ? OK pour Victor, Annuler pour Arthur") ? 'victor' : 'arthur';
-    const gain = {
-      id: Date.now(),
-      date: today,
-      amount: Number(amount),
-      description: "Saisie rapide",
-      person: person,
-      category: "autre"
-    };
-    
-    if (person === 'victor') {
-      victorGains.push(gain);
-      localStorage.setItem("victorGains", JSON.stringify(victorGains));
-    } else {
-      arthurGains.push(gain);
-      localStorage.setItem("arthurGains", JSON.stringify(arthurGains));
-    }
-    
-    refreshAll();
-    showToast(`Gain de ${amount}€ ajouté pour ${person}`);
-  }
-}
-
-function addGain(e, person) {
-  e.preventDefault();
-  const gain = {
-    id: Date.now(),
-    date: document.getElementById(`${person}-date`).value,
-    amount: Number(document.getElementById(`${person}-amount`).value),
-    description: document.getElementById(`${person}-description`).value || "Gain",
-    person: person,
-    category: document.getElementById(`${person}-category`)?.value || "autre"
-  };
-  
-  if (person === 'victor') { 
-    victorGains.push(gain); 
-    localStorage.setItem("victorGains", JSON.stringify(victorGains)); 
-  } else { 
-    arthurGains.push(gain); 
-    localStorage.setItem("arthurGains", JSON.stringify(arthurGains)); 
-  }
-  
-  e.target.reset();
-  document.getElementById(`${person}-date`).value = today;
-  
-  refreshAll(); 
-  showToast(`Gain de ${gain.amount}€ ajouté !`);
-}
-
-function deleteGain(id, person) {
-  if (person === 'victor') {
-    victorGains = victorGains.filter(g => g.id !== id);
-    localStorage.setItem("victorGains", JSON.stringify(victorGains));
-  } else {
-    arthurGains = arthurGains.filter(g => g.id !== id);
-    localStorage.setItem("arthurGains", JSON.stringify(arthurGains));
-  }
-  
-  refreshAll();
-  showToast("Gain supprimé", "warning");
-}
-
 function drawChart() {
   if(!chart) return;
   const p = document.getElementById("period")?.value || "7", now = new Date();
@@ -3321,59 +2377,102 @@ function showPerson(person) {
 
 function showBoth() { showPerson('both'); }
 
-function filterHistory() {
-  const search = document.getElementById('historySearch').value.toLowerCase();
-  const all = [...victorGains.map(g=>({...g, person:'Victor'})), 
-               ...arthurGains.map(g=>({...g, person:'Arthur'}))]
-    .sort((a,b)=>new Date(b.date)-new Date(a.date));
-  
-  const filtered = search ? all.filter(g => 
-    g.description?.toLowerCase().includes(search) ||
-    g.person.toLowerCase().includes(search) ||
-    g.amount.toString().includes(search)
-  ) : all;
-  
-  document.getElementById('history-table-body').innerHTML = filtered.slice(0,20).map(g => 
-    `<tr>
-      <td>${g.date}</td>
-      <td><span class="badge ${g.person==='Victor'?'badge-info':'badge-success'}">${g.person}</span></td>
-      <td><span class="badge">${g.category || 'autre'}</span></td>
-      <td>${g.description||'-'}</td>
-      <td><strong>${g.amount.toFixed(2)} €</strong></td>
-      <td>
-        <button onclick="deleteGain(${g.id}, '${g.person.toLowerCase()}')" class="btn-sm" style="background: var(--danger);">
-          <i class="fas fa-trash"></i>
-        </button>
-      </td>
-    </tr>`
-  ).join('');
-}
-
-function exportChart() {
-  const canvas = document.getElementById('chart');
-  const link = document.createElement('a');
-  link.download = 'graphique-gains.png';
-  link.href = canvas.toDataURL();
-  link.click();
-  showToast("Graphique exporté !");
-}
-
-function exportHistory() {
+function updateHistory() {
   const all = [...victorGains.map(g=>({...g, person:'Victor'})), ...arthurGains.map(g=>({...g, person:'Arthur'}))]
     .sort((a,b)=>new Date(b.date)-new Date(a.date));
   
-  let csv = "Date,Personne,Catégorie,Description,Montant\n";
-  all.forEach(g => {
-    csv += `${g.date},${g.person},${g.category || 'autre'},${g.description || ''},${g.amount}\n`;
-  });
+  filterHistory();
+}
+
+function updateSheets() {
+  if(document.getElementById('product-sheets')) {
+    document.getElementById('product-sheets').innerHTML = products.map(p => `
+      <div class="product-card">
+        <h3 style="color: var(--accent); margin-top: 0;">${p.name}</h3>
+        <p><i class="fas fa-tag"></i> <strong>Catégorie:</strong> ${p.category}</p>
+        <p><i class="fas fa-euro-sign"></i> <strong>Prix:</strong> ${p.price.toFixed(2)} €</p>
+        <p><i class="fas fa-cubes"></i> <strong>Stock:</strong> ${p.quantity} unités</p>
+        <p><i class="fas fa-chart-line"></i> <strong>Valeur:</strong> ${(p.price*p.quantity).toFixed(2)} €</p>
+        <p><i class="fas fa-barcode"></i> <strong>SKU:</strong> ${p.sku || '-'}</p>
+        <div class="stock-bar">
+          <div class="stock-fill" style="width: ${Math.min(100, p.quantity)}%"></div>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+function deleteProduct(id) { 
+  products = products.filter(p=>p.id!==id); 
+  localStorage.setItem("products", JSON.stringify(products)); 
+  updateProducts(); 
+  updateStock(); 
+  updateSheets();
+  showToast("Produit supprimé", "warning");
+}
+
+function editProduct(id) { 
+  const p = products.find(p=>p.id===id); 
+  const q = prompt("Nouvelle quantité:", p.quantity); 
+  if(q) { 
+    p.quantity = Number(q); 
+    localStorage.setItem("products", JSON.stringify(products)); 
+    updateProducts(); 
+    updateStock(); 
+    updateSheets();
+    showToast("Stock mis à jour");
+  } 
+}
+
+function addStock(id) { 
+  const p = products.find(p=>p.id===id); 
+  p.quantity += 1; 
+  localStorage.setItem("products", JSON.stringify(products)); 
+  updateProducts(); 
+    updateStock(); 
+  updateSheets();
+  showToast("Stock +1");
+}
+
+function deleteEvent(id) { 
+  events = events.filter(e=>e.id!==id); 
+  localStorage.setItem("events", JSON.stringify(events)); 
+  updateCalendar(); 
+  updateEventsList();
+  showToast("Événement supprimé", "warning");
+}
+
+function addClient(e) {
+  e.preventDefault();
+  const client = {
+    id: Date.now(),
+    name: document.getElementById('client-name').value,
+    email: document.getElementById('client-email').value,
+    phone: document.getElementById('client-phone').value,
+    company: document.getElementById('client-company').value,
+    type: document.getElementById('client-type').value,
+    createdAt: today
+  };
   
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `historique-gains-${today}.csv`;
-  a.click();
-  showToast("Historique exporté");
+  clients.push(client);
+  localStorage.setItem("clients", JSON.stringify(clients));
+  e.target.reset();
+  
+  updateClients();
+  showToast(`Client ${client.name} ajouté !`);
+}
+
+function updateClients() {
+  filterClients();
+  document.getElementById('clientsBadge').style.display = clients.length > 0 ? 'inline' : 'none';
+  document.getElementById('clientsBadge').innerText = clients.length;
+}
+
+function deleteClient(id) { 
+  clients = clients.filter(c=>c.id!==id); 
+  localStorage.setItem("clients", JSON.stringify(clients)); 
+  updateClients();
+  showToast("Client supprimé", "warning");
 }
 
 function switchTab(tabName) {
@@ -3382,8 +2481,6 @@ function switchTab(tabName) {
   
   const titles = {
     'dashboard': 'Tableau de bord',
-    'transactions': 'Transactions',
-    'boxes': 'Boxes / Lots',
     'products': 'Produits',
     'inventory': 'Stocks',
     'sheets': 'Fiches produits',
@@ -3391,12 +2488,11 @@ function switchTab(tabName) {
     'stats': 'Statistiques',
     'clients': 'Clients',
     'import': 'Import/Export',
-    'reports': 'Rapports',
-    'admin': 'Administration'
+    'reports': 'Rapports'
   };
   document.getElementById('pageTitle').innerText = titles[tabName];
   
-  document.querySelectorAll('.sidebar-item').forEach((item) => {
+  document.querySelectorAll('.sidebar-item').forEach((item, index) => {
     item.classList.remove('active');
     if(item.querySelector('span')?.innerText === titles[tabName]) {
       item.classList.add('active');
@@ -3412,45 +2508,6 @@ function switchTab(tabName) {
   if(tabName === 'inventory') updateStock();
   if(tabName === 'sheets') updateSheets();
   if(tabName === 'clients') updateClients();
-  if(tabName === 'transactions') {
-    updateTransactionsStats();
-    filterTransactions();
-  }
-  if(tabName === 'boxes') {
-    updateBoxesStats();
-    updateBoxesList();
-  }
-}
-
-function showSettings() {
-  document.getElementById('settingsModal').classList.add('active');
-  document.getElementById('currencySetting').value = settings.currency;
-  document.getElementById('notificationsSetting').value = settings.notifications;
-  document.getElementById('refreshSetting').value = settings.refresh;
-}
-
-function closeSettings() {
-  document.getElementById('settingsModal').classList.remove('active');
-}
-
-function updateSettings() {
-  settings = {
-    currency: document.getElementById('currencySetting').value,
-    notifications: document.getElementById('notificationsSetting').value,
-    refresh: document.getElementById('refreshSetting').value
-  };
-  
-  localStorage.setItem("settings", JSON.stringify(settings));
-  
-  if(autoRefreshInterval) clearInterval(autoRefreshInterval);
-  if(settings.refresh > 0) {
-    autoRefreshInterval = setInterval(() => {
-      refreshAll();
-      showToast("Données rafraîchies", "info");
-    }, settings.refresh * 1000);
-  }
-  
-  showToast("Paramètres enregistrés");
 }
 
 function toggleDark() {
@@ -3470,17 +2527,27 @@ function toggleDark() {
   }
 }
 
-// ============ INITIALISATION FINALE ============
+// ============ INITIALISATION AMÉLIORÉE ============
 window.onload = function() {
   showLoader(true);
   
   setTimeout(() => {
     initCharts();
-    refreshAll();
-    updateProductSelects();
+    refresh();
+    drawChart();
+    updateHistory();
+    updateProducts();
+    updateStock();
+    updateSheets();
+    updateCalendar();
+    updateEventsList();
+    updateStats();
+    updateClients();
+    
+    // Appliquer les paramètres
     updateSettings();
     
-    // Écouteur pour fermer le menu
+    // Fermer le menu si on clique en dehors
     document.addEventListener('click', function(e) {
       if(!e.target.closest('.sidebar') && !e.target.closest('.menu-btn')) {
         closeMenu();
@@ -3492,12 +2559,8 @@ window.onload = function() {
       localStorage.setItem("victorGains", JSON.stringify(victorGains));
       localStorage.setItem("arthurGains", JSON.stringify(arthurGains));
       localStorage.setItem("products", JSON.stringify(products));
-      localStorage.setItem("transactions", JSON.stringify(transactions));
-      localStorage.setItem("boxes", JSON.stringify(boxes));
       localStorage.setItem("events", JSON.stringify(events));
       localStorage.setItem("clients", JSON.stringify(clients));
-      localStorage.setItem("users", JSON.stringify(users));
-      localStorage.setItem("goals", JSON.stringify(goals));
       console.log("Sauvegarde automatique effectuée");
     }, 60000);
     
