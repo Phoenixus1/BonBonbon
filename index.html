@@ -2,3510 +2,1096 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Gestion Pro Elite - Version Complete</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-
+<title>Gestion Pro Elite - Cloud</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-/* ============ VARIABLES AVANCÉES ============ */
-:root {
-  --bg: #f8fafc;
-  --card: #ffffff;
-  --text: #0f172a;
-  --text-light: #64748b;
-  --accent: #2563eb;
-  --victor-color: #2563eb;
-  --arthur-color: #10b981;
-  --admin-color: #8b5cf6;
-  --border: #e2e8f0;
-  --hover: #f1f5f9;
-  --success: #10b981;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --info: #3b82f6;
-  --sidebar-bg: #ffffff;
-  --shadow: 0 20px 25px -5px rgba(0,0,0,0.05);
-  --radius: 20px;
-  --radius-sm: 12px;
-}
-
-body.dark {
-  --bg: #0f172a;
-  --card: #1e293b;
-  --text: #f1f5f9;
-  --text-light: #94a3b8;
-  --accent: #38bdf8;
-  --victor-color: #3b82f6;
-  --arthur-color: #10b981;
-  --admin-color: #a78bfa;
-  --border: #334155;
-  --hover: #2d3a4f;
-  --sidebar-bg: #1e293b;
-  --shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
-}
-
-/* ============ ANIMATIONS ============ */
-@keyframes slideIn {
-  from { transform: translateX(-20px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-5px); }
-  100% { transform: translateY(0px); }
-}
-
-/* ============ RESET & BASE ============ */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
-  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
-              color 0.2s, 
-              border-color 0.2s, 
-              transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.6;
-  overflow-x: hidden;
-}
-
-/* ============ LAYOUT PRINCIPAL ============ */
-.app {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-/* ============ TOP BAR AMÉLIORÉ ============ */
-.top-bar {
-  background: var(--card);
-  padding: 12px 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(10px);
-  background: rgba(var(--card-rgb), 0.8);
-}
-
-.top-bar-left {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.menu-btn {
-  background: transparent;
-  color: var(--text);
-  font-size: 22px;
-  padding: 12px;
-  border-radius: var(--radius-sm);
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s;
-}
-
-.menu-btn:hover {
-  background: var(--hover);
-  transform: scale(1.1) rotate(90deg);
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.logo i {
-  font-size: 28px;
-  color: var(--accent);
-  animation: float 3s ease-in-out infinite;
-}
-
-.logo h1 {
-  font-size: 20px;
-  font-weight: 700;
-  margin: 0;
-  background: linear-gradient(135deg, var(--accent), var(--victor-color));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.page-title {
-  font-size: 22px;
-  font-weight: 600;
-  color: var(--text);
-  margin-left: 12px;
-  animation: slideIn 0.3s;
-}
-
-.theme-btn {
-  background: var(--bg);
-  color: var(--text);
-  border: 1px solid var(--border);
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.theme-btn:hover {
-  background: var(--hover);
-  transform: rotate(180deg);
-}
-
-/* ============ SIDEBAR AMÉLIORÉ ============ */
-.sidebar {
-  position: fixed;
-  top: 0;
-  left: -320px;
-  width: 300px;
-  height: 100vh;
-  background: var(--sidebar-bg);
-  border-right: 1px solid var(--border);
-  z-index: 99;
-  transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  display: flex;
-  flex-direction: column;
-  box-shadow: 5px 0 30px rgba(0,0,0,0.1);
-  overflow-y: auto;
-}
-
-.sidebar.open {
-  left: 0;
-}
-
-.sidebar-header {
-  padding: 30px 24px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.sidebar-header i {
-  font-size: 32px;
-  color: var(--accent);
-  animation: pulse 2s infinite;
-}
-
-.sidebar-header h2 {
-  font-size: 22px;
-  font-weight: 700;
-  margin: 0;
-}
-
-.sidebar-menu {
-  flex: 1;
-  padding: 24px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.sidebar-item {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  padding: 16px 18px;
-  border-radius: var(--radius-sm);
-  color: var(--text);
-  text-decoration: none;
-  transition: all 0.3s;
-  cursor: pointer;
-  font-weight: 500;
-  position: relative;
-  overflow: hidden;
-}
-
-.sidebar-item::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 0;
-  background: var(--accent);
-  opacity: 0.1;
-  transition: width 0.3s;
-}
-
-.sidebar-item:hover::before {
-  width: 100%;
-}
-
-.sidebar-item i {
-  width: 24px;
-  text-align: center;
-  font-size: 20px;
-  color: var(--text-light);
-  transition: all 0.3s;
-}
-
-.sidebar-item span {
-  flex: 1;
-}
-
-.sidebar-item:hover {
-  transform: translateX(5px);
-}
-
-.sidebar-item:hover i {
-  color: var(--accent);
-  transform: scale(1.2);
-}
-
-.sidebar-item.active {
-  background: var(--accent);
-  color: white;
-  box-shadow: 0 8px 16px rgba(37,99,235,0.3);
-}
-
-.sidebar-item.active i {
-  color: white;
-}
-
-.sidebar-footer {
-  padding: 24px 16px;
-  border-top: 1px solid var(--border);
-  margin-top: auto;
-}
-
-/* ============ CONTENU PRINCIPAL ============ */
-.main-content {
-  flex: 1;
-  padding: 30px;
-  max-width: 1600px;
-  margin: 0 auto;
-  width: 100%;
-  animation: slideIn 0.4s;
-}
-
-/* ============ TABS ============ */
-.tab-content {
-  display: none;
-  animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.tab-content.active {
-  display: block;
-}
-
-/* ============ CARDS AMÉLIORÉES ============ */
-.card {
-  background: var(--card);
-  border-radius: var(--radius);
-  padding: 24px;
-  margin-bottom: 24px;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  transition: all 0.3s;
-  position: relative;
-  overflow: hidden;
-}
-
-.card::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: 100%;
-  background: linear-gradient(to bottom, var(--accent), transparent);
-}
-
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 30px 35px -10px rgba(0,0,0,0.1);
-}
-
-.card-title {
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 24px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: var(--text);
-}
-
-.card-title i {
-  color: var(--accent);
-  font-size: 24px;
-}
-
-/* ============ GRILLES RESPONSIVES ============ */
-.grid-2, .grid-3, .grid-4, .grid-5 {
-  display: grid;
-  gap: 24px;
-}
-
-.grid-2 { grid-template-columns: repeat(2, 1fr); }
-.grid-3 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
-.grid-4 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-.grid-5 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
-
-/* ============ FORMULAIRES AMÉLIORÉS ============ */
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-input, select, textarea {
-  padding: 16px 20px;
-  border-radius: var(--radius-sm);
-  border: 2px solid var(--border);
-  background: var(--bg);
-  color: var(--text);
-  font-size: 15px;
-  width: 100%;
-  transition: all 0.3s;
-}
-
-input:hover, select:hover, textarea:hover {
-  border-color: var(--accent);
-}
-
-input:focus, select:focus, textarea:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(37,99,235,0.15);
-  transform: scale(1.02);
-}
-
-.btn {
-  padding: 16px 24px;
-  border-radius: var(--radius-sm);
-  border: none;
-  font-weight: 600;
-  font-size: 15px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  transition: all 0.3s;
-  background: var(--accent);
-  color: white;
-  position: relative;
-  overflow: hidden;
-}
-
-.btn::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.3);
-  transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
-}
-
-.btn:hover::after {
-  width: 300px;
-  height: 300px;
-}
-
-.btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 24px rgba(37,99,235,0.3);
-}
-
-.btn-sm {
-  padding: 12px 18px;
-  font-size: 14px;
-}
-
-.btn-block {
-  width: 100%;
-}
-
-/* ============ BADGES AMÉLIORÉS ============ */
-.badge {
-  padding: 8px 14px;
-  border-radius: 30px;
-  font-size: 12px;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  animation: slideIn 0.3s;
-}
-
-.badge-success {
-  background: rgba(16,185,129,0.15);
-  color: #10b981;
-  border: 1px solid rgba(16,185,129,0.3);
-}
-
-.badge-warning {
-  background: rgba(245,158,11,0.15);
-  color: #f59e0b;
-  border: 1px solid rgba(245,158,11,0.3);
-}
-
-.badge-danger {
-  background: rgba(239,68,68,0.15);
-  color: #ef4444;
-  border: 1px solid rgba(239,68,68,0.3);
-}
-
-.badge-info {
-  background: rgba(37,99,235,0.15);
-  color: #2563eb;
-  border: 1px solid rgba(37,99,235,0.3);
-}
-
-.badge-admin {
-  background: rgba(139,92,246,0.15);
-  color: #8b5cf6;
-  border: 1px solid rgba(139,92,246,0.3);
-}
-
-/* ============ STATISTIQUES AMÉLIORÉES ============ */
-.stat-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  transition: all 0.3s;
-  position: relative;
-  overflow: hidden;
-  cursor: pointer;
-}
-
-.stat-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  background: linear-gradient(90deg, var(--accent), var(--victor-color), var(--arthur-color));
-}
-
-.stat-card:hover {
-  transform: scale(1.05);
-  box-shadow: var(--shadow);
-}
-
-.stat-icon {
-  width: 60px;
-  height: 60px;
-  border-radius: 20px;
-  background: linear-gradient(135deg, rgba(37,99,235,0.1), rgba(37,99,235,0.2));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 16px;
-}
-
-.stat-icon i {
-  font-size: 28px;
-  color: var(--accent);
-}
-
-.stat-number {
-  font-size: 32px;
-  font-weight: 800;
-  margin-bottom: 6px;
-  background: linear-gradient(135deg, var(--text), var(--accent));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.stat-label {
-  font-size: 14px;
-  color: var(--text-light);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-/* ============ TABLEAUX MODERNES ============ */
-.table-responsive {
-  overflow-x: auto;
-  margin-top: 20px;
-  border-radius: var(--radius-sm);
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  border-radius: var(--radius-sm);
-}
-
-th {
-  text-align: left;
-  padding: 18px;
-  background: linear-gradient(to bottom, var(--bg), var(--hover));
-  font-weight: 600;
-  color: var(--text);
-  border-bottom: 3px solid var(--accent);
-}
-
-td {
-  padding: 18px;
-  border-bottom: 1px solid var(--border);
-}
-
-tr {
-  transition: all 0.3s;
-}
-
-tr:hover td {
-  background: var(--hover);
-  transform: scale(1.01);
-}
-
-/* ============ PRODUITS AMÉLIORÉS ============ */
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
-}
-
-.product-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 24px;
-  transition: all 0.3s;
-  position: relative;
-  overflow: hidden;
-}
-
-.product-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: var(--shadow);
-}
-
-.product-card::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  background: linear-gradient(90deg, var(--accent), transparent);
-}
-
-.stock-bar {
-  width: 100%;
-  height: 10px;
-  background: var(--border);
-  border-radius: 5px;
-  margin: 16px 0;
-  overflow: hidden;
-}
-
-.stock-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent), var(--victor-color));
-  border-radius: 5px;
-  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* ============ CALENDRIER INTERACTIF ============ */
-.calendar-header {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 10px;
-  margin-bottom: 10px;
-  padding: 0 5px;
-}
-
-.calendar-weekday {
-  text-align: center;
-  font-weight: 700;
-  color: var(--accent);
-  font-size: 14px;
-  padding: 12px;
-  background: var(--bg);
-  border-radius: var(--radius-sm);
-}
-
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 10px;
-}
-
-.calendar-day {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 15px 10px;
-  min-height: 120px;
-  transition: all 0.3s;
-}
-
-.calendar-day:hover {
-  transform: scale(1.05);
-  background: var(--hover);
-  cursor: pointer;
-}
-
-.calendar-day-number {
-  font-weight: 700;
-  margin-bottom: 10px;
-  color: var(--accent);
-  font-size: 18px;
-}
-
-.calendar-event {
-  background: linear-gradient(135deg, rgba(37,99,235,0.1), rgba(37,99,235,0.2));
-  color: var(--accent);
-  padding: 8px 10px;
-  border-radius: 8px;
-  font-size: 12px;
-  margin-top: 6px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  border-left: 3px solid var(--accent);
-  animation: slideIn 0.3s;
-}
-
-/* ============ CLIENTS AMÉLIORÉS ============ */
-.clients-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 24px;
-}
-
-.client-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 24px;
-  transition: all 0.3s;
-  position: relative;
-}
-
-.client-card:hover {
-  transform: translateY(-5px) rotate(1deg);
-  box-shadow: var(--shadow);
-}
-
-/* ============ LOGIN ADMIN ============ */
-.login-container {
-  max-width: 400px;
-  margin: 50px auto;
-  padding: 30px;
-  background: var(--card);
-  border-radius: var(--radius);
-  border: 2px solid var(--border);
-  box-shadow: var(--shadow);
-}
-
-.login-container h2 {
-  text-align: center;
-  margin-bottom: 30px;
-  color: var(--accent);
-}
-
-.login-container input {
-  margin-bottom: 20px;
-}
-
-/* ============ MODALES ============ */
-.modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.5);
-  backdrop-filter: blur(5px);
-  z-index: 1000;
-  align-items: center;
-  justify-content: center;
-  animation: fadeIn 0.3s;
-}
-
-.modal.active {
-  display: flex;
-}
-
-.modal-content {
-  background: var(--card);
-  border-radius: var(--radius);
-  padding: 30px;
-  max-width: 500px;
-  width: 90%;
-  animation: slideIn 0.4s;
-  border: 1px solid var(--border);
-  max-height: 80vh;
-  overflow-y: auto;
-}
-
-/* ============ TOAST NOTIFICATIONS ============ */
-.toast {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  background: var(--success);
-  color: white;
-  padding: 16px 24px;
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow);
-  z-index: 1001;
-  animation: slideIn 0.3s;
-  display: none;
-  align-items: center;
-  gap: 12px;
-}
-
-.toast.show {
-  display: flex;
-}
-
-.toast.error {
-  background: var(--danger);
-}
-
-.toast.warning {
-  background: var(--warning);
-}
-
-/* ============ LOADER ============ */
-.loader {
-  display: none;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1002;
-}
-
-.loader.show {
-  display: block;
-}
-
-.loader i {
-  font-size: 40px;
-  color: var(--accent);
-  animation: pulse 1s infinite;
-}
-
-/* ============ PROGRESS BAR ============ */
-.progress-container {
-  width: 100%;
-  height: 4px;
-  background: var(--border);
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1003;
-}
-
-.progress-bar {
-  height: 100%;
-  background: linear-gradient(90deg, var(--victor-color), var(--arthur-color));
-  width: 0%;
-  transition: width 0.3s;
-}
-
-/* ============ RESPONSIVE ============ */
-@media (max-width: 1024px) {
-  .grid-2 { grid-template-columns: 1fr; }
-  .main-content { padding: 20px; }
-}
-
-@media (max-width: 768px) {
-  .grid-4 { grid-template-columns: 1fr 1fr; }
-  .calendar-grid { grid-template-columns: repeat(1, 1fr); }
-  .calendar-header { display: none; }
-  .logo h1 { display: none; }
-  .page-title { font-size: 18px; }
-}
-
-@media (max-width: 480px) {
-  .grid-4 { grid-template-columns: 1fr; }
-  .product-grid { grid-template-columns: 1fr; }
-  .clients-grid { grid-template-columns: 1fr; }
-  .btn { width: 100%; }
-}
-
-/* ============ UTILS ============ */
-.mb-2 { margin-bottom: 16px; }
-.mb-3 { margin-bottom: 24px; }
-.mb-4 { margin-bottom: 32px; }
-.mt-2 { margin-top: 16px; }
-.mt-3 { margin-top: 24px; }
-.text-center { text-align: center; }
-.w-100 { width: 100%; }
-.d-flex { display: flex; }
-.align-center { align-items: center; }
-.justify-between { justify-content: space-between; }
-.gap-2 { gap: 16px; }
-.gap-3 { gap: 24px; }
-
-/* ============ COULEURS PERSONNALISÉES ============ */
-.color-picker {
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  border: 2px solid var(--border);
-  border-radius: 50%;
-  cursor: pointer;
-}
+:root{--bg:#f8fafc;--card:#fff;--text:#0f172a;--text-light:#64748b;--accent:#2563eb;--victor:#2563eb;--arthur:#10b981;--border:#e2e8f0;--hover:#f1f5f9;--success:#10b981;--warning:#f59e0b;--danger:#ef4444;--radius:20px;--radius-sm:12px;--shadow:0 10px 25px rgba(0,0,0,0.06)}
+body.dark{--bg:#0f172a;--card:#1e293b;--text:#f1f5f9;--text-light:#94a3b8;--border:#334155;--hover:#2d3a4f}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif}
+body{background:var(--bg);color:var(--text);min-height:100vh;transition:background .3s,color .2s}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1e3a8a 0%,#065f46 100%);padding:20px}
+.login-box{background:var(--card);padding:44px;border-radius:var(--radius);box-shadow:0 30px 60px rgba(0,0,0,0.3);width:100%;max-width:420px}
+.login-logo{text-align:center;margin-bottom:28px}
+.login-logo .ico{font-size:44px;margin-bottom:10px}
+.login-logo h1{font-size:24px;font-weight:800;background:linear-gradient(135deg,var(--victor),var(--arthur));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.login-logo p{color:var(--text-light);font-size:13px;margin-top:5px}
+.login-users{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
+.user-btn{padding:14px;border-radius:var(--radius-sm);border:2px solid var(--border);background:var(--bg);cursor:pointer;text-align:center;transition:all .3s;color:var(--text)}
+.user-btn.victor.selected,.user-btn.victor:hover{border-color:var(--victor);background:rgba(37,99,235,.08)}
+.user-btn.arthur.selected,.user-btn.arthur:hover{border-color:var(--arthur);background:rgba(16,185,129,.08)}
+.user-btn .ico{font-size:26px;margin-bottom:6px}
+.user-btn.victor .ico{color:var(--victor)}
+.user-btn.arthur .ico{color:var(--arthur)}
+.user-btn strong{display:block;font-size:15px}
+.user-btn small{font-size:11px;color:var(--text-light)}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-weight:600;font-size:13px;margin-bottom:7px}
+input,select,textarea{width:100%;padding:13px 15px;border-radius:var(--radius-sm);border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;outline:none;transition:border .2s}
+input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.btn{padding:14px 22px;border-radius:var(--radius-sm);border:none;font-weight:600;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--accent);color:#fff;transition:all .3s;width:100%}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(37,99,235,.3)}
+.btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.btn.danger{background:var(--danger)}.btn.success{background:var(--success)}.btn.warning{background:var(--warning)}
+.btn.sm{padding:9px 14px;font-size:12px;width:auto}.btn.ghost{background:transparent;color:var(--text);border:2px solid var(--border)}
+.btn.ghost:hover{background:var(--hover);box-shadow:none}
+.app{display:none}.app.active{display:block}
+.topbar{background:var(--card);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;box-shadow:var(--shadow)}
+.topbar-left{display:flex;align-items:center;gap:14px}
+.logo-txt{font-size:17px;font-weight:800;background:linear-gradient(135deg,var(--victor),var(--arthur));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.menu-btn{background:none;border:none;color:var(--text);font-size:19px;cursor:pointer;padding:9px;border-radius:var(--radius-sm);transition:background .2s}
+.menu-btn:hover{background:var(--hover)}
+.page-title{font-size:16px;font-weight:600}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.user-pill{padding:7px 14px;border-radius:30px;display:flex;align-items:center;gap:7px;font-weight:600;font-size:13px;color:#fff}
+.sync-badge{padding:7px 12px;border-radius:30px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--card);transition:all .3s}
+.sync-badge.syncing{border-color:var(--warning);color:var(--warning);background:rgba(245,158,11,.08)}
+.sync-badge.synced{border-color:var(--success);color:var(--success);background:rgba(16,185,129,.08)}
+.sync-badge.error{border-color:var(--danger);color:var(--danger);background:rgba(239,68,68,.08)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinning{display:inline-block;animation:spin 1s linear infinite}
+.sidebar{position:fixed;top:0;left:-310px;width:285px;height:100vh;background:var(--card);border-right:1px solid var(--border);z-index:99;transition:left .4s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column;overflow-y:auto;box-shadow:4px 0 20px rgba(0,0,0,.08)}
+.sidebar.open{left:0}
+.sidebar-head{padding:22px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.sidebar-head .ico{font-size:26px;color:var(--accent)}
+.sidebar-head h2{font-size:17px;font-weight:700}
+.sidebar-menu{flex:1;padding:14px 10px;display:flex;flex-direction:column;gap:5px}
+.nav-item{display:flex;align-items:center;gap:13px;padding:13px 14px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text);font-weight:500;transition:all .3s}
+.nav-item:hover{background:var(--hover);transform:translateX(3px)}
+.nav-item.active{background:var(--accent);color:#fff;box-shadow:0 5px 14px rgba(37,99,235,.3)}
+.nav-item .ico{width:20px;text-align:center;font-size:17px}
+.nav-badge{margin-left:auto;padding:2px 7px;border-radius:20px;font-size:11px;background:rgba(255,255,255,.25)}
+.sidebar-foot{padding:14px 10px;border-top:1px solid var(--border)}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:98;backdrop-filter:blur(2px)}
+.overlay.active{display:block}
+.content{padding:26px;max-width:1500px;margin:0 auto}
+.tab{display:none}.tab.active{display:block;animation:fadeIn .3s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--card);border-radius:var(--radius);padding:22px;margin-bottom:22px;border:1px solid var(--border);box-shadow:var(--shadow);position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:linear-gradient(to bottom,var(--accent),transparent)}
+.card-title{font-size:17px;font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:9px}
+.card-title .ico{color:var(--accent);font-size:18px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px}
+.grid-products{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:22px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;text-align:center;transition:all .3s;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,var(--victor),var(--arthur))}
+.stat-card:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.stat-icon{width:52px;height:52px;margin:0 auto 12px;background:rgba(37,99,235,.1);border-radius:14px;display:flex;align-items:center;justify-content:center}
+.stat-num{font-size:26px;font-weight:800;color:var(--accent);margin-bottom:5px}
+.stat-lbl{font-size:11px;color:var(--text-light);text-transform:uppercase;letter-spacing:1px}
+.tbl-wrap{overflow-x:auto;border-radius:var(--radius-sm);margin-top:14px}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:13px 14px;background:var(--bg);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--accent);color:var(--text-light)}
+td{padding:13px 14px;border-bottom:1px solid var(--border);font-size:13px}
+tr:hover td{background:var(--hover)}
+.badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.b-success{background:rgba(16,185,129,.12);color:#10b981;border:1px solid rgba(16,185,129,.25)}
+.b-warning{background:rgba(245,158,11,.12);color:#f59e0b;border:1px solid rgba(245,158,11,.25)}
+.b-danger{background:rgba(239,68,68,.12);color:#ef4444;border:1px solid rgba(239,68,68,.25)}
+.b-info{background:rgba(37,99,235,.12);color:#2563eb;border:1px solid rgba(37,99,235,.25)}
+.b-victor{background:rgba(37,99,235,.15);color:#2563eb}.b-arthur{background:rgba(16,185,129,.15);color:#10b981}
+.prod-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;transition:all .3s;position:relative;overflow:hidden}
+.prod-card:hover{transform:translateY(-5px);box-shadow:var(--shadow)}
+.stock-bar{width:100%;height:7px;background:var(--border);border-radius:4px;margin:10px 0;overflow:hidden}
+.stock-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--arthur));border-radius:4px;transition:width .5s}
+.upload-zone{border:2px dashed var(--border);border-radius:var(--radius-sm);padding:36px 20px;text-align:center;cursor:pointer;transition:all .3s}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:rgba(37,99,235,.04)}
+.file-item{display:flex;align-items:center;justify-content:space-between;padding:11px;background:var(--bg);border-radius:var(--radius-sm);margin-top:9px;transition:all .2s}
+.file-item:hover{background:var(--hover)}
+.file-thumb{width:44px;height:44px;border-radius:9px;object-fit:cover;border:1px solid var(--border)}
+.file-icon-box{width:44px;height:44px;border-radius:9px;background:rgba(37,99,235,.1);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:18px}
+.toast{position:fixed;bottom:24px;right:24px;padding:13px 20px;border-radius:var(--radius-sm);color:#fff;font-weight:600;z-index:9999;display:none;align-items:center;gap:9px;box-shadow:0 10px 30px rgba(0,0,0,.2);animation:slideUp .3s}
+.toast.show{display:flex}
+@keyframes slideUp{from{transform:translateY(18px);opacity:0}to{transform:translateY(0);opacity:1}}
+.toast.s{background:var(--success)}.toast.e{background:var(--danger)}.toast.w{background:var(--warning)}.toast.i{background:var(--accent)}
+.cal-header{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin-bottom:7px}
+.cal-day-name{text-align:center;font-weight:700;color:var(--accent);font-size:12px;padding:9px;background:var(--bg);border-radius:7px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
+.cal-day{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 7px;min-height:90px;cursor:pointer;transition:all .2s}
+.cal-day:hover{background:var(--hover);transform:scale(1.02)}
+.cal-day.today{border-color:var(--accent);box-shadow:0 0 0 2px rgba(37,99,235,.15)}
+.cal-num{font-weight:700;font-size:15px;color:var(--accent);margin-bottom:5px}
+.cal-event{font-size:10px;padding:3px 6px;border-radius:5px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-left:3px solid var(--accent);background:rgba(37,99,235,.08);color:var(--accent)}
+.chart-wrap{position:relative;height:300px}
+@media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr}.cal-grid{grid-template-columns:repeat(2,1fr)}.cal-header{display:none}}
+@media(max-width:480px){.grid4{grid-template-columns:1fr 1fr}.content{padding:14px}}
 </style>
 </head>
-
 <body>
-<div class="app">
-  <!-- Progress Bar -->
-  <div class="progress-container">
-    <div class="progress-bar" id="progressBar"></div>
-  </div>
 
-  <!-- Loader -->
-  <div class="loader" id="loader">
-    <i class="fas fa-circle-notch fa-spin"></i>
-  </div>
-
-  <!-- Toast Notifications -->
-  <div class="toast" id="toast">
-    <i class="fas fa-check-circle"></i>
-    <span id="toastMessage">Action réussie !</span>
-  </div>
-
-  <!-- Overlay pour fermer le menu -->
-  <div class="overlay" id="overlay" onclick="closeMenu()"></div>
-
-  <!-- Menu Hamburger Sidebar -->
-  <div class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <i class="fas fa-chart-line"></i>
-      <h2>Gestion Pro</h2>
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="ico">☁️</div>
+      <h1>Gestion Pro Cloud</h1>
+      <p>Synchronisation Supabase activée</p>
     </div>
-    
-    <div class="sidebar-menu">
-      <div class="sidebar-item active" onclick="switchTab('dashboard'); closeMenu()">
-        <i class="fas fa-home"></i>
-        <span>Tableau de bord</span>
-        <span class="badge" id="dashboardBadge" style="display: none;">!</span>
-      </div>
-      <div class="sidebar-item" onclick="switchTab('transactions'); closeMenu()">
-        <i class="fas fa-exchange-alt"></i>
-        <span>Transactions</span>
-        <span class="badge badge-info" id="transactionBadge" style="display: none;">!</span>
-      </div>
-      <div class="sidebar-item" onclick="switchTab('boxes'); closeMenu()">
-        <i class="fas fa-cube"></i>
-        <span>Boxes / Lots</span>
-        <span class="badge badge-success" id="boxBadge" style="display: none;">!</span>
-      </div>
-      <div class="sidebar-item" onclick="switchTab('products'); closeMenu()">
-        <i class="fas fa-box"></i>
-        <span>Produits</span>
-        <span class="badge badge-danger" id="productBadge" style="display: none;"></span>
-      </div>
-      <div class="sidebar-item" onclick="switchTab('inventory'); closeMenu()">
-        <i class="fas fa-warehouse"></i>
-        <span>Stocks</span>
-        <span class="badge badge-danger" id="inventoryBadge" style="display: none;"></span>
-      </div>
-      <div class="sidebar-item" onclick="switchTab('sheets'); closeMenu()">
-        <i class="fas fa-file-alt"></i>
-        <span>Fiches produits</span>
-      </div>
-      <div class="sidebar-item" onclick="switchTab('calendar'); closeMenu()">
-        <i class="fas fa-calendar"></i>
-        <span>Calendrier</span>
-        <span class="badge badge-info" id="calendarBadge" style="display: none;"></span>
-      </div>
-      <div class="sidebar-item" onclick="switchTab('stats'); closeMenu()">
-        <i class="fas fa-chart-pie"></i>
-        <span>Statistiques</span>
-      </div>
-      <div class="sidebar-item" onclick="switchTab('clients'); closeMenu()">
-        <i class="fas fa-users"></i>
-        <span>Clients</span>
-        <span class="badge" id="clientsBadge" style="display: none;"></span>
-      </div>
-      <div class="sidebar-item" onclick="switchTab('import'); closeMenu()">
-        <i class="fas fa-file-import"></i>
-        <span>Import/Export</span>
-      </div>
-      <div class="sidebar-item" onclick="switchTab('reports'); closeMenu()">
-        <i class="fas fa-file-pdf"></i>
-        <span>Rapports</span>
-      </div>
-      <div class="sidebar-item" onclick="switchTab('admin'); closeMenu()">
-        <i class="fas fa-crown" style="color: var(--admin-color);"></i>
-        <span>Administration</span>
-        <span class="badge badge-admin" id="adminBadge" style="display: none;">Admin</span>
-      </div>
-    </div>
-    
-    <div class="sidebar-footer">
-      <div class="sidebar-item" onclick="toggleDark(); closeMenu()">
-        <i class="fas fa-moon"></i>
-        <span>Mode sombre</span>
-      </div>
-      <div class="sidebar-item" onclick="showSettings()">
-        <i class="fas fa-cog"></i>
-        <span>Paramètres</span>
-      </div>
-      <div class="sidebar-item" onclick="logout()" id="logoutBtn" style="display: none;">
-        <i class="fas fa-sign-out-alt"></i>
-        <span>Déconnexion</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Top Bar -->
-  <div class="top-bar">
-    <div class="top-bar-left">
-      <button class="menu-btn" onclick="toggleMenu()">
-        <i class="fas fa-bars"></i>
+    <p style="font-size:13px;font-weight:600;margin-bottom:11px;color:var(--text-light)">Choisissez votre profil</p>
+    <div class="login-users">
+      <button class="user-btn victor" onclick="selectUser('victor')" id="btn-victor">
+        <div class="ico">👤</div><strong>Victor</strong><small>victor@gestionpro.fr</small>
       </button>
-      <div class="logo">
-        <i class="fas fa-chart-line"></i>
-        <h1>Gestion Pro</h1>
-      </div>
+      <button class="user-btn arthur" onclick="selectUser('arthur')" id="btn-arthur">
+        <div class="ico">👤</div><strong>Arthur</strong><small>arthur@gestionpro.fr</small>
+      </button>
+    </div>
+    <div class="form-group">
+      <label>🔒 Mot de passe</label>
+      <input type="password" id="loginPwd" placeholder="6 caractères minimum" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="btn" id="loginBtn" onclick="doLogin()">➜ Se connecter</button>
+    <p id="loginMsg" style="text-align:center;margin-top:14px;font-size:12px;color:var(--text-light)">Première connexion ? Le compte sera créé automatiquement.</p>
+  </div>
+</div>
+
+<div class="app" id="app">
+  <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-head"><div class="ico">📊</div><h2>Gestion Pro</h2></div>
+    <div class="sidebar-menu">
+      <div class="nav-item active" onclick="goTab('dashboard',this)"><div class="ico">🏠</div><span>Tableau de bord</span></div>
+      <div class="nav-item" onclick="goTab('transactions',this)"><div class="ico">🔄</div><span>Transactions</span><span class="nav-badge" id="nb-transactions" style="display:none">0</span></div>
+      <div class="nav-item" onclick="goTab('boxes',this)"><div class="ico">📦</div><span>Boxes / Lots</span></div>
+      <div class="nav-item" onclick="goTab('products',this)"><div class="ico">🛍️</div><span>Produits</span><span class="nav-badge" id="nb-products" style="display:none">0</span></div>
+      <div class="nav-item" onclick="goTab('stock',this)"><div class="ico">🏭</div><span>Stocks</span><span class="nav-badge" id="nb-lowstock" style="display:none">⚠</span></div>
+      <div class="nav-item" onclick="goTab('calendar',this)"><div class="ico">📅</div><span>Calendrier</span></div>
+      <div class="nav-item" onclick="goTab('stats',this)"><div class="ico">📈</div><span>Statistiques</span></div>
+      <div class="nav-item" onclick="goTab('clients',this)"><div class="ico">👥</div><span>Clients</span></div>
+      <div class="nav-item" onclick="goTab('files',this)"><div class="ico">📁</div><span>Fichiers Cloud</span></div>
+    </div>
+    <div class="sidebar-foot">
+      <div class="nav-item" onclick="toggleDark()"><div class="ico">🌙</div><span>Mode sombre</span></div>
+      <div class="nav-item" style="color:var(--danger)" onclick="doLogout()"><div class="ico">🚪</div><span>Déconnexion</span></div>
+    </div>
+  </div>
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+      <span class="logo-txt">☁ Gestion Pro Cloud</span>
       <span class="page-title" id="pageTitle">Tableau de bord</span>
     </div>
-    <div class="d-flex align-center gap-2">
-      <span id="userDisplay" style="display: none; padding: 8px 16px; background: var(--accent); color: white; border-radius: var(--radius-sm);">
-        <i class="fas fa-user-shield"></i> Admin
-      </span>
-      <button class="theme-btn" onclick="quickAddGain()">
-        <i class="fas fa-plus-circle"></i>
-      </button>
-      <button class="theme-btn" onclick="toggleDark()">
-        <i class="fas fa-moon"></i>
-      </button>
+    <div class="topbar-right">
+      <div class="sync-badge synced" id="syncBadge"><span id="syncIco">☁</span><span id="syncText">Synchronisé</span></div>
+      <div class="user-pill" id="userPill" style="background:var(--victor)"><span>👤</span><span id="userLabel">Victor</span></div>
     </div>
   </div>
 
-  <!-- Contenu Principal -->
-  <div class="main-content">
-    <!-- Tableau de bord amélioré (ANCIENNE VERSION CONSERVÉE) -->
-    <div id="tab-dashboard" class="tab-content active">
-      <!-- Sélecteur de personne avec stats -->
-      <div class="grid-3" style="margin-bottom: 20px;">
-        <button onclick="showPerson('victor')" id="victor-toggle" class="btn active" style="background: var(--victor-color);">
-          <i class="fas fa-user"></i> Victor
-          <span class="badge" id="victorQuickStats">0 €</span>
-        </button>
-        <button onclick="showPerson('arthur')" id="arthur-toggle" class="btn" style="background: var(--arthur-color);">
-          <i class="fas fa-user"></i> Arthur
-          <span class="badge" id="arthurQuickStats">0 €</span>
-        </button>
-        <button onclick="showBoth()" id="both-toggle" class="btn" style="background: var(--accent);">
-          <i class="fas fa-users"></i> Les deux
-          <span class="badge" id="bothQuickStats">0 €</span>
-        </button>
+  <div class="content">
+    <!-- DASHBOARD -->
+    <div class="tab active" id="tab-dashboard">
+      <div class="grid4">
+        <div class="stat-card"><div class="stat-icon" style="font-size:24px">💶</div><div class="stat-num" id="s-total">0 €</div><div class="stat-lbl">Total combiné</div></div>
+        <div class="stat-card"><div class="stat-icon" style="font-size:24px;color:var(--victor)">👤</div><div class="stat-num" id="s-victor" style="color:var(--victor)">0 €</div><div class="stat-lbl">Victor</div></div>
+        <div class="stat-card"><div class="stat-icon" style="font-size:24px;color:var(--arthur)">👤</div><div class="stat-num" id="s-arthur" style="color:var(--arthur)">0 €</div><div class="stat-lbl">Arthur</div></div>
+        <div class="stat-card"><div class="stat-icon" style="font-size:24px">📆</div><div class="stat-num" id="s-month">0 €</div><div class="stat-lbl">Ce mois</div></div>
       </div>
-
-      <!-- Formulaire gains amélioré -->
-      <div class="grid-2">
+      <div class="grid2">
         <div class="card">
-          <div class="card-title">
-            <i class="fas fa-user"></i> Victor - Ajouter un gain
-            <span class="badge badge-info">Aujourd'hui</span>
-          </div>
-          <form onsubmit="addGain(event, 'victor')">
-            <div class="form-group">
-              <input type="date" id="victor-date" required>
-            </div>
-            <div class="form-group">
-              <input type="number" id="victor-amount" placeholder="Montant (€)" required min="0" step="0.01">
-            </div>
-            <div class="form-group">
-              <input type="text" id="victor-description" placeholder="Description">
-            </div>
-            <div class="form-group">
-              <select id="victor-category">
-                <option value="vente">Vente</option>
-                <option value="prestation">Prestation</option>
-                <option value="autre">Autre</option>
-              </select>
-            </div>
-            <button type="submit" class="btn btn-block" style="background: var(--victor-color);">
-              <i class="fas fa-plus-circle"></i> Ajouter
-            </button>
+          <div class="card-title" style="color:var(--victor)"><div class="ico">👤</div>Victor — Ajouter un gain</div>
+          <form onsubmit="addGain(event,'victor')">
+            <div class="form-group"><label>Date</label><input type="date" id="v-date" required></div>
+            <div class="form-group"><label>Montant (€)</label><input type="number" id="v-amount" placeholder="0.00" step="0.01" min="0" required></div>
+            <div class="form-group"><label>Description</label><input type="text" id="v-desc" placeholder="Ex: Vente iPhone..."></div>
+            <div class="form-group"><label>Catégorie</label><select id="v-cat"><option value="vente">Vente</option><option value="prestation">Prestation</option><option value="autre">Autre</option></select></div>
+            <button type="submit" class="btn" style="background:var(--victor)">+ Ajouter</button>
           </form>
-          <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--border);">
-            <div style="display: flex; justify-content: space-between;">
-              <span style="font-weight: 600;">Total Victor:</span>
-              <span style="font-weight: 700; font-size: 24px; color: var(--victor-color);" id="victor-total">0 €</span>
-            </div>
+          <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+            <span style="font-weight:600">Total Victor</span>
+            <span style="font-size:24px;font-weight:800;color:var(--victor)" id="victor-total">0 €</span>
           </div>
         </div>
-
         <div class="card">
-          <div class="card-title">
-            <i class="fas fa-user"></i> Arthur - Ajouter un gain
-            <span class="badge badge-success">Aujourd'hui</span>
-          </div>
-          <form onsubmit="addGain(event, 'arthur')">
-            <div class="form-group">
-              <input type="date" id="arthur-date" required>
-            </div>
-            <div class="form-group">
-              <input type="number" id="arthur-amount" placeholder="Montant (€)" required min="0" step="0.01">
-            </div>
-            <div class="form-group">
-              <input type="text" id="arthur-description" placeholder="Description">
-            </div>
-            <div class="form-group">
-              <select id="arthur-category">
-                <option value="vente">Vente</option>
-                <option value="prestation">Prestation</option>
-                <option value="autre">Autre</option>
-              </select>
-            </div>
-            <button type="submit" class="btn btn-block" style="background: var(--arthur-color);">
-              <i class="fas fa-plus-circle"></i> Ajouter
-            </button>
+          <div class="card-title" style="color:var(--arthur)"><div class="ico">👤</div>Arthur — Ajouter un gain</div>
+          <form onsubmit="addGain(event,'arthur')">
+            <div class="form-group"><label>Date</label><input type="date" id="a-date" required></div>
+            <div class="form-group"><label>Montant (€)</label><input type="number" id="a-amount" placeholder="0.00" step="0.01" min="0" required></div>
+            <div class="form-group"><label>Description</label><input type="text" id="a-desc" placeholder="Ex: Vente AirPods..."></div>
+            <div class="form-group"><label>Catégorie</label><select id="a-cat"><option value="vente">Vente</option><option value="prestation">Prestation</option><option value="autre">Autre</option></select></div>
+            <button type="submit" class="btn" style="background:var(--arthur)">+ Ajouter</button>
           </form>
-          <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--border);">
-            <div style="display: flex; justify-content: space-between;">
-              <span style="font-weight: 600;">Total Arthur:</span>
-              <span style="font-weight: 700; font-size: 24px; color: var(--arthur-color);" id="arthur-total">0 €</span>
-            </div>
+          <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+            <span style="font-weight:600">Total Arthur</span>
+            <span style="font-size:24px;font-weight:800;color:var(--arthur)" id="arthur-total">0 €</span>
           </div>
         </div>
       </div>
-
-      <!-- Stats rapides améliorées -->
-      <div class="grid-4">
-        <div class="stat-card">
-          <div class="stat-icon">
-            <i class="fas fa-euro-sign"></i>
-          </div>
-          <div class="stat-number" id="total">0 €</div>
-          <div class="stat-label">Total combiné</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">
-            <i class="fas fa-calendar-day"></i>
-          </div>
-          <div class="stat-number" id="yesterday">0 €</div>
-          <div class="stat-label">Hier</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">
-            <i class="fas fa-calendar-week"></i>
-          </div>
-          <div class="stat-number" id="week">0 €</div>
-          <div class="stat-label">Cette semaine</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">
-            <i class="fas fa-calendar-alt"></i>
-          </div>
-          <div class="stat-number" id="month">0 €</div>
-          <div class="stat-label">Ce mois</div>
-        </div>
-      </div>
-
-      <!-- Graphique amélioré -->
       <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-          <div class="card-title" style="margin-bottom: 0;">
-            <i class="fas fa-chart-line"></i> Évolution des gains
-          </div>
-          <div class="d-flex gap-2">
-            <select id="period" onchange="drawChart()" style="width: auto; padding: 12px 20px;">
-              <option value="today">Aujourd'hui</option>
-              <option value="7" selected>7 derniers jours</option>
-              <option value="30">30 derniers jours</option>
-              <option value="month">Ce mois</option>
-              <option value="year">Cette année</option>
-              <option value="all">Tout</option>
-            </select>
-            <button onclick="exportChart()" class="btn-sm" style="background: var(--success);">
-              <i class="fas fa-download"></i>
-            </button>
-          </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+          <div class="card-title" style="margin-bottom:0"><div class="ico" style="display:inline">📈</div> Évolution des gains</div>
+          <select id="chartPeriod" onchange="drawChart()" style="width:auto;padding:9px 14px">
+            <option value="7">7 jours</option><option value="30">30 jours</option><option value="all">Tout</option>
+          </select>
         </div>
-        <div style="position: relative; height: 350px;">
-          <canvas id="chart"></canvas>
-        </div>
+        <div class="chart-wrap"><canvas id="mainChart"></canvas></div>
       </div>
-
-      <!-- Historique avec filtres -->
       <div class="card">
-        <div class="d-flex justify-between align-center mb-3">
-          <div class="card-title" style="margin-bottom: 0;">
-            <i class="fas fa-history"></i> Derniers gains
-          </div>
-          <div class="d-flex gap-2">
-            <input type="text" id="historySearch" placeholder="Rechercher..." onkeyup="filterHistory()" style="width: 200px;">
-            <button onclick="exportHistory()" class="btn-sm" style="background: var(--success);">
-              <i class="fas fa-file-export"></i> Export
-            </button>
-          </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div class="card-title" style="margin-bottom:0">🕐 Derniers gains</div>
+          <input type="text" id="searchGains" placeholder="Rechercher..." onkeyup="renderGainsTable()" style="width:190px;padding:9px 13px">
         </div>
-        <div class="table-responsive">
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Personne</th>
-                <th>Catégorie</th>
-                <th>Description</th>
-                <th>Montant</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="history-table-body"></tbody>
-          </table>
-        </div>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Date</th><th>Personne</th><th>Catégorie</th><th>Description</th><th>Montant</th><th>Action</th></tr></thead>
+          <tbody id="gains-tbody"></tbody>
+        </table></div>
       </div>
     </div>
 
-    <!-- NOUVEL ONGLET TRANSACTIONS -->
-    <div id="tab-transactions" class="tab-content">
-      <div class="grid-4">
-        <div class="stat-card" onclick="showTransactionStats('all')">
-          <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
-          <div class="stat-number" id="transactions-total">0 €</div>
-          <div class="stat-label">CA Total</div>
-        </div>
-        <div class="stat-card" onclick="showTransactionStats('margin')">
-          <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
-          <div class="stat-number" id="transactions-margin">0 €</div>
-          <div class="stat-label">Marge Totale</div>
-        </div>
-        <div class="stat-card" onclick="showTransactionStats('count')">
-          <div class="stat-icon"><i class="fas fa-calculator"></i></div>
-          <div class="stat-number" id="transactions-count">0</div>
-          <div class="stat-label">Transactions</div>
-        </div>
-        <div class="stat-card" onclick="showTransactionStats('margin-rate')">
-          <div class="stat-icon"><i class="fas fa-percent"></i></div>
-          <div class="stat-number" id="transactions-margin-rate">0%</div>
-          <div class="stat-label">Taux de marge</div>
-        </div>
+    <!-- TRANSACTIONS -->
+    <div class="tab" id="tab-transactions">
+      <div class="grid4">
+        <div class="stat-card"><div class="stat-icon" style="font-size:24px">🛒</div><div class="stat-num" id="t-ca">0 €</div><div class="stat-lbl">CA Total</div></div>
+        <div class="stat-card"><div class="stat-icon" style="font-size:24px">📈</div><div class="stat-num" id="t-margin">0 €</div><div class="stat-lbl">Marge Totale</div></div>
+        <div class="stat-card"><div class="stat-icon" style="font-size:24px">🧮</div><div class="stat-num" id="t-count">0</div><div class="stat-lbl">Transactions</div></div>
+        <div class="stat-card"><div class="stat-icon" style="font-size:24px">%</div><div class="stat-num" id="t-rate">0%</div><div class="stat-lbl">Taux de marge</div></div>
       </div>
-
       <div class="card">
-        <div class="card-title">
-          <i class="fas fa-plus-circle"></i> Nouvelle transaction
-        </div>
+        <div class="card-title">➕ Nouvelle transaction</div>
         <form onsubmit="addTransaction(event)">
-          <div class="grid-3">
-            <select id="transaction-person" required>
-              <option value="victor">Victor</option>
-              <option value="arthur">Arthur</option>
-              <option value="commun">Commun</option>
-            </select>
-            <select id="transaction-product" required onchange="updateTransactionPrice()">
-              <option value="">Sélectionner un produit</option>
-            </select>
-            <input type="number" id="transaction-quantity" placeholder="Quantité" min="1" value="1" required onchange="updateTransactionPrice()">
-            <input type="number" id="transaction-price" placeholder="Prix de vente (€)" step="0.01" required>
-            <input type="number" id="transaction-cost" placeholder="Coût d'achat (€)" step="0.01" readonly>
-            <input type="date" id="transaction-date" required>
+          <div class="grid3">
+            <div class="form-group"><label>Personne</label><select id="tr-person"><option value="victor">Victor</option><option value="arthur">Arthur</option><option value="commun">Commun</option></select></div>
+            <div class="form-group"><label>Produit</label><select id="tr-product" onchange="fillTransactionProduct()"><option value="">-- Sélectionner --</option></select></div>
+            <div class="form-group"><label>Quantité</label><input type="number" id="tr-qty" value="1" min="1" onchange="fillTransactionProduct()"></div>
+            <div class="form-group"><label>Prix de vente (€)</label><input type="number" id="tr-price" step="0.01" placeholder="0.00" required></div>
+            <div class="form-group"><label>Coût d'achat (€)</label><input type="number" id="tr-cost" step="0.01" placeholder="0.00" readonly style="opacity:.7"></div>
+            <div class="form-group"><label>Date</label><input type="date" id="tr-date" required></div>
           </div>
-          <div class="grid-2" style="margin-top: 20px;">
-            <div>
-              <strong>Marge unitaire: <span id="transaction-margin-unit">0.00 €</span></strong>
-            </div>
-            <div>
-              <strong>Marge totale: <span id="transaction-margin-total">0.00 €</span></strong>
-            </div>
+          <div style="padding:12px;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:14px;display:flex;gap:22px">
+            <span>Marge unitaire : <strong id="tr-mu">0.00 €</strong></span>
+            <span>Marge totale : <strong id="tr-mt">0.00 €</strong></span>
           </div>
-          <button type="submit" class="btn btn-block mt-3" style="background: var(--success);">
-            <i class="fas fa-check"></i> Valider la transaction
-          </button>
+          <button type="submit" class="btn success">✓ Valider la transaction</button>
         </form>
       </div>
-
       <div class="card">
-        <div class="d-flex justify-between align-center mb-3">
-          <div class="card-title" style="margin-bottom: 0;">
-            <i class="fas fa-list"></i> Historique des transactions
-          </div>
-          <div class="d-flex gap-2">
-            <select id="transactionFilter" onchange="filterTransactions()">
-              <option value="all">Toutes</option>
-              <option value="victor">Victor</option>
-              <option value="arthur">Arthur</option>
-              <option value="commun">Commun</option>
-            </select>
-            <input type="text" id="transactionSearch" placeholder="Rechercher..." onkeyup="filterTransactions()">
-          </div>
-        </div>
-        <div class="table-responsive">
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Personne</th>
-                <th>Produit</th>
-                <th>Qté</th>
-                <th>Prix vente</th>
-                <th>Coût achat</th>
-                <th>Marge</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="transactions-list"></tbody>
-          </table>
-        </div>
+        <div class="card-title">📋 Historique</div>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Date</th><th>Personne</th><th>Produit</th><th>Qté</th><th>Prix vente</th><th>Coût</th><th>Marge</th><th>Action</th></tr></thead>
+          <tbody id="trans-tbody"></tbody>
+        </table></div>
       </div>
     </div>
 
-    <!-- NOUVEL ONGLET BOXES / LOTS -->
-    <div id="tab-boxes" class="tab-content">
-      <div class="grid-3">
-        <div class="stat-card">
-          <div class="stat-icon"><i class="fas fa-cubes"></i></div>
-          <div class="stat-number" id="boxes-total">0</div>
-          <div class="stat-label">Boxes créées</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon"><i class="fas fa-euro-sign"></i></div>
-          <div class="stat-number" id="boxes-revenue">0 €</div>
-          <div class="stat-label">CA Boxes</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
-          <div class="stat-number" id="boxes-margin">0 €</div>
-          <div class="stat-label">Marge Boxes</div>
-        </div>
+    <!-- BOXES -->
+    <div class="tab" id="tab-boxes">
+      <div class="grid3">
+        <div class="stat-card"><div class="stat-icon" style="font-size:24px">📦</div><div class="stat-num" id="b-total">0</div><div class="stat-lbl">Boxes créées</div></div>
+        <div class="stat-card"><div class="stat-icon" style="font-size:24px">💶</div><div class="stat-num" id="b-ca">0 €</div><div class="stat-lbl">CA Boxes</div></div>
+        <div class="stat-card"><div class="stat-icon" style="font-size:24px">📈</div><div class="stat-num" id="b-margin">0 €</div><div class="stat-lbl">Marge Boxes</div></div>
       </div>
-
       <div class="card">
-        <div class="card-title">
-          <i class="fas fa-cube"></i> Créer une box / lot
-        </div>
+        <div class="card-title">📦 Créer une box / lot</div>
         <form onsubmit="addBox(event)">
-          <div class="grid-2">
-            <input type="text" id="box-name" placeholder="Nom de la box" required>
-            <input type="number" id="box-price" placeholder="Prix de vente (€)" step="0.01" required>
-            <input type="number" id="box-cost" placeholder="Coût total (€)" step="0.01" readonly>
-            <input type="date" id="box-date" required>
+          <div class="grid2">
+            <div class="form-group"><label>Nom de la box</label><input type="text" id="box-name" required placeholder="Ex: Pack Gaming"></div>
+            <div class="form-group"><label>Prix de vente (€)</label><input type="number" id="box-price" step="0.01" required placeholder="0.00"></div>
+            <div class="form-group"><label>Date</label><input type="date" id="box-date" required></div>
+            <div class="form-group"><label>Coût total calculé</label><input type="number" id="box-cost" readonly style="opacity:.7" placeholder="Auto"></div>
           </div>
-          <div class="card mt-3">
-            <h3>Produits dans la box</h3>
+          <div style="border:1px dashed var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:14px">
+            <h4 style="margin-bottom:12px">Produits dans la box</h4>
             <div id="box-products-list"></div>
-            <div class="grid-3 mt-3">
-              <select id="box-product-select">
-                <option value="">Sélectionner un produit</option>
-              </select>
-              <input type="number" id="box-product-quantity" placeholder="Quantité" min="1" value="1">
-              <button type="button" onclick="addProductToBox()" class="btn-sm" style="background: var(--success);">
-                <i class="fas fa-plus"></i> Ajouter à la box
-              </button>
+            <div class="grid3" style="margin-top:12px">
+              <select id="box-prod-sel"><option value="">-- Produit --</option></select>
+              <input type="number" id="box-prod-qty" value="1" min="1" placeholder="Quantité">
+              <button type="button" class="btn success sm" onclick="addProdToBox()">+ Ajouter</button>
             </div>
           </div>
-          <div class="mt-3">
-            <strong>Récapitulatif:</strong>
-            <div>Coût total: <span id="box-total-cost">0.00 €</span></div>
-            <div>Prix de vente: <span id="box-total-price">0.00 €</span></div>
-            <div>Marge: <span id="box-total-margin">0.00 €</span></div>
-            <div>Taux de marge: <span id="box-margin-rate">0%</span></div>
+          <div style="padding:12px;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:14px;display:flex;gap:20px;flex-wrap:wrap">
+            <span>Coût : <strong id="bx-cost">0 €</strong></span>
+            <span>Vente : <strong id="bx-price">0 €</strong></span>
+            <span>Marge : <strong id="bx-margin">0 €</strong></span>
+            <span>Taux : <strong id="bx-rate">0%</strong></span>
           </div>
-          <button type="submit" class="btn btn-block mt-3" style="background: var(--success);">
-            <i class="fas fa-save"></i> Créer la box
-          </button>
+          <button type="submit" class="btn success">💾 Créer la box</button>
         </form>
       </div>
-
       <div class="card">
-        <div class="card-title">
-          <i class="fas fa-cubes"></i> Boxes créées
-        </div>
-        <div id="boxes-grid" class="product-grid"></div>
+        <div class="card-title">📦 Boxes créées</div>
+        <div id="boxes-grid" class="grid-products"></div>
       </div>
     </div>
 
-    <!-- Onglet Produits amélioré (ANCIEN) -->
-    <div id="tab-products" class="tab-content">
+    <!-- PRODUCTS -->
+    <div class="tab" id="tab-products">
       <div class="card">
-        <div class="card-title">
-          <i class="fas fa-box"></i> Ajouter un produit
-        </div>
+        <div class="card-title">➕ Ajouter un produit</div>
         <form onsubmit="addProduct(event)">
-          <div class="grid-3">
-            <input type="text" id="product-name" placeholder="Nom du produit" required>
-            <input type="number" id="product-price" placeholder="Prix de vente (€)" step="0.01" required>
-            <input type="number" id="product-cost" placeholder="Prix d'achat (€)" step="0.01" required>
-            <input type="number" id="product-quantity" placeholder="Quantité en stock" required>
-            <select id="product-category">
-              <option>Électronique</option>
-              <option>Vêtements</option>
-              <option>Alimentation</option>
-              <option>Maison</option>
-              <option>Sports</option>
-              <option>Livres</option>
-              <option>Jouets</option>
-              <option>Autre</option>
-            </select>
-            <input type="text" id="product-sku" placeholder="SKU (référence)">
+          <div class="grid3">
+            <div class="form-group"><label>Nom</label><input type="text" id="p-name" required placeholder="Nom du produit"></div>
+            <div class="form-group"><label>Prix de vente (€)</label><input type="number" id="p-price" step="0.01" required placeholder="0.00"></div>
+            <div class="form-group"><label>Prix d'achat (€)</label><input type="number" id="p-cost" step="0.01" required placeholder="0.00"></div>
+            <div class="form-group"><label>Quantité en stock</label><input type="number" id="p-qty" required placeholder="0"></div>
+            <div class="form-group"><label>Catégorie</label><select id="p-cat"><option>Électronique</option><option>Vêtements</option><option>Alimentation</option><option>Maison</option><option>Sports</option><option>Livres</option><option>Jouets</option><option>Autre</option></select></div>
+            <div class="form-group"><label>SKU (référence)</label><input type="text" id="p-sku" placeholder="Ex: SKU-001"></div>
           </div>
-          <button type="submit" class="btn btn-block mt-3" style="background: var(--success);">
-            <i class="fas fa-save"></i> Ajouter
-          </button>
+          <button type="submit" class="btn success">💾 Ajouter le produit</button>
         </form>
       </div>
-      
       <div class="card">
-        <div class="d-flex justify-between align-center mb-3">
-          <div class="card-title" style="margin-bottom: 0;">
-            <i class="fas fa-boxes"></i> Catalogue produits
-          </div>
-          <div class="d-flex gap-2">
-            <select id="productFilter" onchange="filterProducts()" style="width: 150px;">
-              <option value="all">Toutes catégories</option>
-              <option value="Électronique">Électronique</option>
-              <option value="Vêtements">Vêtements</option>
-              <option value="Alimentation">Alimentation</option>
-              <option value="Maison">Maison</option>
-            </select>
-            <input type="text" id="productSearch" placeholder="Rechercher..." onkeyup="filterProducts()">
-          </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div class="card-title" style="margin-bottom:0">🛍️ Catalogue</div>
+          <input type="text" id="searchProducts" placeholder="Rechercher..." onkeyup="renderProducts()" style="width:190px;padding:9px 13px">
         </div>
-        <div id="products-list" class="product-grid"></div>
+        <div id="products-grid" class="grid-products"></div>
       </div>
     </div>
 
-    <!-- Onglet Stocks amélioré (ANCIEN) -->
-    <div id="tab-inventory" class="tab-content">
-      <div class="grid-4">
-        <div class="stat-card">
-          <div class="stat-icon"><i class="fas fa-box"></i></div>
-          <div class="stat-number" id="total-products">0</div>
-          <div class="stat-label">Produits</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon"><i class="fas fa-cubes"></i></div>
-          <div class="stat-number" id="total-stock">0</div>
-          <div class="stat-label">Unités en stock</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
-          <div class="stat-number" id="low-stock">0</div>
-          <div class="stat-label">Stock faible</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon"><i class="fas fa-euro-sign"></i></div>
-          <div class="stat-number" id="stock-value">0 €</div>
-          <div class="stat-label">Valeur totale</div>
-        </div>
+    <!-- STOCK -->
+    <div class="tab" id="tab-stock">
+      <div class="grid4">
+        <div class="stat-card"><div class="stat-icon" style="font-size:24px">📦</div><div class="stat-num" id="st-total">0</div><div class="stat-lbl">Produits</div></div>
+        <div class="stat-card"><div class="stat-icon" style="font-size:24px">🔢</div><div class="stat-num" id="st-units">0</div><div class="stat-lbl">Unités totales</div></div>
+        <div class="stat-card"><div class="stat-icon" style="font-size:24px">⚠️</div><div class="stat-num" id="st-low" style="color:var(--warning)">0</div><div class="stat-lbl">Stock faible</div></div>
+        <div class="stat-card"><div class="stat-icon" style="font-size:24px">💶</div><div class="stat-num" id="st-value">0 €</div><div class="stat-lbl">Valeur stock</div></div>
       </div>
-      
       <div class="card">
-        <div class="d-flex justify-between align-center mb-3">
-          <div class="card-title" style="margin-bottom: 0;">
-            <i class="fas fa-clipboard-list"></i> État des stocks
-          </div>
-          <div>
-            <button onclick="alertLowStock()" class="btn-sm" style="background: var(--warning);">
-              <i class="fas fa-bell"></i> Alerte stock faible
-            </button>
-          </div>
-        </div>
-        <div class="table-responsive">
-          <table>
-            <thead>
-              <tr>
-                <th>Produit</th>
-                <th>SKU</th>
-                <th>Catégorie</th>
-                <th>Prix vente</th>
-                <th>Prix achat</th>
-                <th>Quantité</th>
-                <th>Valeur</th>
-                <th>Marge</th>
-                <th>Statut</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="stock-table-body"></tbody>
-          </table>
-        </div>
+        <div class="card-title">📋 État des stocks</div>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Produit</th><th>SKU</th><th>Catégorie</th><th>Prix vente</th><th>Prix achat</th><th>Stock</th><th>Valeur</th><th>Marge</th><th>Statut</th><th>Action</th></tr></thead>
+          <tbody id="stock-tbody"></tbody>
+        </table></div>
       </div>
     </div>
 
-    <!-- Onglet Fiches produits (ANCIEN) -->
-    <div id="tab-sheets" class="tab-content">
+    <!-- CALENDAR -->
+    <div class="tab" id="tab-calendar">
       <div class="card">
-        <div class="card-title">
-          <i class="fas fa-file-alt"></i> Fiches détaillées
-        </div>
-        <div id="product-sheets" class="product-grid"></div>
-      </div>
-    </div>
-
-    <!-- Onglet Calendrier amélioré (ANCIEN) -->
-    <div id="tab-calendar" class="tab-content">
-      <div class="card">
-        <div class="card-title">
-          <i class="fas fa-calendar-plus"></i> Ajouter un événement
-        </div>
+        <div class="card-title">📅 Ajouter un événement</div>
         <form onsubmit="addEvent(event)">
-          <div class="grid-3">
-            <input type="text" id="event-title" placeholder="Titre" required>
-            <input type="date" id="event-date" required>
-            <select id="event-person">
-              <option value="commun">Commun</option>
-              <option value="victor">Victor</option>
-              <option value="arthur">Arthur</option>
-            </select>
-            <input type="text" id="event-time" placeholder="Heure (ex: 14:30)">
-            <select id="event-type">
-              <option value="rdv">Rendez-vous</option>
-              <option value="livraison">Livraison</option>
-              <option value="reunion">Réunion</option>
-              <option value="autre">Autre</option>
-            </select>
-            <button type="submit" class="btn">
-              <i class="fas fa-plus"></i> Ajouter
-            </button>
+          <div class="grid3">
+            <div class="form-group"><label>Titre</label><input type="text" id="ev-title" required placeholder="Ex: Livraison client..."></div>
+            <div class="form-group"><label>Date</label><input type="date" id="ev-date" required></div>
+            <div class="form-group"><label>Heure</label><input type="text" id="ev-time" placeholder="14:30"></div>
+            <div class="form-group"><label>Personne</label><select id="ev-person"><option value="commun">Commun</option><option value="victor">Victor</option><option value="arthur">Arthur</option></select></div>
+            <div class="form-group"><label>Type</label><select id="ev-type"><option value="rdv">Rendez-vous</option><option value="livraison">Livraison</option><option value="reunion">Réunion</option><option value="autre">Autre</option></select></div>
+            <div style="display:flex;align-items:flex-end"><button type="submit" class="btn">+ Ajouter</button></div>
           </div>
         </form>
       </div>
-      
       <div class="card">
-        <div class="d-flex justify-between align-center mb-3">
-          <div class="card-title" style="margin-bottom: 0;">
-            <i class="fas fa-calendar"></i> Mars 2026
-          </div>
-          <div>
-            <button onclick="previousMonth()" class="btn-sm"><i class="fas fa-chevron-left"></i></button>
-            <button onclick="nextMonth()" class="btn-sm"><i class="fas fa-chevron-right"></i></button>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+          <div class="card-title" style="margin-bottom:0">📅 <span id="cal-month-title">Calendrier</span></div>
+          <div style="display:flex;gap:9px">
+            <button class="btn ghost sm" onclick="prevMonth()">‹</button>
+            <button class="btn ghost sm" onclick="nextMonth()">›</button>
           </div>
         </div>
-        <div class="calendar-header">
-          <div class="calendar-weekday">Lun</div>
-          <div class="calendar-weekday">Mar</div>
-          <div class="calendar-weekday">Mer</div>
-          <div class="calendar-weekday">Jeu</div>
-          <div class="calendar-weekday">Ven</div>
-          <div class="calendar-weekday">Sam</div>
-          <div class="calendar-weekday">Dim</div>
+        <div class="cal-header">
+          <div class="cal-day-name">Lun</div><div class="cal-day-name">Mar</div><div class="cal-day-name">Mer</div>
+          <div class="cal-day-name">Jeu</div><div class="cal-day-name">Ven</div><div class="cal-day-name">Sam</div><div class="cal-day-name">Dim</div>
         </div>
-        <div id="calendar-view" class="calendar-grid"></div>
-      </div>
-      
-      <div class="card">
-        <div class="card-title">
-          <i class="fas fa-list"></i> Tous les événements
-        </div>
-        <div class="table-responsive">
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Heure</th>
-                <th>Titre</th>
-                <th>Type</th>
-                <th>Personne</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="events-table-body"></tbody>
-          </table>
-        </div>
+        <div class="cal-grid" id="calGrid"></div>
       </div>
     </div>
 
-    <!-- Onglet Statistiques amélioré (ANCIEN) -->
-    <div id="tab-stats" class="tab-content">
-      <div class="grid-4">
-        <div class="stat-card">
-          <div class="stat-icon"><i class="fas fa-euro-sign"></i></div>
-          <div class="stat-number" id="stats-total">0 €</div>
-          <div class="stat-label">Gains totaux</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon"><i class="fas fa-user"></i></div>
-          <div class="stat-number" id="stats-victor">0 €</div>
-          <div class="stat-label">Victor</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon"><i class="fas fa-user"></i></div>
-          <div class="stat-number" id="stats-arthur">0 €</div>
-          <div class="stat-label">Arthur</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
-          <div class="stat-number" id="stats-average">0 €</div>
-          <div class="stat-label">Moyenne/jour</div>
-        </div>
+    <!-- STATS -->
+    <div class="tab" id="tab-stats">
+      <div class="grid4">
+        <div class="stat-card"><div class="stat-icon" style="font-size:24px">💶</div><div class="stat-num" id="st2-total">0 €</div><div class="stat-lbl">Total gains</div></div>
+        <div class="stat-card"><div class="stat-icon" style="font-size:24px">👤</div><div class="stat-num" id="st2-victor" style="color:var(--victor)">0 €</div><div class="stat-lbl">Victor</div></div>
+        <div class="stat-card"><div class="stat-icon" style="font-size:24px">👤</div><div class="stat-num" id="st2-arthur" style="color:var(--arthur)">0 €</div><div class="stat-lbl">Arthur</div></div>
+        <div class="stat-card"><div class="stat-icon" style="font-size:24px">📊</div><div class="stat-num" id="st2-avg">0 €</div><div class="stat-lbl">Moy/jour</div></div>
       </div>
-      
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-title">
-            <i class="fas fa-chart-pie"></i> Répartition des gains
-          </div>
-          <div style="position: relative; height: 300px;">
-            <canvas id="pie-chart"></canvas>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-title">
-            <i class="fas fa-chart-bar"></i> Performance mensuelle
-          </div>
-          <div style="position: relative; height: 300px;">
-            <canvas id="monthly-chart"></canvas>
-          </div>
-        </div>
+      <div class="grid2">
+        <div class="card"><div class="card-title">🥧 Répartition</div><div class="chart-wrap"><canvas id="pieChart"></canvas></div></div>
+        <div class="card"><div class="card-title">📊 Par mois</div><div class="chart-wrap"><canvas id="barChart"></canvas></div></div>
       </div>
-      
       <div class="card">
-        <div class="card-title">
-          <i class="fas fa-trophy"></i> Objectifs
-        </div>
-        <div class="grid-2">
+        <div class="card-title">🏆 Objectifs mensuels</div>
+        <div class="grid2">
           <div>
-            <h3>Victor - Objectif mensuel: <span id="victor-goal-amount">2000</span> €</h3>
-            <div class="progress-container" style="position: relative; margin-top: 10px; height: 20px; background: var(--border);">
-              <div class="progress-bar" id="victor-progress" style="width: 0%; height: 100%;"></div>
-            </div>
-            <p id="victor-goal">0 € / 2000 €</p>
+            <h4 style="margin-bottom:10px">Victor — Objectif 2 000 €</h4>
+            <div class="stock-bar" style="height:18px"><div class="stock-fill" id="prog-victor" style="width:0%;background:var(--victor)"></div></div>
+            <p id="goal-victor" style="margin-top:7px;font-size:13px">0 € / 2000 €</p>
           </div>
           <div>
-            <h3>Arthur - Objectif mensuel: <span id="arthur-goal-amount">2000</span> €</h3>
-            <div class="progress-container" style="position: relative; margin-top: 10px; height: 20px; background: var(--border);">
-              <div class="progress-bar" id="arthur-progress" style="width: 0%; height: 100%; background: var(--arthur-color);"></div>
-            </div>
-            <p id="arthur-goal">0 € / 2000 €</p>
+            <h4 style="margin-bottom:10px">Arthur — Objectif 2 000 €</h4>
+            <div class="stock-bar" style="height:18px"><div class="stock-fill" id="prog-arthur" style="width:0%;background:var(--arthur)"></div></div>
+            <p id="goal-arthur" style="margin-top:7px;font-size:13px">0 € / 2000 €</p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Onglet Clients amélioré (ANCIEN) -->
-    <div id="tab-clients" class="tab-content">
+    <!-- CLIENTS -->
+    <div class="tab" id="tab-clients">
       <div class="card">
-        <div class="card-title">
-          <i class="fas fa-user-plus"></i> Ajouter un client
-        </div>
+        <div class="card-title">👤 Ajouter un client</div>
         <form onsubmit="addClient(event)">
-          <div class="grid-3">
-            <input type="text" id="client-name" placeholder="Nom complet" required>
-            <input type="email" id="client-email" placeholder="Email">
-            <input type="text" id="client-phone" placeholder="Téléphone">
-            <input type="text" id="client-company" placeholder="Entreprise">
-            <select id="client-type">
-              <option value="particulier">Particulier</option>
-              <option value="professionnel">Professionnel</option>
-            </select>
-            <button type="submit" class="btn" style="background: var(--success);">
-              <i class="fas fa-user-plus"></i> Ajouter
-            </button>
+          <div class="grid3">
+            <div class="form-group"><label>Nom complet</label><input type="text" id="cl-name" required></div>
+            <div class="form-group"><label>Email</label><input type="email" id="cl-email"></div>
+            <div class="form-group"><label>Téléphone</label><input type="text" id="cl-phone"></div>
+            <div class="form-group"><label>Entreprise</label><input type="text" id="cl-company"></div>
+            <div class="form-group"><label>Type</label><select id="cl-type"><option value="particulier">Particulier</option><option value="professionnel">Professionnel</option></select></div>
+            <div style="display:flex;align-items:flex-end"><button type="submit" class="btn success">+ Ajouter</button></div>
           </div>
         </form>
       </div>
-      
       <div class="card">
-        <div class="d-flex justify-between align-center mb-3">
-          <div class="card-title" style="margin-bottom: 0;">
-            <i class="fas fa-users"></i> Liste des clients
-          </div>
-          <input type="text" id="clientSearch" placeholder="Rechercher un client..." onkeyup="filterClients()">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div class="card-title" style="margin-bottom:0">👥 Liste clients</div>
+          <input type="text" id="searchClients" placeholder="Rechercher..." onkeyup="renderClients()" style="width:190px;padding:9px 13px">
         </div>
-        <div id="clients-list" class="clients-grid"></div>
+        <div id="clients-grid" class="grid-products"></div>
       </div>
     </div>
 
-    <!-- Onglet Import/Export (ANCIEN) -->
-    <div id="tab-import" class="tab-content">
+    <!-- FILES -->
+    <div class="tab" id="tab-files">
       <div class="card">
-        <div class="card-title">
-          <i class="fas fa-file-import"></i> Import/Export de données
-        </div>
-        <div class="grid-2">
-          <div>
-            <h3>Exporter</h3>
-            <button onclick="exportData('csv')" class="btn btn-block mb-2">
-              <i class="fas fa-file-csv"></i> Exporter en CSV
-            </button>
-            <button onclick="exportData('json')" class="btn btn-block mb-2">
-              <i class="fas fa-file-code"></i> Exporter en JSON
-            </button>
-            <button onclick="exportData('pdf')" class="btn btn-block">
-              <i class="fas fa-file-pdf"></i> Exporter en PDF
-            </button>
-          </div>
-          <div>
-            <h3>Importer</h3>
-            <input type="file" id="importFile" accept=".json,.csv" class="mb-2">
-            <button onclick="importData()" class="btn btn-block">
-              <i class="fas fa-file-import"></i> Importer
-            </button>
-          </div>
+        <div class="card-title">☁️ Uploader des fichiers</div>
+        <div class="upload-zone" id="uploadZone">
+          <div style="font-size:44px;margin-bottom:12px">☁️</div>
+          <p style="font-size:15px;font-weight:600;margin-bottom:5px">Glissez vos fichiers ici</p>
+          <p style="color:var(--text-light);font-size:13px">Factures PDF, photos de produits, reçus...</p>
+          <input type="file" id="fileInput" multiple style="display:none" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx">
         </div>
       </div>
-    </div>
-
-    <!-- Onglet Rapports (ANCIEN) -->
-    <div id="tab-reports" class="tab-content">
       <div class="card">
-        <div class="card-title">
-          <i class="fas fa-file-pdf"></i> Générer des rapports
-        </div>
-        <div class="grid-3">
-          <div class="stat-card" onclick="generateReport('daily')">
-            <i class="fas fa-calendar-day" style="font-size: 32px;"></i>
-            <h3>Rapport journalier</h3>
-            <p>Gains du jour</p>
-          </div>
-          <div class="stat-card" onclick="generateReport('weekly')">
-            <i class="fas fa-calendar-week" style="font-size: 32px;"></i>
-            <h3>Rapport hebdomadaire</h3>
-            <p>Gains de la semaine</p>
-          </div>
-          <div class="stat-card" onclick="generateReport('monthly')">
-            <i class="fas fa-calendar-alt" style="font-size: 32px;"></i>
-            <h3>Rapport mensuel</h3>
-            <p>Gains du mois</p>
-          </div>
-        </div>
+        <div class="card-title">📁 Fichiers stockés <span class="badge b-info" id="files-count">0</span></div>
+        <div id="files-list"></div>
       </div>
-    </div>
-
-    <!-- Onglet Administration (NOUVEAU) -->
-    <div id="tab-admin" class="tab-content">
-      <!-- Login Admin -->
-      <div id="adminLogin" class="login-container">
-        <h2><i class="fas fa-crown"></i> Administration</h2>
-        <input type="text" id="adminUsername" placeholder="Nom d'utilisateur" value="admin">
-        <input type="password" id="adminPassword" placeholder="Mot de passe">
-        <button onclick="adminLogin()" class="btn btn-block">Se connecter</button>
-      </div>
-
-      <!-- Panneau d'administration (caché par défaut) -->
-      <div id="adminPanel" style="display: none;">
-        <div class="grid-4">
-          <div class="stat-card" onclick="showAdminSection('users')">
-            <div class="stat-icon"><i class="fas fa-users-cog"></i></div>
-            <div class="stat-number" id="total-users">2</div>
-            <div class="stat-label">Utilisateurs</div>
-          </div>
-          <div class="stat-card" onclick="showAdminSection('goals')">
-            <div class="stat-icon"><i class="fas fa-bullseye"></i></div>
-            <div class="stat-number" id="active-goals">2</div>
-            <div class="stat-label">Objectifs actifs</div>
-          </div>
-          <div class="stat-card" onclick="showAdminSection('settings')">
-            <div class="stat-icon"><i class="fas fa-sliders-h"></i></div>
-            <div class="stat-number">Config</div>
-            <div class="stat-label">Paramètres</div>
-          </div>
-          <div class="stat-card" onclick="showAdminSection('backup')">
-            <div class="stat-icon"><i class="fas fa-database"></i></div>
-            <div class="stat-number">Sauvegarde</div>
-            <div class="stat-label">Données</div>
-          </div>
-        </div>
-
-        <!-- Gestion des utilisateurs -->
-        <div id="admin-users" class="card">
-          <div class="card-title">
-            <i class="fas fa-users"></i> Gestion des utilisateurs
-          </div>
-          <form onsubmit="addUser(event)">
-            <div class="grid-3">
-              <input type="text" id="new-username" placeholder="Nom d'utilisateur" required>
-              <input type="password" id="new-password" placeholder="Mot de passe" required>
-              <input type="color" id="new-user-color" class="color-picker" value="#2563eb">
-            </div>
-            <div class="grid-3">
-              <input type="number" id="user-monthly-goal" placeholder="Objectif mensuel (€)" value="2000">
-              <select id="user-role">
-                <option value="user">Utilisateur</option>
-                <option value="admin">Administrateur</option>
-              </select>
-              <button type="submit" class="btn" style="background: var(--success);">
-                <i class="fas fa-user-plus"></i> Ajouter
-              </button>
-            </div>
-          </form>
-          
-          <div class="table-responsive mt-3">
-            <table>
-              <thead>
-                <tr>
-                  <th>Utilisateur</th>
-                  <th>Rôle</th>
-                  <th>Couleur</th>
-                  <th>Objectif</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="users-list"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Gestion des objectifs -->
-        <div id="admin-goals" class="card">
-          <div class="card-title">
-            <i class="fas fa-bullseye"></i> Objectifs personnalisés
-          </div>
-          <form onsubmit="addGoal(event)">
-            <div class="grid-3">
-              <select id="goal-user" required>
-                <option value="victor">Victor</option>
-                <option value="arthur">Arthur</option>
-              </select>
-              <input type="number" id="goal-amount" placeholder="Montant objectif (€)" required>
-              <select id="goal-period">
-                <option value="monthly">Mensuel</option>
-                <option value="weekly">Hebdomadaire</option>
-                <option value="yearly">Annuel</option>
-              </select>
-            </div>
-            <button type="submit" class="btn btn-block mt-3">Définir l'objectif</button>
-          </form>
-          <div id="goals-list" class="mt-3"></div>
-        </div>
-
-        <!-- Sauvegarde des données -->
-        <div id="admin-backup" class="card">
-          <div class="card-title">
-            <i class="fas fa-database"></i> Sauvegarde et restauration
-          </div>
-          <div class="grid-2">
-            <div>
-              <button onclick="backupData()" class="btn btn-block" style="background: var(--success);">
-                <i class="fas fa-save"></i> Sauvegarder
-              </button>
-            </div>
-            <div>
-              <input type="file" id="restoreFile" accept=".json">
-              <button onclick="restoreData()" class="btn btn-block mt-2" style="background: var(--warning);">
-                <i class="fas fa-undo"></i> Restaurer
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Paramètres -->
-  <div class="modal" id="settingsModal">
-    <div class="modal-content">
-      <h2>Paramètres</h2>
-      <div class="form-group">
-        <label>Devise</label>
-        <select id="currencySetting" onchange="updateSettings()">
-          <option value="€">Euro (€)</option>
-          <option value="$">Dollar ($)</option>
-          <option value="£">Livre (£)</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Notifications</label>
-        <select id="notificationsSetting" onchange="updateSettings()">
-          <option value="all">Toutes</option>
-          <option value="important">Importantes uniquement</option>
-          <option value="none">Désactivées</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Rafraîchissement auto</label>
-        <select id="refreshSetting" onchange="updateSettings()">
-          <option value="0">Désactivé</option>
-          <option value="30">30 secondes</option>
-          <option value="60">1 minute</option>
-          <option value="300">5 minutes</option>
-        </select>
-      </div>
-      <button onclick="closeSettings()" class="btn btn-block">Fermer</button>
     </div>
   </div>
 </div>
 
+<div class="toast" id="toast"><span id="toastIco">✓</span><span id="toastMsg"></span></div>
+
 <script>
-// ============ DONNÉES ÉTENDUES ============
-let victorGains = JSON.parse(localStorage.getItem("victorGains") || "[]");
-let arthurGains = JSON.parse(localStorage.getItem("arthurGains") || "[]");
-let products = JSON.parse(localStorage.getItem("products") || "[]");
-let events = JSON.parse(localStorage.getItem("events") || "[]");
-let clients = JSON.parse(localStorage.getItem("clients") || "[]");
-let transactions = JSON.parse(localStorage.getItem("transactions") || "[]");
-let boxes = JSON.parse(localStorage.getItem("boxes") || "[]");
-let users = JSON.parse(localStorage.getItem("users") || '[{"username":"victor","password":"","color":"#2563eb","role":"user","goal":2000},{"username":"arthur","password":"","color":"#10b981","role":"user","goal":2000}]');
-let goals = JSON.parse(localStorage.getItem("goals") || '[]');
-let settings = JSON.parse(localStorage.getItem("settings") || '{"currency":"€","notifications":"all","refresh":0}');
-let currentUser = null;
-let currentView = 'both';
-let autoRefreshInterval = null;
-let currentMonth = 2; // Mars
-let currentYear = 2026;
+// ══════════════════════════════════════════
+// CHARGEMENT SUPABASE + CHART.JS via CDN
+// ══════════════════════════════════════════
+(function loadScripts(){
+  const scripts = [
+    'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js',
+    'https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js'
+  ];
+  let loaded = 0;
+  scripts.forEach(src => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = () => { loaded++; if(loaded === scripts.length) initApp(); };
+    s.onerror = () => showNetworkError();
+    document.head.appendChild(s);
+  });
+})();
 
-// Charts
-let chart, pieChart, monthlyChart;
-
-// ============ INITIALISATION ============
-const today = new Date().toISOString().split('T')[0];
-if(document.getElementById('victor-date')) document.getElementById('victor-date').value = today;
-if(document.getElementById('arthur-date')) document.getElementById('arthur-date').value = today;
-if(document.getElementById('event-date')) document.getElementById('event-date').value = today;
-if(document.getElementById('transaction-date')) document.getElementById('transaction-date').value = today;
-if(document.getElementById('box-date')) document.getElementById('box-date').value = today;
-
-// ============ FONCTIONS ADMIN ============
-function adminLogin() {
-  const username = document.getElementById('adminUsername').value;
-  const password = document.getElementById('adminPassword').value;
-  
-  if(username === 'admin' && password === 'admin123') {
-    currentUser = { username: 'admin', role: 'admin', color: '#8b5cf6' };
-    document.getElementById('adminLogin').style.display = 'none';
-    document.getElementById('adminPanel').style.display = 'block';
-    document.getElementById('userDisplay').style.display = 'inline';
-    document.getElementById('logoutBtn').style.display = 'flex';
-    document.querySelector('.sidebar-item[onclick*="admin"] .badge').style.display = 'inline';
-    showToast('Connexion admin réussie', 'success');
-    loadAdminData();
-  } else {
-    showToast('Identifiants incorrects', 'error');
-  }
-}
-
-function logout() {
-  currentUser = null;
-  document.getElementById('adminLogin').style.display = 'block';
-  document.getElementById('adminPanel').style.display = 'none';
-  document.getElementById('userDisplay').style.display = 'none';
-  document.getElementById('logoutBtn').style.display = 'none';
-  document.querySelector('.sidebar-item[onclick*="admin"] .badge').style.display = 'none';
-  showToast('Déconnexion réussie', 'info');
-}
-
-function addUser(e) {
-  e.preventDefault();
-  const newUser = {
-    id: Date.now(),
-    username: document.getElementById('new-username').value,
-    password: document.getElementById('new-password').value,
-    color: document.getElementById('new-user-color').value,
-    goal: Number(document.getElementById('user-monthly-goal').value),
-    role: document.getElementById('user-role').value,
-    createdAt: today
-  };
-  
-  users.push(newUser);
-  localStorage.setItem("users", JSON.stringify(users));
-  updateUsersList();
-  showToast(`Utilisateur ${newUser.username} ajouté`);
-  e.target.reset();
-}
-
-function updateUsersList() {
-  if(document.getElementById('users-list')) {
-    document.getElementById('users-list').innerHTML = users.map(u => `
-      <tr>
-        <td><span style="color: ${u.color}; font-weight: 600;">${u.username}</span></td>
-        <td><span class="badge ${u.role === 'admin' ? 'badge-admin' : 'badge-info'}">${u.role}</span></td>
-        <td><div style="width: 30px; height: 30px; background: ${u.color}; border-radius: 50%;"></div></td>
-        <td>${u.goal || 2000} €</td>
-        <td>
-          <button onclick="deleteUser(${u.id})" class="btn-sm" style="background: var(--danger);">
-            <i class="fas fa-trash"></i>
-          </button>
-        </td>
-      </tr>
-    `).join('');
-    document.getElementById('total-users').innerText = users.length;
-  }
-}
-
-function deleteUser(id) {
-  if(id && users.find(u => u.id === id)?.username !== 'admin') {
-    users = users.filter(u => u.id !== id);
-    localStorage.setItem("users", JSON.stringify(users));
-    updateUsersList();
-    showToast('Utilisateur supprimé', 'warning');
-  } else {
-    showToast('Impossible de supprimer admin', 'error');
-  }
-}
-
-function addGoal(e) {
-  e.preventDefault();
-  const goal = {
-    id: Date.now(),
-    user: document.getElementById('goal-user').value,
-    amount: Number(document.getElementById('goal-amount').value),
-    period: document.getElementById('goal-period').value,
-    createdAt: today
-  };
-  
-  goals.push(goal);
-  localStorage.setItem("goals", JSON.stringify(goals));
-  updateGoalsList();
-  showToast('Objectif ajouté');
-  e.target.reset();
-}
-
-function updateGoalsList() {
-  if(document.getElementById('goals-list')) {
-    document.getElementById('goals-list').innerHTML = goals.map(g => `
-      <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid var(--border);">
-        <span><strong>${g.user}</strong> - ${g.amount}€ (${g.period})</span>
-        <button onclick="deleteGoal(${g.id})" class="btn-sm" style="background: var(--danger);">
-          <i class="fas fa-trash"></i>
-        </button>
+function showNetworkError(){
+  document.getElementById('loginWrap').innerHTML = `
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1e3a8a,#065f46);padding:20px">
+      <div style="background:#fff;border-radius:20px;padding:40px;max-width:480px;text-align:center">
+        <div style="font-size:52px;margin-bottom:16px">🌐</div>
+        <h2 style="color:#ef4444;margin-bottom:14px">Connexion Internet requise</h2>
+        <p style="color:#64748b;margin-bottom:20px">Ce dashboard se connecte à Supabase et nécessite Internet.</p>
+        <div style="background:#f8fafc;border-radius:12px;padding:16px;text-align:left;margin-bottom:20px;font-size:14px">
+          <strong>✅ Vérifiez que vous êtes bien connecté</strong><br><br>
+          Si le problème persiste, ouvrez le fichier depuis un serveur :<br>
+          • Glissez le fichier sur <a href="https://codesandbox.io" target="_blank" style="color:#2563eb">codesandbox.io</a><br>
+          • Ou utilisez VS Code + extension <strong>Live Server</strong>
+        </div>
+        <button onclick="location.reload()" style="background:#2563eb;color:#fff;border:none;padding:14px 28px;border-radius:12px;cursor:pointer;font-size:15px;font-weight:600">↺ Réessayer</button>
       </div>
-    `).join('');
-    document.getElementById('active-goals').innerText = goals.length;
+    </div>`;
+}
+
+// ══════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════
+const SUPA_URL = 'https://xqhgmtxqfeooaeviqdbg.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxaGdtdHhxZmVvb2FldmlxZGJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMDc5MzUsImV4cCI6MjA4Njc4MzkzNX0.7kosR0wE0mwxAP2HX-t3DYQytJ0C41_uIBP350poMbo';
+const USERS_CFG = { victor:{email:'victor@gestionpro.fr',color:'#2563eb'}, arthur:{email:'arthur@gestionpro.fr',color:'#10b981'} };
+const TODAY = new Date().toISOString().split('T')[0];
+const MONTHS = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+
+let db, currentUser=null, selectedPerson=null;
+let gains=[],products=[],transactions=[],boxes=[],clients=[],events=[],files=[];
+let mainChart,pieChart2,barChart2;
+let calMonth=new Date().getMonth(), calYear=new Date().getFullYear();
+let boxProds=[];
+
+async function initApp(){
+  db = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+  setToday();
+  initCharts();
+  initUpload();
+  const {data:{session}} = await db.auth.getSession();
+  if(session){ currentUser=session.user; showApp(session.user.email.split('@')[0]); await loadAll(); }
+}
+
+function setToday(){
+  ['v-date','a-date','tr-date','box-date','ev-date'].forEach(id=>{const e=el(id);if(e)e.value=TODAY;});
+}
+
+// ══════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════
+function selectUser(who){
+  selectedPerson=who;
+  document.querySelectorAll('.user-btn').forEach(b=>b.classList.remove('selected'));
+  el('btn-'+who).classList.add('selected');
+}
+
+async function doLogin(){
+  if(!selectedPerson){toast('Choisissez Victor ou Arthur','w');return;}
+  const pwd=el('loginPwd').value.trim();
+  if(pwd.length<6){toast('Mot de passe : 6 caractères minimum','w');return;}
+  const btn=el('loginBtn');
+  btn.disabled=true; btn.textContent='⏳ Connexion...';
+  try {
+    let {data,error}=await db.auth.signInWithPassword({email:USERS_CFG[selectedPerson].email,password:pwd});
+    if(error){
+      const {data:d2,error:e2}=await db.auth.signUp({email:USERS_CFG[selectedPerson].email,password:pwd,options:{data:{username:selectedPerson}}});
+      if(e2){
+        if(e2.status===500||e2.message?.includes('email')){showEmailGuide();throw new Error('Désactivez la confirmation email (voir les instructions)');}
+        throw e2;
+      }
+      if(d2?.user&&!d2.session){showEmailGuide();throw new Error('Activez votre compte ou désactivez la confirmation email');}
+      data=d2; toast('Compte créé ! Bienvenue 🎉','s');
+    }
+    if(!data?.user) throw new Error('Connexion impossible');
+    currentUser=data.user;
+    showApp(selectedPerson);
+    await loadAll();
+    toast('Connecté ✓','s');
+  } catch(e){ toast('Erreur : '+e.message,'e'); }
+  finally{ btn.disabled=false; btn.textContent='➜ Se connecter'; }
+}
+
+function showEmailGuide(){
+  el('loginMsg').innerHTML=`<span style="color:#f59e0b;font-weight:600">⚠ Désactivez la confirmation email :<br>
+  <a href="https://supabase.com/dashboard/project/xqhgmtxqfeooaeviqdbg/auth/providers" target="_blank" style="color:#2563eb">
+  Supabase → Auth → Providers → Email → décochez "Confirm email" → Save</a></span>`;
+}
+
+async function doLogout(){
+  await db.auth.signOut(); currentUser=null;
+  el('app').classList.remove('active');
+  el('loginWrap').style.display='flex';
+  toast('Déconnecté','i');
+}
+
+function showApp(who){
+  el('loginWrap').style.display='none';
+  el('app').classList.add('active');
+  el('userPill').style.background=USERS_CFG[who]?.color||'#2563eb';
+  el('userLabel').textContent=who.charAt(0).toUpperCase()+who.slice(1);
+}
+
+// ══════════════════════════════════════════
+// SYNC
+// ══════════════════════════════════════════
+function setSync(state,txt){
+  const b=el('syncBadge'),i=el('syncIco'),s=el('syncText');
+  b.className='sync-badge '+state; s.textContent=txt;
+  i.textContent=state==='syncing'?'⏳':state==='synced'?'☁':'⚠';
+}
+
+// ══════════════════════════════════════════
+// LOAD ALL
+// ══════════════════════════════════════════
+async function loadAll(){
+  setSync('syncing','Chargement...');
+  try {
+    const [g,p,tr,bx,cl,ev,fi]=await Promise.all([
+      db.from('gains').select('*').order('date',{ascending:false}),
+      db.from('products').select('*').order('created_at',{ascending:false}),
+      db.from('transactions').select('*').order('date',{ascending:false}),
+      db.from('boxes').select('*').order('date',{ascending:false}),
+      db.from('clients').select('*').order('created_at',{ascending:false}),
+      db.from('events').select('*').order('date',{ascending:true}),
+      db.from('files').select('*').order('created_at',{ascending:false})
+    ]);
+    const hasErr=[g,p,tr,bx,cl,ev,fi].some(r=>r.error&&(r.error.status===401||r.error.status===403||r.error.code==='42P01'));
+    if(hasErr){setSync('error','Tables manquantes');toast('Lancez le SQL dans Supabase !','w');return;}
+    gains=g.data||[]; products=p.data||[]; transactions=tr.data||[];
+    boxes=bx.data||[]; clients=cl.data||[]; events=ev.data||[]; files=fi.data||[];
+    renderAll();
+    setSync('synced','Synchronisé ✓');
+  } catch(e){ setSync('error','Erreur'); toast('Erreur : '+e.message,'e'); }
+}
+
+function renderAll(){
+  updateDashStats(); renderGainsTable(); drawChart(); renderProducts(); updateStockStats();
+  renderStockTable(); renderTransactions(); renderBoxesList(); updateBoxesStats();
+  renderCalendar(); renderClients(); renderFiles(); updateStatsTab(); fillProductSelects();
+}
+
+// ══════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════
+function updateDashStats(){
+  const vT=gains.filter(g=>g.person==='victor').reduce((s,g)=>s+Number(g.amount),0);
+  const aT=gains.filter(g=>g.person==='arthur').reduce((s,g)=>s+Number(g.amount),0);
+  const now=new Date();
+  const mT=gains.filter(g=>{const d=new Date(g.date);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}).reduce((s,g)=>s+Number(g.amount),0);
+  el('s-total').textContent=fmt(vT+aT); el('s-victor').textContent=fmt(vT);
+  el('s-arthur').textContent=fmt(aT); el('s-month').textContent=fmt(mT);
+  el('victor-total').textContent=fmt(vT); el('arthur-total').textContent=fmt(aT);
+}
+
+function renderGainsTable(){
+  const q=(el('searchGains').value||'').toLowerCase();
+  const all=[...gains].filter(g=>!q||(g.description||'').toLowerCase().includes(q)||g.person.includes(q)||String(g.amount).includes(q)).slice(0,30);
+  el('gains-tbody').innerHTML=all.map(g=>`<tr>
+    <td>${g.date}</td>
+    <td><span class="badge ${g.person==='victor'?'b-victor':'b-arthur'}">${g.person}</span></td>
+    <td><span class="badge b-info">${g.category||'autre'}</span></td>
+    <td>${g.description||'-'}</td>
+    <td><strong>${fmt(g.amount)}</strong></td>
+    <td><button class="btn danger sm" onclick="deleteGain('${g.id}')">🗑</button></td>
+  </tr>`).join('');
+}
+
+async function addGain(e,person){
+  e.preventDefault();
+  const pf=person==='victor'?'v':'a';
+  const row={date:el(pf+'-date').value,amount:Number(el(pf+'-amount').value),description:el(pf+'-desc').value||'Gain',person,category:el(pf+'-cat').value};
+  setSync('syncing','Enregistrement...');
+  try {
+    const {data,error}=await db.from('gains').insert([row]).select();
+    if(error) throw error;
+    gains.unshift(data[0]); e.target.reset(); el(pf+'-date').value=TODAY;
+    renderAll(); toast(`${fmt(row.amount)} ajouté ✓`,'s');
+  } catch(err){toast('Erreur : '+err.message,'e');setSync('error','Erreur');}
+}
+
+async function deleteGain(id){
+  if(!confirm('Supprimer ce gain ?')) return;
+  await db.from('gains').delete().eq('id',id);
+  gains=gains.filter(g=>g.id!==id); renderAll(); toast('Supprimé','w');
+}
+
+// ══════════════════════════════════════════
+// PRODUCTS
+// ══════════════════════════════════════════
+async function addProduct(e){
+  e.preventDefault();
+  const row={name:el('p-name').value,price:Number(el('p-price').value),cost:Number(el('p-cost').value),quantity:Number(el('p-qty').value),category:el('p-cat').value,sku:el('p-sku').value||`SKU-${Date.now()}`};
+  const {data,error}=await db.from('products').insert([row]).select();
+  if(error){toast('Erreur : '+error.message,'e');return;}
+  products.unshift(data[0]); e.target.reset(); renderAll(); toast(`"${row.name}" ajouté ✓`,'s');
+}
+
+function renderProducts(){
+  const q=(el('searchProducts')?.value||'').toLowerCase();
+  const f=products.filter(p=>!q||p.name.toLowerCase().includes(q)||(p.sku||'').toLowerCase().includes(q));
+  el('products-grid').innerHTML=f.map(p=>`<div class="prod-card">
+    <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:9px">
+      <h3 style="font-size:15px">${p.name}</h3><span class="badge b-info">${p.category||'-'}</span>
+    </div>
+    <div style="font-size:22px;font-weight:800;color:var(--accent);margin:9px 0">${fmt(p.price)}</div>
+    <div class="stock-bar"><div class="stock-fill" style="width:${Math.min(100,p.quantity)}%"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:12px">
+      <span>📦 ${p.quantity} unités</span><span>Achat: ${fmt(p.cost)}</span>
+    </div>
+    <div style="font-size:12px;margin-bottom:12px">Marge: <span class="badge b-success">+${fmt(p.price-(p.cost||0))}</span></div>
+    <div style="display:flex;gap:7px">
+      <button class="btn sm" onclick="editProductQty('${p.id}',${p.quantity})" style="flex:1;background:var(--warning)">✏️</button>
+      <button class="btn danger sm" onclick="deleteProduct('${p.id}')" style="flex:1">🗑</button>
+    </div>
+  </div>`).join('');
+  el('nb-products').textContent=products.length;
+  el('nb-products').style.display=products.length>0?'inline':'none';
+  fillProductSelects();
+}
+
+async function deleteProduct(id){
+  if(!confirm('Supprimer ce produit ?')) return;
+  await db.from('products').delete().eq('id',id);
+  products=products.filter(p=>p.id!==id); renderAll(); toast('Produit supprimé','w');
+}
+
+async function editProductQty(id,current){
+  const q=prompt('Nouvelle quantité:',current); if(q===null) return;
+  await db.from('products').update({quantity:Number(q)}).eq('id',id);
+  products.find(p=>p.id===id).quantity=Number(q); renderAll(); toast('Stock mis à jour ✓','s');
+}
+
+function updateStockStats(){
+  const low=products.filter(p=>p.quantity<10).length;
+  el('st-total').textContent=products.length;
+  el('st-units').textContent=products.reduce((s,p)=>s+p.quantity,0);
+  el('st-low').textContent=low;
+  el('st-value').textContent=fmt(products.reduce((s,p)=>s+(p.price*p.quantity),0));
+  el('nb-lowstock').style.display=low>0?'inline':'none';
+}
+
+function renderStockTable(){
+  el('stock-tbody').innerHTML=products.map(p=>`<tr>
+    <td><strong>${p.name}</strong></td><td><span class="badge b-info">${p.sku||'-'}</span></td>
+    <td>${p.category||'-'}</td><td>${fmt(p.price)}</td><td>${fmt(p.cost)}</td>
+    <td><span class="badge ${p.quantity<5?'b-danger':p.quantity<10?'b-warning':'b-success'}">${p.quantity}</span></td>
+    <td>${fmt(p.price*p.quantity)}</td><td><span class="badge b-info">+${fmt(p.price-(p.cost||0))}</span></td>
+    <td>${p.quantity<5?'<span class="badge b-danger">Critique</span>':p.quantity<10?'<span class="badge b-warning">Faible</span>':'<span class="badge b-success">OK</span>'}</td>
+    <td><div style="display:flex;gap:5px">
+      <button class="btn sm success" onclick="stockDelta('${p.id}',1)">+</button>
+      <button class="btn sm warning" onclick="stockDelta('${p.id}',-1)">-</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+async function stockDelta(id,delta){
+  const p=products.find(x=>x.id===id); if(!p) return;
+  const nq=Math.max(0,p.quantity+delta);
+  await db.from('products').update({quantity:nq}).eq('id',id);
+  p.quantity=nq; renderAll(); toast(`Stock ${delta>0?'+1':'-1'} ✓`,'s');
+}
+
+// ══════════════════════════════════════════
+// TRANSACTIONS
+// ══════════════════════════════════════════
+function fillProductSelects(){
+  const opts='<option value="">-- Sélectionner --</option>'+products.map(p=>`<option value="${p.id}" data-price="${p.price}" data-cost="${p.cost}">${p.name} (${p.quantity} en stock)</option>`).join('');
+  ['tr-product','box-prod-sel'].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML=opts;});
+}
+
+function fillTransactionProduct(){
+  const sel=el('tr-product'),opt=sel.options[sel.selectedIndex];
+  const price=Number(opt.dataset.price||0),cost=Number(opt.dataset.cost||0),qty=Number(el('tr-qty').value)||1;
+  el('tr-price').value=price.toFixed(2); el('tr-cost').value=cost.toFixed(2);
+  el('tr-mu').textContent=fmt(price-cost); el('tr-mt').textContent=fmt((price-cost)*qty);
+}
+
+async function addTransaction(e){
+  e.preventDefault();
+  const prod=products.find(p=>p.id===el('tr-product').value);
+  if(!prod){toast('Choisissez un produit','w');return;}
+  const qty=Number(el('tr-qty').value),price=Number(el('tr-price').value),cost=Number(el('tr-cost').value);
+  if(prod.quantity<qty){toast('Stock insuffisant !','e');return;}
+  const row={person:el('tr-person').value,product_name:prod.name,quantity:qty,price,cost,margin:(price-cost)*qty,date:el('tr-date').value};
+  setSync('syncing','Enregistrement...');
+  try {
+    const {data,error}=await db.from('transactions').insert([row]).select();
+    if(error) throw error;
+    transactions.unshift(data[0]);
+    const nq=prod.quantity-qty;
+    await db.from('products').update({quantity:nq}).eq('id',prod.id); prod.quantity=nq;
+    const gainRow={date:row.date,amount:price*qty,description:`Vente: ${prod.name} x${qty}`,person:row.person==='commun'?'victor':row.person,category:'vente'};
+    await db.from('gains').insert([gainRow]);
+    await loadAll(); e.target.reset(); setToday();
+    toast(`Transaction OK ! Marge: ${fmt(row.margin)}`,'s');
+  } catch(err){toast('Erreur : '+err.message,'e');}
+}
+
+function renderTransactions(){
+  const total=transactions.reduce((s,t)=>s+Number(t.price)*Number(t.quantity),0);
+  const margin=transactions.reduce((s,t)=>s+Number(t.margin),0);
+  el('t-ca').textContent=fmt(total); el('t-margin').textContent=fmt(margin);
+  el('t-count').textContent=transactions.length;
+  el('t-rate').textContent=total>0?(margin/total*100).toFixed(1)+'%':'0%';
+  el('nb-transactions').textContent=transactions.length;
+  el('nb-transactions').style.display=transactions.length>0?'inline':'none';
+  el('trans-tbody').innerHTML=transactions.map(t=>`<tr>
+    <td>${t.date}</td>
+    <td><span class="badge ${t.person==='victor'?'b-victor':'b-arthur'}">${t.person}</span></td>
+    <td>${t.product_name}</td><td>${t.quantity}</td><td>${fmt(t.price)}</td><td>${fmt(t.cost)}</td>
+    <td><span class="badge ${Number(t.margin)>0?'b-success':'b-danger'}">${fmt(t.margin)}</span></td>
+    <td><button class="btn danger sm" onclick="deleteTransaction('${t.id}')">🗑</button></td>
+  </tr>`).join('');
+}
+function updateTransStats(){renderTransactions();}
+
+async function deleteTransaction(id){
+  if(!confirm('Supprimer ?')) return;
+  await db.from('transactions').delete().eq('id',id);
+  transactions=transactions.filter(t=>t.id!==id); renderAll(); toast('Transaction supprimée','w');
+}
+
+// ══════════════════════════════════════════
+// BOXES
+// ══════════════════════════════════════════
+function addProdToBox(){
+  const sel=el('box-prod-sel'),id=sel.value;
+  if(!id){toast('Choisissez un produit','w');return;}
+  const qty=Number(el('box-prod-qty').value)||1,prod=products.find(p=>p.id===id);
+  if(!prod) return;
+  if(prod.quantity<qty){toast('Stock insuffisant','e');return;}
+  boxProds.push({productId:id,name:prod.name,quantity:qty,price:prod.price,cost:prod.cost});
+  refreshBoxUI();
+}
+
+function refreshBoxUI(){
+  el('box-products-list').innerHTML=boxProds.map((p,i)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px;border-bottom:1px solid var(--border)">
+    <span><strong>${p.name}</strong> x${p.quantity}</span><span>${fmt(p.cost*p.quantity)}</span>
+    <button class="btn danger sm" onclick="removeProdFromBox(${i})">✕</button>
+  </div>`).join('');
+  const tc=boxProds.reduce((s,p)=>s+p.cost*p.quantity,0);
+  const tp=boxProds.reduce((s,p)=>s+p.price*p.quantity,0);
+  const mg=tp-tc,rate=tp>0?(mg/tp*100):0;
+  el('box-cost').value=tc.toFixed(2);
+  el('bx-cost').textContent=fmt(tc); el('bx-price').textContent=fmt(tp);
+  el('bx-margin').textContent=fmt(mg); el('bx-rate').textContent=rate.toFixed(1)+'%';
+}
+
+function removeProdFromBox(i){boxProds.splice(i,1);refreshBoxUI();}
+
+async function addBox(e){
+  e.preventDefault();
+  if(!boxProds.length){toast('Ajoutez au moins un produit','w');return;}
+  const price=Number(el('box-price').value),cost=Number(el('box-cost').value);
+  const row={name:el('box-name').value,price,cost,products:JSON.stringify(boxProds),date:el('box-date').value};
+  setSync('syncing','Création...');
+  try {
+    const {data,error}=await db.from('boxes').insert([row]).select();
+    if(error) throw error;
+    boxes.unshift(data[0]);
+    for(const p of boxProds){
+      const prod=products.find(x=>x.id===p.productId);
+      if(prod){prod.quantity-=p.quantity;await db.from('products').update({quantity:prod.quantity}).eq('id',p.productId);}
+    }
+    boxProds=[];refreshBoxUI();e.target.reset();setToday();renderAll();toast(`Box "${row.name}" créée ✓`,'s');
+  } catch(err){toast('Erreur : '+err.message,'e');}
+}
+
+function renderBoxesList(){
+  el('boxes-grid').innerHTML=boxes.map(b=>{
+    const prods=typeof b.products==='string'?JSON.parse(b.products):b.products;
+    const mg=b.price-b.cost;
+    return `<div class="prod-card">
+      <h3 style="color:var(--accent);margin-bottom:10px">${b.name}</h3>
+      <div style="font-size:21px;font-weight:800;margin-bottom:9px">${fmt(b.price)}</div>
+      <div class="stock-bar"><div class="stock-fill" style="width:${Math.min(100,(mg/b.price)*200)}%"></div></div>
+      <p style="font-size:13px">Coût : ${fmt(b.cost)}</p>
+      <p style="font-size:13px">Marge : <span class="badge b-success">+${fmt(mg)}</span></p>
+      <p style="font-size:13px">Produits : ${(prods||[]).length}</p>
+      <p style="font-size:12px;color:var(--text-light)">${b.date}</p>
+    </div>`;
+  }).join('');
+}
+
+function updateBoxesStats(){
+  el('b-total').textContent=boxes.length;
+  el('b-ca').textContent=fmt(boxes.reduce((s,b)=>s+b.price,0));
+  el('b-margin').textContent=fmt(boxes.reduce((s,b)=>s+(b.price-b.cost),0));
+}
+
+// ══════════════════════════════════════════
+// CALENDAR
+// ══════════════════════════════════════════
+function renderCalendar(){
+  el('cal-month-title').textContent=`${MONTHS[calMonth]} ${calYear}`;
+  const first=new Date(calYear,calMonth,1).getDay();
+  const offset=(first===0)?6:first-1;
+  const days=new Date(calYear,calMonth+1,0).getDate();
+  const today=new Date();
+  let html='';
+  for(let i=0;i<offset;i++) html+='<div></div>';
+  for(let d=1;d<=days;d++){
+    const ds=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dayEvs=events.filter(ev=>ev.date===ds);
+    const isToday=d===today.getDate()&&calMonth===today.getMonth()&&calYear===today.getFullYear();
+    html+=`<div class="cal-day ${isToday?'today':''}" onclick="showDayAlert('${ds}')">
+      <div class="cal-num">${d}</div>
+      ${dayEvs.slice(0,2).map(ev=>`<div class="cal-event">${ev.time?ev.time+' ':''} ${ev.title}</div>`).join('')}
+      ${dayEvs.length>2?`<div style="font-size:10px;color:var(--accent)">+${dayEvs.length-2}</div>`:''}
+    </div>`;
+  }
+  el('calGrid').innerHTML=html;
+}
+
+function showDayAlert(ds){
+  const dayEvs=events.filter(ev=>ev.date===ds);
+  if(!dayEvs.length){toast('Aucun événement','i');return;}
+  alert(`Événements du ${ds}:\n`+dayEvs.map(ev=>`• ${ev.time||'?'} - ${ev.title} (${ev.person})`).join('\n'));
+}
+
+function prevMonth(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCalendar();}
+function nextMonth(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCalendar();}
+
+async function addEvent(e){
+  e.preventDefault();
+  const row={title:el('ev-title').value,date:el('ev-date').value,time:el('ev-time').value,person:el('ev-person').value,type:el('ev-type').value};
+  const {data,error}=await db.from('events').insert([row]).select();
+  if(error){toast('Erreur : '+error.message,'e');return;}
+  events.push(data[0]); events.sort((a,b)=>a.date.localeCompare(b.date));
+  e.target.reset(); el('ev-date').value=TODAY; renderCalendar(); toast('Événement ajouté ✓','s');
+}
+
+// ══════════════════════════════════════════
+// STATS
+// ══════════════════════════════════════════
+function updateStatsTab(){
+  const vT=gains.filter(g=>g.person==='victor').reduce((s,g)=>s+Number(g.amount),0);
+  const aT=gains.filter(g=>g.person==='arthur').reduce((s,g)=>s+Number(g.amount),0);
+  const total=vT+aT,days=new Set(gains.map(g=>g.date)).size;
+  el('st2-total').textContent=fmt(total); el('st2-victor').textContent=fmt(vT);
+  el('st2-arthur').textContent=fmt(aT); el('st2-avg').textContent=days?fmt(total/days):'0 €';
+  const now=new Date();
+  const vm=gains.filter(g=>g.person==='victor'&&new Date(g.date).getMonth()===now.getMonth()&&new Date(g.date).getFullYear()===now.getFullYear()).reduce((s,g)=>s+Number(g.amount),0);
+  const am=gains.filter(g=>g.person==='arthur'&&new Date(g.date).getMonth()===now.getMonth()&&new Date(g.date).getFullYear()===now.getFullYear()).reduce((s,g)=>s+Number(g.amount),0);
+  el('prog-victor').style.width=Math.min(100,(vm/2000*100))+'%'; el('goal-victor').textContent=`${fmt(vm)} / 2000 €`;
+  el('prog-arthur').style.width=Math.min(100,(am/2000*100))+'%'; el('goal-arthur').textContent=`${fmt(am)} / 2000 €`;
+  if(pieChart2){pieChart2.data.datasets[0].data=[vT,aT];pieChart2.update();}
+  if(barChart2){
+    const months=[],data=[];
+    for(let i=5;i>=0;i--){
+      const d=new Date();d.setMonth(d.getMonth()-i);
+      const m=d.getMonth(),y=d.getFullYear();
+      months.push(d.toLocaleDateString('fr-FR',{month:'short'}));
+      data.push(gains.filter(g=>new Date(g.date).getMonth()===m&&new Date(g.date).getFullYear()===y).reduce((s,g)=>s+Number(g.amount),0));
+    }
+    barChart2.data.labels=months;barChart2.data.datasets[0].data=data;barChart2.update();
   }
 }
 
-function deleteGoal(id) {
-  goals = goals.filter(g => g.id !== id);
-  localStorage.setItem("goals", JSON.stringify(goals));
-  updateGoalsList();
-  showToast('Objectif supprimé', 'warning');
+// ══════════════════════════════════════════
+// CLIENTS
+// ══════════════════════════════════════════
+async function addClient(e){
+  e.preventDefault();
+  const row={name:el('cl-name').value,email:el('cl-email').value,phone:el('cl-phone').value,company:el('cl-company').value,type:el('cl-type').value};
+  const {data,error}=await db.from('clients').insert([row]).select();
+  if(error){toast('Erreur : '+error.message,'e');return;}
+  clients.unshift(data[0]);e.target.reset();renderClients();toast(`"${row.name}" ajouté ✓`,'s');
 }
 
-function backupData() {
-  const data = {
-    victorGains,
-    arthurGains,
-    products,
-    transactions,
-    boxes,
-    users,
-    goals,
-    events,
-    clients,
-    settings
-  };
-  
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `backup-gestion-pro-${today}.json`;
-  a.click();
-  showToast('Sauvegarde effectuée');
+function renderClients(){
+  const q=(el('searchClients')?.value||'').toLowerCase();
+  const f=clients.filter(c=>!q||c.name.toLowerCase().includes(q)||(c.email||'').toLowerCase().includes(q));
+  el('clients-grid').innerHTML=f.map(c=>`<div class="prod-card">
+    <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:10px">
+      <h3 style="font-size:15px">👤 ${c.name}</h3>
+      <button class="btn danger sm" onclick="deleteClient('${c.id}')">✕</button>
+    </div>
+    <p style="font-size:13px;margin:5px 0">📧 ${c.email||'Non renseigné'}</p>
+    <p style="font-size:13px;margin:5px 0">📞 ${c.phone||'Non renseigné'}</p>
+    <p style="font-size:13px;margin:5px 0">🏢 ${c.company||'Non renseigné'}</p>
+    <span class="badge b-info" style="margin-top:7px">${c.type||'particulier'}</span>
+  </div>`).join('');
 }
 
-function restoreData() {
-  const file = document.getElementById('restoreFile').files[0];
-  if(!file) {
-    showToast('Sélectionnez un fichier', 'error');
-    return;
-  }
-  
-  const reader = new FileReader();
-  reader.onload = function(e) {
+async function deleteClient(id){
+  await db.from('clients').delete().eq('id',id);
+  clients=clients.filter(c=>c.id!==id);renderClients();toast('Client supprimé','w');
+}
+
+// ══════════════════════════════════════════
+// FILES
+// ══════════════════════════════════════════
+function initUpload(){
+  const zone=el('uploadZone'),input=el('fileInput');
+  zone.addEventListener('click',()=>input.click());
+  zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag');});
+  zone.addEventListener('dragleave',()=>zone.classList.remove('drag'));
+  zone.addEventListener('drop',async e=>{e.preventDefault();zone.classList.remove('drag');await uploadFiles(Array.from(e.dataTransfer.files));});
+  input.addEventListener('change',async e=>{await uploadFiles(Array.from(e.target.files));input.value='';});
+}
+
+async function uploadFiles(fileList){
+  for(const file of fileList){
+    const ext=file.name.split('.').pop();
+    const path=`${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    setSync('syncing',`Upload ${file.name}...`);
     try {
-      const data = JSON.parse(e.target.result);
-      
-      victorGains = data.victorGains || victorGains;
-      arthurGains = data.arthurGains || arthurGains;
-      products = data.products || products;
-      transactions = data.transactions || transactions;
-      boxes = data.boxes || boxes;
-      users = data.users || users;
-      goals = data.goals || goals;
-      
-      localStorage.setItem("victorGains", JSON.stringify(victorGains));
-      localStorage.setItem("arthurGains", JSON.stringify(arthurGains));
-      localStorage.setItem("products", JSON.stringify(products));
-      localStorage.setItem("transactions", JSON.stringify(transactions));
-      localStorage.setItem("boxes", JSON.stringify(boxes));
-      localStorage.setItem("users", JSON.stringify(users));
-      localStorage.setItem("goals", JSON.stringify(goals));
-      
-      refreshAll();
-      showToast('Données restaurées avec succès');
-    } catch(error) {
-      showToast('Erreur lors de la restauration', 'error');
-    }
-  };
-  reader.readAsText(file);
-}
-
-function showAdminSection(section) {
-  document.getElementById('admin-users').style.display = section === 'users' ? 'block' : 'none';
-  document.getElementById('admin-goals').style.display = section === 'goals' ? 'block' : 'none';
-  document.getElementById('admin-backup').style.display = section === 'backup' ? 'block' : 'none';
-}
-
-function loadAdminData() {
-  updateUsersList();
-  updateGoalsList();
-}
-
-// ============ FONCTIONS TRANSACTIONS ============
-function updateTransactionPrice() {
-  const productId = document.getElementById('transaction-product').value;
-  const product = products.find(p => p.id == productId);
-  const quantity = Number(document.getElementById('transaction-quantity').value) || 1;
-  
-  if(product) {
-    document.getElementById('transaction-price').value = product.price.toFixed(2);
-    document.getElementById('transaction-cost').value = product.cost.toFixed(2);
-    
-    const marginUnit = product.price - product.cost;
-    const marginTotal = marginUnit * quantity;
-    
-    document.getElementById('transaction-margin-unit').innerText = marginUnit.toFixed(2) + ' €';
-    document.getElementById('transaction-margin-total').innerText = marginTotal.toFixed(2) + ' €';
+      const {error:upErr}=await db.storage.from('uploads').upload(path,file);
+      if(upErr) throw upErr;
+      const {data:{publicUrl}}=db.storage.from('uploads').getPublicUrl(path);
+      const {data,error:dbErr}=await db.from('files').insert([{name:file.name,type:file.type,size:file.size,url:publicUrl}]).select();
+      if(dbErr) throw dbErr;
+      files.unshift(data[0]);renderFiles();toast(`${file.name} uploadé ✓`,'s');
+    } catch(err){toast('Erreur upload : '+err.message,'e');}
   }
+  setSync('synced','Synchronisé');
 }
 
-function addTransaction(e) {
-  e.preventDefault();
-  
-  const productId = document.getElementById('transaction-product').value;
-  const product = products.find(p => p.id == productId);
-  const quantity = Number(document.getElementById('transaction-quantity').value);
-  const price = Number(document.getElementById('transaction-price').value);
-  const cost = product.cost;
-  
-  const transaction = {
-    id: Date.now(),
-    person: document.getElementById('transaction-person').value,
-    productId: productId,
-    productName: product.name,
-    quantity: quantity,
-    price: price,
-    cost: cost,
-    margin: (price - cost) * quantity,
-    date: document.getElementById('transaction-date').value,
-    createdAt: new Date().toISOString()
-  };
-  
-  // Mettre à jour le stock
-  const productIndex = products.findIndex(p => p.id == productId);
-  if(products[productIndex].quantity >= quantity) {
-    products[productIndex].quantity -= quantity;
-    
-    transactions.push(transaction);
-    localStorage.setItem("transactions", JSON.stringify(transactions));
-    localStorage.setItem("products", JSON.stringify(products));
-    
-    // Ajouter aux gains selon la personne
-    if(transaction.person === 'victor') {
-      victorGains.push({
-        id: Date.now() + 1,
-        date: transaction.date,
-        amount: transaction.price * transaction.quantity,
-        description: `Vente: ${transaction.productName} x${transaction.quantity}`,
-        person: 'victor',
-        category: 'vente'
-      });
-      localStorage.setItem("victorGains", JSON.stringify(victorGains));
-    } else if(transaction.person === 'arthur') {
-      arthurGains.push({
-        id: Date.now() + 2,
-        date: transaction.date,
-        amount: transaction.price * transaction.quantity,
-        description: `Vente: ${transaction.productName} x${transaction.quantity}`,
-        person: 'arthur',
-        category: 'vente'
-      });
-      localStorage.setItem("arthurGains", JSON.stringify(arthurGains));
-    } else if(transaction.person === 'commun') {
-      // Partager équitablement
-      const halfAmount = (transaction.price * transaction.quantity) / 2;
-      victorGains.push({
-        id: Date.now() + 1,
-        date: transaction.date,
-        amount: halfAmount,
-        description: `Vente commune: ${transaction.productName} x${transaction.quantity}`,
-        person: 'victor',
-        category: 'vente'
-      });
-      arthurGains.push({
-        id: Date.now() + 2,
-        date: transaction.date,
-        amount: halfAmount,
-        description: `Vente commune: ${transaction.productName} x${transaction.quantity}`,
-        person: 'arthur',
-        category: 'vente'
-      });
-      localStorage.setItem("victorGains", JSON.stringify(victorGains));
-      localStorage.setItem("arthurGains", JSON.stringify(arthurGains));
-    }
-    
-    updateProductSelects();
-    updateTransactionsStats();
-    filterTransactions();
-    refreshAll();
-    showToast(`Transaction ajoutée - Marge: ${transaction.margin.toFixed(2)}€`);
-    e.target.reset();
-    document.getElementById('transaction-date').value = today;
-  } else {
-    showToast('Stock insuffisant !', 'error');
-  }
-}
-
-function updateTransactionsStats() {
-  const total = transactions.reduce((sum, t) => sum + (t.price * t.quantity), 0);
-  const margin = transactions.reduce((sum, t) => sum + t.margin, 0);
-  const marginRate = total > 0 ? (margin / total * 100) : 0;
-  
-  if(document.getElementById('transactions-total')) document.getElementById('transactions-total').innerHTML = total.toFixed(2) + ' €';
-  if(document.getElementById('transactions-margin')) document.getElementById('transactions-margin').innerHTML = margin.toFixed(2) + ' €';
-  if(document.getElementById('transactions-count')) document.getElementById('transactions-count').innerHTML = transactions.length;
-  if(document.getElementById('transactions-margin-rate')) document.getElementById('transactions-margin-rate').innerHTML = marginRate.toFixed(1) + '%';
-  
-  document.getElementById('transactionBadge').style.display = transactions.length > 0 ? 'inline' : 'none';
-}
-
-function filterTransactions() {
-  const filter = document.getElementById('transactionFilter')?.value || 'all';
-  const search = document.getElementById('transactionSearch')?.value.toLowerCase() || '';
-  
-  let filtered = transactions;
-  
-  if(filter !== 'all') {
-    filtered = filtered.filter(t => t.person === filter);
-  }
-  
-  if(search) {
-    filtered = filtered.filter(t => 
-      t.productName.toLowerCase().includes(search) ||
-      t.person.toLowerCase().includes(search)
-    );
-  }
-  
-  filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
-  
-  if(document.getElementById('transactions-list')) {
-    document.getElementById('transactions-list').innerHTML = filtered.map(t => `
-      <tr>
-        <td>${t.date}</td>
-        <td><span class="badge" style="background: ${t.person === 'victor' ? 'var(--victor-color)' : t.person === 'arthur' ? 'var(--arthur-color)' : 'var(--warning)'}; color: white;">${t.person}</span></td>
-        <td>${t.productName} x${t.quantity}</td>
-        <td>${t.quantity}</td>
-        <td>${t.price.toFixed(2)} €</td>
-        <td>${t.cost.toFixed(2)} €</td>
-        <td><span class="badge ${t.margin > 0 ? 'badge-success' : 'badge-danger'}">${t.margin.toFixed(2)} €</span></td>
-        <td>
-          <button onclick="deleteTransaction(${t.id})" class="btn-sm" style="background: var(--danger);">
-            <i class="fas fa-trash"></i>
-          </button>
-        </td>
-      </tr>
-    `).join('');
-  }
-}
-
-function deleteTransaction(id) {
-  const transaction = transactions.find(t => t.id === id);
-  
-  // Restaurer le stock
-  const product = products.find(p => p.id == transaction.productId);
-  if(product) {
-    product.quantity += transaction.quantity;
-    localStorage.setItem("products", JSON.stringify(products));
-  }
-  
-  transactions = transactions.filter(t => t.id !== id);
-  localStorage.setItem("transactions", JSON.stringify(transactions));
-  
-  filterTransactions();
-  updateTransactionsStats();
-  refreshAll();
-  showToast('Transaction supprimée', 'warning');
-}
-
-function showTransactionStats(type) {
-  const total = transactions.reduce((sum, t) => sum + (t.price * t.quantity), 0);
-  const margin = transactions.reduce((sum, t) => sum + t.margin, 0);
-  
-  if(type === 'all') showToast(`CA Total: ${total.toFixed(2)}€`, 'info');
-  if(type === 'margin') showToast(`Marge Totale: ${margin.toFixed(2)}€`, 'info');
-  if(type === 'count') showToast(`Nombre de transactions: ${transactions.length}`, 'info');
-  if(type === 'margin-rate') {
-    const rate = total > 0 ? (margin / total * 100).toFixed(1) : 0;
-    showToast(`Taux de marge moyen: ${rate}%`, 'info');
-  }
-}
-
-// ============ FONCTIONS BOXES ============
-let currentBoxProducts = [];
-
-function updateProductSelects() {
-  const productSelect = document.getElementById('transaction-product');
-  const boxProductSelect = document.getElementById('box-product-select');
-  
-  if(productSelect) {
-    productSelect.innerHTML = '<option value="">Sélectionner un produit</option>' + 
-      products.map(p => `<option value="${p.id}" data-price="${p.price}" data-cost="${p.cost}">${p.name} - ${p.price}€ (Stock: ${p.quantity})</option>`).join('');
-  }
-  
-  if(boxProductSelect) {
-    boxProductSelect.innerHTML = '<option value="">Sélectionner un produit</option>' + 
-      products.map(p => `<option value="${p.id}">${p.name} - ${p.price}€ (Stock: ${p.quantity})</option>`).join('');
-  }
-}
-
-function addProductToBox() {
-  const productId = document.getElementById('box-product-select').value;
-  const quantity = Number(document.getElementById('box-product-quantity').value);
-  
-  if(!productId || quantity < 1) {
-    showToast('Sélectionnez un produit', 'error');
-    return;
-  }
-  
-  const product = products.find(p => p.id == productId);
-  
-  if(product.quantity < quantity) {
-    showToast('Stock insuffisant !', 'error');
-    return;
-  }
-  
-  currentBoxProducts.push({
-    productId: product.id,
-    name: product.name,
-    quantity: quantity,
-    price: product.price,
-    cost: product.cost
-  });
-  
-  updateBoxProductsList();
-  updateBoxTotals();
-}
-
-function updateBoxProductsList() {
-  const list = document.getElementById('box-products-list');
-  if(list) {
-    list.innerHTML = currentBoxProducts.map((p, index) => `
-      <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid var(--border);">
-        <span><strong>${p.name}</strong> x${p.quantity}</span>
-        <span>${(p.cost * p.quantity).toFixed(2)} €</span>
-        <button onclick="removeFromBox(${index})" class="btn-sm" style="background: var(--danger);">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-    `).join('');
-  }
-}
-
-function removeFromBox(index) {
-  currentBoxProducts.splice(index, 1);
-  updateBoxProductsList();
-  updateBoxTotals();
-}
-
-function updateBoxTotals() {
-  const totalCost = currentBoxProducts.reduce((sum, p) => sum + (p.cost * p.quantity), 0);
-  const totalPrice = currentBoxProducts.reduce((sum, p) => sum + (p.price * p.quantity), 0);
-  const margin = totalPrice - totalCost;
-  const marginRate = totalPrice > 0 ? (margin / totalPrice * 100) : 0;
-  
-  document.getElementById('box-cost').value = totalCost.toFixed(2);
-  document.getElementById('box-total-cost').innerText = totalCost.toFixed(2) + ' €';
-  document.getElementById('box-total-price').innerText = totalPrice.toFixed(2) + ' €';
-  document.getElementById('box-total-margin').innerText = margin.toFixed(2) + ' €';
-  document.getElementById('box-margin-rate').innerText = marginRate.toFixed(1) + '%';
-}
-
-function addBox(e) {
-  e.preventDefault();
-  
-  if(currentBoxProducts.length === 0) {
-    showToast('Ajoutez au moins un produit', 'error');
-    return;
-  }
-  
-  const boxPrice = Number(document.getElementById('box-price').value);
-  const boxCost = Number(document.getElementById('box-cost').value);
-  
-  const box = {
-    id: Date.now(),
-    name: document.getElementById('box-name').value,
-    price: boxPrice,
-    cost: boxCost,
-    products: [...currentBoxProducts],
-    date: document.getElementById('box-date').value,
-    createdAt: new Date().toISOString()
-  };
-  
-  boxes.push(box);
-  localStorage.setItem("boxes", JSON.stringify(boxes));
-  
-  // Mettre à jour les stocks
-  box.products.forEach(p => {
-    const product = products.find(prod => prod.id == p.productId);
-    if(product) {
-      product.quantity -= p.quantity;
-    }
-  });
-  localStorage.setItem("products", JSON.stringify(products));
-  
-  // Vider la box courante
-  currentBoxProducts = [];
-  updateBoxProductsList();
-  updateBoxTotals();
-  updateBoxesList();
-  updateBoxesStats();
-  updateProductSelects();
-  
-  showToast(`Box "${box.name}" créée - Marge: ${(box.price - box.cost).toFixed(2)}€`);
-  e.target.reset();
-  document.getElementById('box-date').value = today;
-}
-
-function updateBoxesStats() {
-  const totalBoxes = boxes.length;
-  const revenue = boxes.reduce((sum, b) => sum + b.price, 0);
-  const margin = boxes.reduce((sum, b) => sum + (b.price - b.cost), 0);
-  
-  if(document.getElementById('boxes-total')) document.getElementById('boxes-total').innerText = totalBoxes;
-  if(document.getElementById('boxes-revenue')) document.getElementById('boxes-revenue').innerHTML = revenue.toFixed(2) + ' €';
-  if(document.getElementById('boxes-margin')) document.getElementById('boxes-margin').innerHTML = margin.toFixed(2) + ' €';
-  
-  document.getElementById('boxBadge').style.display = totalBoxes > 0 ? 'inline' : 'none';
-}
-
-function updateBoxesList() {
-  if(document.getElementById('boxes-grid')) {
-    document.getElementById('boxes-grid').innerHTML = boxes.map(b => `
-      <div class="product-card">
-        <h3 style="color: var(--accent);">${b.name}</h3>
-        <div style="font-size: 20px; font-weight: 700; margin: 10px 0;">
-          ${b.price.toFixed(2)} €
-        </div>
-        <div class="stock-bar">
-          <div class="stock-fill" style="width: ${(b.price / (b.cost || 1)) * 50}%"></div>
-        </div>
-        <p><strong>Coût:</strong> ${b.cost.toFixed(2)} €</p>
-        <p><strong>Marge:</strong> <span class="badge badge-success">${(b.price - b.cost).toFixed(2)} €</span></p>
-        <p><strong>Produits:</strong> ${b.products.length}</p>
-        <p><strong>Date:</strong> ${b.date}</p>
-        <button onclick="viewBoxDetails(${b.id})" class="btn btn-block mt-2">Détails</button>
-      </div>
-    `).join('');
-  }
-}
-
-function viewBoxDetails(id) {
-  const box = boxes.find(b => b.id === id);
-  let details = `Box: ${box.name}\nPrix: ${box.price}€\nCoût: ${box.cost}€\nMarge: ${(box.price - box.cost).toFixed(2)}€\n\nProduits:\n`;
-  box.products.forEach(p => {
-    details += `- ${p.name} x${p.quantity} (${(p.cost * p.quantity).toFixed(2)}€)\n`;
-  });
-  alert(details);
-}
-
-// ============ FONCTIONS PRODUITS AMÉLIORÉES ============
-function addProduct(e) {
-  e.preventDefault();
-  const product = {
-    id: Date.now(),
-    name: document.getElementById('product-name').value,
-    price: Number(document.getElementById('product-price').value),
-    cost: Number(document.getElementById('product-cost').value),
-    quantity: Number(document.getElementById('product-quantity').value),
-    category: document.getElementById('product-category').value,
-    sku: document.getElementById('product-sku').value || `SKU-${Date.now()}`,
-    createdAt: today
-  };
-  
-  products.push(product);
-  localStorage.setItem("products", JSON.stringify(products));
-  e.target.reset();
-  
-  updateProducts();
-  updateStock();
-  updateSheets();
-  updateProductSelects();
-  showToast(`Produit ${product.name} ajouté !`);
-}
-
-function filterProducts() {
-  const search = document.getElementById('productSearch')?.value.toLowerCase() || '';
-  const category = document.getElementById('productFilter')?.value || 'all';
-  
-  const filtered = products.filter(p => 
-    (category === 'all' || p.category === category) &&
-    (p.name.toLowerCase().includes(search) || p.sku?.toLowerCase().includes(search))
-  );
-  
-  document.getElementById('products-list').innerHTML = filtered.map(p => `
-    <div class="product-card">
-      <div style="display: flex; justify-content: space-between; align-items: start;">
-        <h3 style="margin: 0 0 10px 0;">${p.name}</h3>
-        <span class="badge badge-info">${p.category}</span>
-      </div>
-      <div style="font-size: 24px; font-weight: 700; margin: 10px 0; color: var(--accent);">
-        ${p.price.toFixed(2)} €
-      </div>
-      <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-        <span><i class="fas fa-cubes"></i> Stock:</span>
-        <span style="font-weight: 600;">${p.quantity}</span>
-      </div>
-      <div class="stock-bar">
-        <div class="stock-fill" style="width: ${Math.min(100, p.quantity)}%"></div>
-      </div>
-      <div style="display: flex; justify-content: space-between; margin: 10px 0;">
-        <span>Achat: ${p.cost?.toFixed(2)} €</span>
-        <span>Marge: <span class="badge badge-success">${(p.price - (p.cost||0)).toFixed(2)} €</span></span>
-      </div>
-      <div style="display: flex; gap: 10px; margin-top: 20px;">
-        <button onclick="editProduct(${p.id})" class="btn-sm" style="background: var(--warning); flex: 1;">
-          <i class="fas fa-edit"></i>
-        </button>
-        <button onclick="deleteProduct(${p.id})" class="btn-sm" style="background: var(--danger); flex: 1;">
-          <i class="fas fa-trash"></i>
-        </button>
+function renderFiles(){
+  el('files-count').textContent=files.length;
+  el('files-list').innerHTML=files.map(f=>`<div class="file-item">
+    <div style="display:flex;align-items:center;gap:12px">
+      ${f.type.startsWith('image/')?`<img src="${f.url}" class="file-thumb" alt="${f.name}">`:'<div class="file-icon-box">📄</div>'}
+      <div>
+        <div style="font-weight:600;font-size:13px">${f.name}</div>
+        <div style="font-size:11px;color:var(--text-light)">${f.size?((f.size/1024).toFixed(1)+' KB'):''} — ${new Date(f.created_at).toLocaleDateString('fr-FR')}</div>
       </div>
     </div>
-  `).join('');
-  
-  document.getElementById('productBadge').style.display = filtered.length > 0 ? 'none' : 'inline';
+    <div style="display:flex;gap:7px">
+      <button class="btn sm" onclick="window.open('${f.url}','_blank')">👁 Voir</button>
+      <a href="${f.url}" download class="btn sm success">⬇</a>
+      <button class="btn danger sm" onclick="deleteFile('${f.id}','${f.url}')">🗑</button>
+    </div>
+  </div>`).join('');
 }
 
-function updateProducts() {
-  filterProducts();
+async function deleteFile(id,url){
+  if(!confirm('Supprimer ce fichier ?')) return;
+  const path=url.split('/uploads/')[1];
+  await db.storage.from('uploads').remove([path]);
+  await db.from('files').delete().eq('id',id);
+  files=files.filter(f=>f.id!==id);renderFiles();toast('Fichier supprimé','w');
 }
 
-function updateStock() {
-  const totalProducts = products.length;
-  const totalStock = products.reduce((s,p)=>s+p.quantity,0);
-  const lowStock = products.filter(p=>p.quantity<10).length;
-  const stockValue = products.reduce((s,p)=>s+(p.price*p.quantity),0);
-  
-  if(document.getElementById('total-products')) document.getElementById('total-products').innerText = totalProducts;
-  if(document.getElementById('total-stock')) document.getElementById('total-stock').innerText = totalStock;
-  if(document.getElementById('low-stock')) document.getElementById('low-stock').innerText = lowStock;
-  if(document.getElementById('stock-value')) document.getElementById('stock-value').innerHTML = stockValue.toFixed(2) + ' €';
-  
-  if(lowStock > 0) {
-    document.getElementById('inventoryBadge').style.display = 'inline';
-    document.getElementById('inventoryBadge').innerText = lowStock;
-  } else {
-    document.getElementById('inventoryBadge').style.display = 'none';
-  }
-  
-  if(document.getElementById('stock-table-body')) {
-    document.getElementById('stock-table-body').innerHTML = products.map(p => `
-      <tr>
-        <td><strong>${p.name}</strong></td>
-        <td><span class="badge">${p.sku || '-'}</span></td>
-        <td>${p.category}</td>
-        <td>${p.price.toFixed(2)} €</td>
-        <td>${p.cost ? p.cost.toFixed(2) + ' €' : '-'}</td>
-        <td>
-          <span class="badge ${p.quantity < 5 ? 'badge-danger' : p.quantity < 10 ? 'badge-warning' : 'badge-success'}">
-            ${p.quantity}
-          </span>
-        </td>
-        <td>${(p.price * p.quantity).toFixed(2)} €</td>
-        <td><span class="badge badge-info">${(p.price - (p.cost||0)).toFixed(2)} €</span></td>
-        <td>
-          ${p.quantity < 5 ? '<span class="badge badge-danger">Critique</span>' : 
-            p.quantity < 10 ? '<span class="badge badge-warning">Faible</span>' : 
-            '<span class="badge badge-success">OK</span>'}
-        </td>
-        <td>
-          <div style="display: flex; gap: 5px;">
-            <button onclick="addStock(${p.id})" class="btn-sm" style="background: var(--success);">
-              <i class="fas fa-plus"></i>
-            </button>
-            <button onclick="removeStock(${p.id})" class="btn-sm" style="background: var(--warning);">
-              <i class="fas fa-minus"></i>
-            </button>
-          </div>
-        </td>
-      </tr>
-    `).join('');
-  }
+// ══════════════════════════════════════════
+// CHARTS
+// ══════════════════════════════════════════
+function initCharts(){
+  const ctx1=el('mainChart');
+  if(ctx1) mainChart=new Chart(ctx1,{type:'line',data:{labels:[],datasets:[
+    {label:'Victor',data:[],borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,.05)',fill:true,tension:.4,borderWidth:3,pointRadius:4},
+    {label:'Arthur',data:[],borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.05)',fill:true,tension:.4,borderWidth:3,pointRadius:4}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{y:{beginAtZero:true}}}});
+  const ctx2=el('pieChart');
+  if(ctx2) pieChart2=new Chart(ctx2,{type:'doughnut',data:{labels:['Victor','Arthur'],datasets:[{data:[0,0],backgroundColor:['#2563eb','#10b981'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});
+  const ctx3=el('barChart');
+  if(ctx3) barChart2=new Chart(ctx3,{type:'bar',data:{labels:[],datasets:[{label:'Gains',data:[],backgroundColor:'#2563eb',borderRadius:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
 }
 
-function updateSheets() {
-  if(document.getElementById('product-sheets')) {
-    document.getElementById('product-sheets').innerHTML = products.map(p => `
-      <div class="product-card">
-        <h3 style="color: var(--accent); margin-top: 0;">${p.name}</h3>
-        <p><i class="fas fa-tag"></i> <strong>Catégorie:</strong> ${p.category}</p>
-        <p><i class="fas fa-euro-sign"></i> <strong>Prix vente:</strong> ${p.price.toFixed(2)} €</p>
-        <p><i class="fas fa-euro-sign"></i> <strong>Prix achat:</strong> ${p.cost ? p.cost.toFixed(2) + ' €' : '-'}</p>
-        <p><i class="fas fa-cubes"></i> <strong>Stock:</strong> ${p.quantity} unités</p>
-        <p><i class="fas fa-chart-line"></i> <strong>Valeur:</strong> ${(p.price*p.quantity).toFixed(2)} €</p>
-        <p><i class="fas fa-barcode"></i> <strong>SKU:</strong> ${p.sku || '-'}</p>
-        <div class="stock-bar">
-          <div class="stock-fill" style="width: ${Math.min(100, p.quantity)}%"></div>
-        </div>
-      </div>
-    `).join('');
-  }
-}
-
-function deleteProduct(id) { 
-  if(confirm('Supprimer ce produit ?')) {
-    products = products.filter(p=>p.id!==id); 
-    localStorage.setItem("products", JSON.stringify(products)); 
-    updateProducts(); 
-    updateStock(); 
-    updateSheets();
-    updateProductSelects();
-    showToast("Produit supprimé", "warning");
-  }
-}
-
-function editProduct(id) { 
-  const p = products.find(p=>p.id===id); 
-  const q = prompt("Nouvelle quantité:", p.quantity); 
-  if(q) { 
-    p.quantity = Number(q); 
-    localStorage.setItem("products", JSON.stringify(products)); 
-    updateProducts(); 
-    updateStock(); 
-    updateSheets();
-    updateProductSelects();
-    showToast("Stock mis à jour");
-  } 
-}
-
-function addStock(id) { 
-  const p = products.find(p=>p.id===id); 
-  p.quantity += 1; 
-  localStorage.setItem("products", JSON.stringify(products)); 
-  updateProducts(); 
-  updateStock(); 
-  updateSheets();
-  updateProductSelects();
-  showToast("Stock +1");
-}
-
-function removeStock(id) { 
-  const p = products.find(p=>p.id===id); 
-  if(p.quantity > 0) { 
-    p.quantity -= 1; 
-    localStorage.setItem("products", JSON.stringify(products)); 
-    updateProducts(); 
-    updateStock(); 
-    updateSheets();
-    updateProductSelects();
-    showToast("Stock -1");
-  } 
-}
-
-function alertLowStock() {
-  const lowStock = products.filter(p => p.quantity < 10);
-  if (lowStock.length > 0) {
-    let message = "Produits en stock faible :\n";
-    lowStock.forEach(p => {
-      message += `- ${p.name}: ${p.quantity} unités\n`;
-    });
-    alert(message);
-  } else {
-    showToast("Aucun produit en stock faible !");
-  }
-}
-
-// ============ FONCTIONS CALENDRIER ============
-function updateCalendar() {
-  if(!document.getElementById('calendar-view')) return;
-  
-  let html = '';
-  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-  const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-  let firstDayIndex = firstDay === 0 ? 6 : firstDay - 1;
-  
-  for(let i = 0; i < firstDayIndex; i++) {
-    html += '<div class="calendar-day" style="background: transparent; border: none;"></div>';
-  }
-  
-  for(let d = 1; d <= daysInMonth; d++) {
-    const dateStr = `${currentYear}-${(currentMonth+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
-    const dayEvents = events.filter(e => e.date === dateStr);
-    
-    html += `<div class="calendar-day" onclick="showDayEvents('${dateStr}')">`;
-    html += `<div class="calendar-day-number">${d}</div>`;
-    
-    dayEvents.slice(0, 2).forEach(e => {
-      html += `<div class="calendar-event" style="background: ${e.person === 'victor' ? 'rgba(37,99,235,0.1)' : e.person === 'arthur' ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)'}">
-                <i class="fas fa-calendar-check"></i> ${e.time ? e.time : ''} ${e.title}
-               </div>`;
-    });
-    
-    if(dayEvents.length > 2) {
-      html += `<div style="font-size: 11px; color: var(--accent); margin-top: 4px;">
-                +${dayEvents.length - 2}...
-               </div>`;
-    }
-    
-    html += '</div>';
-  }
-  
-  document.getElementById('calendar-view').innerHTML = html;
-  document.querySelector('#tab-calendar .card .card-title i.fa-calendar').parentElement.innerHTML = 
-    `<i class="fas fa-calendar"></i> ${getMonthName(currentMonth)} ${currentYear}`;
-}
-
-function getMonthName(month) {
-  const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
-                  'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
-  return months[month];
-}
-
-function previousMonth() {
-  currentMonth--;
-  if(currentMonth < 0) {
-    currentMonth = 11;
-    currentYear--;
-  }
-  updateCalendar();
-}
-
-function nextMonth() {
-  currentMonth++;
-  if(currentMonth > 11) {
-    currentMonth = 0;
-    currentYear++;
-  }
-  updateCalendar();
-}
-
-function showDayEvents(date) {
-  const dayEvents = events.filter(e => e.date === date);
-  let message = `Événements du ${date}:\n`;
-  if(dayEvents.length === 0) {
-    message += "Aucun événement";
-  } else {
-    dayEvents.forEach(e => {
-      message += `\n- ${e.time || '00:00'} - ${e.title} (${e.person})`;
-    });
-  }
-  alert(message);
-}
-
-function addEvent(e) {
-  e.preventDefault();
-  const event = {
-    id: Date.now(),
-    title: document.getElementById('event-title').value,
-    date: document.getElementById('event-date').value,
-    time: document.getElementById('event-time').value,
-    person: document.getElementById('event-person').value,
-    type: document.getElementById('event-type').value
-  };
-  
-  events.push(event);
-  localStorage.setItem("events", JSON.stringify(events));
-  e.target.reset();
-  document.getElementById('event-date').value = today;
-  
-  updateCalendar();
-  updateEventsList();
-  showToast(`Événement "${event.title}" ajouté !`);
-}
-
-function updateEventsList() {
-  if(document.getElementById('events-table-body')) {
-    const sortedEvents = events.sort((a,b)=>a.date.localeCompare(b.date) || (a.time || '').localeCompare(b.time || ''));
-    document.getElementById('events-table-body').innerHTML = sortedEvents.map(e => `
-      <tr>
-        <td>${e.date}</td>
-        <td>${e.time || '-'}</td>
-        <td>${e.title}</td>
-        <td><span class="badge">${e.type || 'autre'}</span></td>
-        <td>
-          <span class="badge ${e.person === 'victor' ? 'badge-info' : e.person === 'arthur' ? 'badge-success' : 'badge-warning'}">
-            ${e.person}
-          </span>
-        </td>
-        <td>
-          <button onclick="deleteEvent(${e.id})" class="btn-sm" style="background: var(--danger);">
-            <i class="fas fa-trash"></i>
-          </button>
-        </td>
-      </tr>
-    `).join('');
-    
-    document.getElementById('calendarBadge').style.display = events.length > 0 ? 'inline' : 'none';
-    document.getElementById('calendarBadge').innerText = events.length;
-  }
-}
-
-function deleteEvent(id) { 
-  events = events.filter(e=>e.id!==id); 
-  localStorage.setItem("events", JSON.stringify(events)); 
-  updateCalendar(); 
-  updateEventsList();
-  showToast("Événement supprimé", "warning");
-}
-
-// ============ FONCTIONS STATISTIQUES ============
-function updateStats() {
-  const victorTotal = sum(victorGains, ()=>true);
-  const arthurTotal = sum(arthurGains, ()=>true);
-  const total = victorTotal + arthurTotal;
-  
-  if(document.getElementById('stats-total')) document.getElementById('stats-total').innerHTML = total.toFixed(2)+' €';
-  if(document.getElementById('stats-victor')) document.getElementById('stats-victor').innerHTML = victorTotal.toFixed(2)+' €';
-  if(document.getElementById('stats-arthur')) document.getElementById('stats-arthur').innerHTML = arthurTotal.toFixed(2)+' €';
-  
-  const all = [...victorGains,...arthurGains];
-  const uniqueDays = new Set(all.map(g=>g.date)).size;
-  const avg = uniqueDays ? total / uniqueDays : 0;
-  if(document.getElementById('stats-average')) document.getElementById('stats-average').innerHTML = avg.toFixed(2)+' €';
-  
-  // Mettre à jour les objectifs
-  const now = new Date();
-  const victorMonthTotal = sum(victorGains, g => 
-    new Date(g.date).getMonth() === now.getMonth() && 
-    new Date(g.date).getFullYear() === now.getFullYear()
-  );
-  const arthurMonthTotal = sum(arthurGains, g => 
-    new Date(g.date).getMonth() === now.getMonth() && 
-    new Date(g.date).getFullYear() === now.getFullYear()
-  );
-  
-  const victorGoal = users.find(u => u.username === 'victor')?.goal || 2000;
-  const arthurGoal = users.find(u => u.username === 'arthur')?.goal || 2000;
-  
-  if(document.getElementById('victor-goal-amount')) document.getElementById('victor-goal-amount').innerText = victorGoal;
-  if(document.getElementById('arthur-goal-amount')) document.getElementById('arthur-goal-amount').innerText = arthurGoal;
-  
-  if(document.getElementById('victor-progress')) {
-    const victorPercent = (victorMonthTotal / victorGoal) * 100;
-    document.getElementById('victor-progress').style.width = Math.min(100, victorPercent) + '%';
-    document.getElementById('victor-goal').innerHTML = `${victorMonthTotal.toFixed(2)} € / ${victorGoal} €`;
-  }
-  
-  if(document.getElementById('arthur-progress')) {
-    const arthurPercent = (arthurMonthTotal / arthurGoal) * 100;
-    document.getElementById('arthur-progress').style.width = Math.min(100, arthurPercent) + '%';
-    document.getElementById('arthur-goal').innerHTML = `${arthurMonthTotal.toFixed(2)} € / ${arthurGoal} €`;
-  }
-  
-  if(pieChart) {
-    pieChart.data.datasets[0].data = [victorTotal, arthurTotal];
-    pieChart.update();
-  }
-  
-  if(monthlyChart) {
-    const monthData = [];
-    const monthLabels = [];
-    for(let i = 5; i >= 0; i--) {
-      const d = new Date();
-      d.setMonth(d.getMonth() - i);
-      const month = d.getMonth();
-      const year = d.getFullYear();
-      const monthTotal = sum(all, g => 
-        new Date(g.date).getMonth() === month && 
-        new Date(g.date).getFullYear() === year
-      );
-      monthData.push(monthTotal);
-      monthLabels.push(d.toLocaleDateString('fr-FR', { month: 'short' }));
-    }
-    monthlyChart.data.labels = monthLabels;
-    monthlyChart.data.datasets[0].data = monthData;
-    monthlyChart.update();
-  }
-}
-
-// ============ FONCTIONS CLIENTS ============
-function addClient(e) {
-  e.preventDefault();
-  const client = {
-    id: Date.now(),
-    name: document.getElementById('client-name').value,
-    email: document.getElementById('client-email').value,
-    phone: document.getElementById('client-phone').value,
-    company: document.getElementById('client-company').value,
-    type: document.getElementById('client-type').value,
-    createdAt: today
-  };
-  
-  clients.push(client);
-  localStorage.setItem("clients", JSON.stringify(clients));
-  e.target.reset();
-  
-  updateClients();
-  showToast(`Client ${client.name} ajouté !`);
-}
-
-function filterClients() {
-  const search = document.getElementById('clientSearch')?.value.toLowerCase() || '';
-  
-  const filtered = clients.filter(c => 
-    c.name.toLowerCase().includes(search) ||
-    c.email?.toLowerCase().includes(search) ||
-    c.phone?.includes(search)
-  );
-  
-  if(document.getElementById('clients-list')) {
-    document.getElementById('clients-list').innerHTML = filtered.map(c => `
-      <div class="client-card">
-        <div style="display: flex; justify-content: space-between; align-items: start;">
-          <h3 style="margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px;">
-            <i class="fas fa-user-circle" style="color: var(--accent);"></i> ${c.name}
-          </h3>
-          <button onclick="deleteClient(${c.id})" class="btn-sm" style="background: var(--danger);">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-        <p style="margin: 8px 0; display: flex; align-items: center; gap: 10px;">
-          <i class="fas fa-envelope" style="color: var(--text-light);"></i> ${c.email || 'Non renseigné'}
-        </p>
-        <p style="margin: 8px 0; display: flex; align-items: center; gap: 10px;">
-          <i class="fas fa-phone" style="color: var(--text-light);"></i> ${c.phone || 'Non renseigné'}
-        </p>
-        <p style="margin: 8px 0; display: flex; align-items: center; gap: 10px;">
-          <i class="fas fa-building" style="color: var(--text-light);"></i> ${c.company || 'Non renseigné'}
-        </p>
-      </div>
-    `).join('');
-  }
-}
-
-function updateClients() {
-  filterClients();
-  document.getElementById('clientsBadge').style.display = clients.length > 0 ? 'inline' : 'none';
-  document.getElementById('clientsBadge').innerText = clients.length;
-}
-
-function deleteClient(id) { 
-  clients = clients.filter(c=>c.id!==id); 
-  localStorage.setItem("clients", JSON.stringify(clients)); 
-  updateClients();
-  showToast("Client supprimé", "warning");
-}
-
-// ============ FONCTIONS RAPPORTS ============
-function generateReport(type) {
-  showLoader(true);
-  
-  setTimeout(() => {
-    const now = new Date();
-    let total = 0;
-    let period = '';
-    
-    if(type === 'daily') {
-      total = sum([...victorGains, ...arthurGains], g => g.date === today);
-      period = today;
-    } else if(type === 'weekly') {
-      total = sum([...victorGains, ...arthurGains], g => (now - new Date(g.date)) / 86400000 <= 7);
-      period = '7 derniers jours';
-    } else if(type === 'monthly') {
-      total = sum([...victorGains, ...arthurGains], g => 
-        new Date(g.date).getMonth() === now.getMonth() && 
-        new Date(g.date).getFullYear() === now.getFullYear()
-      );
-      period = getMonthName(now.getMonth());
-    }
-    
-    const report = `
-      RAPPORT - ${period.toUpperCase()}
-      ================================
-      Date: ${today}
-      Période: ${period}
-      Total des gains: ${total.toFixed(2)} €
-      Victor: ${sum(victorGains, () => true).toFixed(2)} €
-      Arthur: ${sum(arthurGains, () => true).toFixed(2)} €
-      Nombre de transactions: ${victorGains.length + arthurGains.length}
-    `;
-    
-    const blob = new Blob([report], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `rapport-${type}-${today}.txt`;
-    a.click();
-    
-    showLoader(false);
-    showToast(`Rapport ${type} généré !`);
-  }, 500);
-}
-
-// ============ FONCTIONS IMPORT/EXPORT ============
-function exportData(format) {
-  showLoader(true);
-  
-  setTimeout(() => {
-    const data = {
-      victorGains,
-      arthurGains,
-      products,
-      events,
-      clients,
-      transactions,
-      boxes,
-      users,
-      goals
-    };
-    
-    if (format === 'json') {
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `gestion-pro-${today}.json`;
-      a.click();
-    } else if (format === 'csv') {
-      let csv = "Type,Date,Personne,Montant,Description\n";
-      
-      [...victorGains.map(g => ({...g, type: 'Gain'})), 
-       ...arthurGains.map(g => ({...g, type: 'Gain'}))]
-        .forEach(g => {
-          csv += `${g.type},${g.date},${g.person},${g.amount},${g.description}\n`;
-        });
-      
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `gestion-pro-${today}.csv`;
-      a.click();
-    } else if (format === 'pdf') {
-      window.print();
-    }
-    
-    showLoader(false);
-    showToast(`Données exportées en ${format.toUpperCase()}`);
-  }, 500);
-}
-
-function importData() {
-  const fileInput = document.getElementById('importFile');
-  const file = fileInput.files[0];
-  
-  if (!file) {
-    showToast("Veuillez sélectionner un fichier", "error");
-    return;
-  }
-  
-  showLoader(true);
-  
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const data = JSON.parse(e.target.result);
-      
-      if (data.victorGains) victorGains = data.victorGains;
-      if (data.arthurGains) arthurGains = data.arthurGains;
-      if (data.products) products = data.products;
-      if (data.events) events = data.events;
-      if (data.clients) clients = data.clients;
-      if (data.transactions) transactions = data.transactions;
-      if (data.boxes) boxes = data.boxes;
-      
-      localStorage.setItem("victorGains", JSON.stringify(victorGains));
-      localStorage.setItem("arthurGains", JSON.stringify(arthurGains));
-      localStorage.setItem("products", JSON.stringify(products));
-      localStorage.setItem("events", JSON.stringify(events));
-      localStorage.setItem("clients", JSON.stringify(clients));
-      localStorage.setItem("transactions", JSON.stringify(transactions));
-      localStorage.setItem("boxes", JSON.stringify(boxes));
-      
-      refreshAll();
-      showToast("Données importées avec succès !");
-    } catch (error) {
-      showToast("Erreur lors de l'import", "error");
-    }
-    
-    showLoader(false);
-  };
-  
-  reader.readAsText(file);
-}
-
-// ============ FONCTIONS DE BASE ============
-function initCharts() {
-  if(document.getElementById('chart')) {
-    chart = new Chart(document.getElementById("chart"), {
-      type: "line",
-      data: { 
-        labels: [], 
-        datasets: [
-          { 
-            label: "Victor", 
-            data: [], 
-            borderColor: "var(--victor-color)", 
-            backgroundColor: "rgba(37,99,235,0.05)", 
-            fill: true, 
-            tension: 0.4,
-            borderWidth: 3,
-            pointRadius: 4,
-            pointHoverRadius: 8
-          },
-          { 
-            label: "Arthur", 
-            data: [], 
-            borderColor: "var(--arthur-color)", 
-            backgroundColor: "rgba(16,185,129,0.05)", 
-            fill: true, 
-            tension: 0.4,
-            borderWidth: 3,
-            pointRadius: 4,
-            pointHoverRadius: 8
-          }
-        ]
-      },
-      options: { 
-        responsive: true, 
-        maintainAspectRatio: false,
-        plugins: { 
-          legend: { position: 'top' },
-          tooltip: { enabled: true }
-        }, 
-        scales: { 
-          y: { 
-            beginAtZero: true, 
-            title: { display: true, text: 'Montant (€)' } 
-          } 
-        } 
-      }
-    });
-  }
-
-  if(document.getElementById("pie-chart")) {
-    pieChart = new Chart(document.getElementById("pie-chart"), { 
-      type: "pie", 
-      data: { 
-        labels: ["Victor", "Arthur"], 
-        datasets: [{ 
-          data: [0,0], 
-          backgroundColor: ["var(--victor-color)", "var(--arthur-color)"],
-          borderWidth: 0
-        }] 
-      },
-      options: { 
-        responsive: true, 
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { position: 'bottom' }
-        }
-      }
-    });
-  }
-
-  if(document.getElementById("monthly-chart")) {
-    monthlyChart = new Chart(document.getElementById("monthly-chart"), { 
-      type: "bar", 
-      data: { 
-        labels: [], 
-        datasets: [{ 
-          label: "Gains 2026", 
-          data: [], 
-          backgroundColor: "var(--accent)",
-          borderRadius: 8
-        }] 
-      },
-      options: { 
-        responsive: true, 
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false }
-        }
-      }
-    });
-  }
-}
-
-function toggleMenu() {
-  document.getElementById('sidebar').classList.toggle('open');
-  document.getElementById('overlay').classList.toggle('active');
-}
-
-function closeMenu() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('overlay').classList.remove('active');
-}
-
-function sum(gainsArray, filter) { 
-  return gainsArray.filter(filter).reduce((s,g)=>s+g.amount,0); 
-}
-
-function refresh() {
-  let now = new Date(), yesterday = new Date(now); 
-  yesterday.setDate(now.getDate()-1);
-  const victorTotal = sum(victorGains, () => true), arthurTotal = sum(arthurGains, () => true);
-  
-  if(document.getElementById("victor-total")) document.getElementById("victor-total").innerHTML = victorTotal.toFixed(2) + " €";
-  if(document.getElementById("arthur-total")) document.getElementById("arthur-total").innerHTML = arthurTotal.toFixed(2) + " €";
-  if(document.getElementById("victorQuickStats")) document.getElementById("victorQuickStats").innerHTML = victorTotal.toFixed(2) + " €";
-  if(document.getElementById("arthurQuickStats")) document.getElementById("arthurQuickStats").innerHTML = arthurTotal.toFixed(2) + " €";
-  if(document.getElementById("bothQuickStats")) document.getElementById("bothQuickStats").innerHTML = (victorTotal + arthurTotal).toFixed(2) + " €";
-  
-  const allGains = [...victorGains, ...arthurGains];
-  if(document.getElementById("total")) document.getElementById("total").innerHTML = (victorTotal + arthurTotal).toFixed(2) + " €";
-  if(document.getElementById("yesterday")) document.getElementById("yesterday").innerHTML = sum(allGains, g => new Date(g.date).toDateString() === yesterday.toDateString()).toFixed(2) + " €";
-  if(document.getElementById("week")) document.getElementById("week").innerHTML = sum(allGains, g => (now - new Date(g.date)) / 86400000 <= 7).toFixed(2) + " €";
-  if(document.getElementById("month")) document.getElementById("month").innerHTML = sum(allGains, g => new Date(g.date).getMonth() === now.getMonth() && new Date(g.date).getFullYear() === now.getFullYear()).toFixed(2) + " €";
-  
-  updateProgressBar((victorTotal + arthurTotal) / 1000);
-}
-
-function refreshAll() {
-  refresh();
-  updateProducts();
-  updateStock();
-  updateTransactionsStats();
-  updateBoxesStats();
-  filterTransactions();
-  updateBoxesList();
-  updateUsersList();
-  updateGoalsList();
-  updateStats();
-  updateCalendar();
-  updateEventsList();
-  updateClients();
-  if(chart) drawChart();
-}
-
-function showToast(message, type = 'success') {
-  const toast = document.getElementById('toast');
-  const toastMessage = document.getElementById('toastMessage');
-  toast.className = 'toast';
-  if (type === 'error') toast.classList.add('error');
-  if (type === 'warning') toast.classList.add('warning');
-  toast.classList.add('show');
-  toastMessage.textContent = message;
-  
-  setTimeout(() => {
-    toast.classList.remove('show');
-  }, 3000);
-}
-
-function updateProgressBar(percent) {
-  const bar = document.getElementById('progressBar');
-  bar.style.width = Math.min(100, percent) + '%';
-}
-
-function showLoader(show = true) {
-  const loader = document.getElementById('loader');
-  if (show) {
-    loader.classList.add('show');
-  } else {
-    loader.classList.remove('show');
-  }
-}
-
-function quickAddGain() {
-  const amount = prompt("Montant du gain (€):");
-  if (amount) {
-    const person = confirm("Pour Victor ? OK pour Victor, Annuler pour Arthur") ? 'victor' : 'arthur';
-    const gain = {
-      id: Date.now(),
-      date: today,
-      amount: Number(amount),
-      description: "Saisie rapide",
-      person: person,
-      category: "autre"
-    };
-    
-    if (person === 'victor') {
-      victorGains.push(gain);
-      localStorage.setItem("victorGains", JSON.stringify(victorGains));
-    } else {
-      arthurGains.push(gain);
-      localStorage.setItem("arthurGains", JSON.stringify(arthurGains));
-    }
-    
-    refreshAll();
-    showToast(`Gain de ${amount}€ ajouté pour ${person}`);
-  }
-}
-
-function addGain(e, person) {
-  e.preventDefault();
-  const gain = {
-    id: Date.now(),
-    date: document.getElementById(`${person}-date`).value,
-    amount: Number(document.getElementById(`${person}-amount`).value),
-    description: document.getElementById(`${person}-description`).value || "Gain",
-    person: person,
-    category: document.getElementById(`${person}-category`)?.value || "autre"
-  };
-  
-  if (person === 'victor') { 
-    victorGains.push(gain); 
-    localStorage.setItem("victorGains", JSON.stringify(victorGains)); 
-  } else { 
-    arthurGains.push(gain); 
-    localStorage.setItem("arthurGains", JSON.stringify(arthurGains)); 
-  }
-  
-  e.target.reset();
-  document.getElementById(`${person}-date`).value = today;
-  
-  refreshAll(); 
-  showToast(`Gain de ${gain.amount}€ ajouté !`);
-}
-
-function deleteGain(id, person) {
-  if (person === 'victor') {
-    victorGains = victorGains.filter(g => g.id !== id);
-    localStorage.setItem("victorGains", JSON.stringify(victorGains));
-  } else {
-    arthurGains = arthurGains.filter(g => g.id !== id);
-    localStorage.setItem("arthurGains", JSON.stringify(arthurGains));
-  }
-  
-  refreshAll();
-  showToast("Gain supprimé", "warning");
-}
-
-function drawChart() {
-  if(!chart) return;
-  const p = document.getElementById("period")?.value || "7", now = new Date();
-  let victorMap = {}, arthurMap = {}, allDates = new Set();
-  
-  [...victorGains, ...arthurGains].forEach(g => {
-    let d = new Date(g.date);
-    let include = p==="today" ? d.toDateString()===now.toDateString() :
-                 p==="7" ? (now-d)/86400000<=7 :
-                 p==="30" ? (now-d)/86400000<=30 :
-                 p==="month" ? d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear() :
-                 p==="year" ? d.getFullYear()===now.getFullYear() : true;
-    if (include) {
-      const key = d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit' });
-      allDates.add(key);
-      if (g.person==='victor') victorMap[key] = (victorMap[key]||0) + g.amount;
-      else arthurMap[key] = (arthurMap[key]||0) + g.amount;
-    }
+function drawChart(){
+  if(!mainChart) return;
+  const period=el('chartPeriod')?.value||'7';
+  const now=new Date(),vMap={},aMap={},allDates=new Set();
+  gains.forEach(g=>{
+    const d=new Date(g.date),diff=(now-d)/86400000;
+    if(period!=='all'&&diff>Number(period)) return;
+    const key=d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'});
+    allDates.add(key);
+    if(g.person==='victor') vMap[key]=(vMap[key]||0)+Number(g.amount);
+    else aMap[key]=(aMap[key]||0)+Number(g.amount);
   });
-  
-  const sortedDates = Array.from(allDates).sort((a,b) => new Date(a.split('/').reverse().join('-')) - new Date(b.split('/').reverse().join('')));
-  chart.data.labels = sortedDates;
-  chart.data.datasets[0].data = (currentView==='victor'||currentView==='both') ? sortedDates.map(d=>victorMap[d]||0) : [];
-  chart.data.datasets[1].data = (currentView==='arthur'||currentView==='both') ? sortedDates.map(d=>arthurMap[d]||0) : [];
-  chart.update();
+  const labels=Array.from(allDates);
+  mainChart.data.labels=labels;
+  mainChart.data.datasets[0].data=labels.map(k=>vMap[k]||0);
+  mainChart.data.datasets[1].data=labels.map(k=>aMap[k]||0);
+  mainChart.update();
 }
 
-function showPerson(person) {
-  currentView = person;
-  document.querySelectorAll('#victor-toggle, #arthur-toggle, #both-toggle').forEach(btn => {
-    btn.classList.remove('active');
-  });
-  if(document.getElementById(`${person}-toggle`)) {
-    document.getElementById(`${person}-toggle`).classList.add('active');
-  }
-  drawChart();
+// ══════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════
+const TITLES={dashboard:'Tableau de bord',transactions:'Transactions',boxes:'Boxes / Lots',products:'Produits',stock:'Stocks',calendar:'Calendrier',stats:'Statistiques',clients:'Clients',files:'Fichiers Cloud'};
+
+function goTab(name,navEl){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el('tab-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(navEl) navEl.classList.add('active');
+  el('pageTitle').textContent=TITLES[name]||name;
+  closeSidebar();
+  if(name==='stats') updateStatsTab();
+  if(name==='calendar') renderCalendar();
+  if(name==='files') renderFiles();
 }
 
-function showBoth() { showPerson('both'); }
+function toggleSidebar(){el('sidebar').classList.toggle('open');el('overlay').classList.toggle('active');}
+function closeSidebar(){el('sidebar').classList.remove('open');el('overlay').classList.remove('active');}
+function toggleDark(){document.body.classList.toggle('dark');}
 
-function filterHistory() {
-  const search = document.getElementById('historySearch').value.toLowerCase();
-  const all = [...victorGains.map(g=>({...g, person:'Victor'})), 
-               ...arthurGains.map(g=>({...g, person:'Arthur'}))]
-    .sort((a,b)=>new Date(b.date)-new Date(a.date));
-  
-  const filtered = search ? all.filter(g => 
-    g.description?.toLowerCase().includes(search) ||
-    g.person.toLowerCase().includes(search) ||
-    g.amount.toString().includes(search)
-  ) : all;
-  
-  document.getElementById('history-table-body').innerHTML = filtered.slice(0,20).map(g => 
-    `<tr>
-      <td>${g.date}</td>
-      <td><span class="badge ${g.person==='Victor'?'badge-info':'badge-success'}">${g.person}</span></td>
-      <td><span class="badge">${g.category || 'autre'}</span></td>
-      <td>${g.description||'-'}</td>
-      <td><strong>${g.amount.toFixed(2)} €</strong></td>
-      <td>
-        <button onclick="deleteGain(${g.id}, '${g.person.toLowerCase()}')" class="btn-sm" style="background: var(--danger);">
-          <i class="fas fa-trash"></i>
-        </button>
-      </td>
-    </tr>`
-  ).join('');
+// ══════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════
+function el(id){return document.getElementById(id);}
+function fmt(n){return Number(n||0).toFixed(2)+' €';}
+function toast(msg,type='s'){
+  const t=el('toast'),m=el('toastMsg'),i=el('toastIco');
+  t.className='toast '+type+' show';
+  m.textContent=msg;
+  i.textContent=type==='s'?'✓':type==='e'?'✗':type==='w'?'⚠':'ℹ';
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3500);
 }
 
-function exportChart() {
-  const canvas = document.getElementById('chart');
-  const link = document.createElement('a');
-  link.download = 'graphique-gains.png';
-  link.href = canvas.toDataURL();
-  link.click();
-  showToast("Graphique exporté !");
-}
-
-function exportHistory() {
-  const all = [...victorGains.map(g=>({...g, person:'Victor'})), ...arthurGains.map(g=>({...g, person:'Arthur'}))]
-    .sort((a,b)=>new Date(b.date)-new Date(a.date));
-  
-  let csv = "Date,Personne,Catégorie,Description,Montant\n";
-  all.forEach(g => {
-    csv += `${g.date},${g.person},${g.category || 'autre'},${g.description || ''},${g.amount}\n`;
-  });
-  
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `historique-gains-${today}.csv`;
-  a.click();
-  showToast("Historique exporté");
-}
-
-function switchTab(tabName) {
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.getElementById(`tab-${tabName}`).classList.add('active');
-  
-  const titles = {
-    'dashboard': 'Tableau de bord',
-    'transactions': 'Transactions',
-    'boxes': 'Boxes / Lots',
-    'products': 'Produits',
-    'inventory': 'Stocks',
-    'sheets': 'Fiches produits',
-    'calendar': 'Calendrier',
-    'stats': 'Statistiques',
-    'clients': 'Clients',
-    'import': 'Import/Export',
-    'reports': 'Rapports',
-    'admin': 'Administration'
-  };
-  document.getElementById('pageTitle').innerText = titles[tabName];
-  
-  document.querySelectorAll('.sidebar-item').forEach((item) => {
-    item.classList.remove('active');
-    if(item.querySelector('span')?.innerText === titles[tabName]) {
-      item.classList.add('active');
-    }
-  });
-  
-  updateProgressBar(100);
-  setTimeout(() => updateProgressBar(0), 200);
-  
-  if(tabName === 'stats') updateStats();
-  if(tabName === 'calendar') { updateCalendar(); updateEventsList(); }
-  if(tabName === 'products') updateProducts();
-  if(tabName === 'inventory') updateStock();
-  if(tabName === 'sheets') updateSheets();
-  if(tabName === 'clients') updateClients();
-  if(tabName === 'transactions') {
-    updateTransactionsStats();
-    filterTransactions();
-  }
-  if(tabName === 'boxes') {
-    updateBoxesStats();
-    updateBoxesList();
-  }
-}
-
-function showSettings() {
-  document.getElementById('settingsModal').classList.add('active');
-  document.getElementById('currencySetting').value = settings.currency;
-  document.getElementById('notificationsSetting').value = settings.notifications;
-  document.getElementById('refreshSetting').value = settings.refresh;
-}
-
-function closeSettings() {
-  document.getElementById('settingsModal').classList.remove('active');
-}
-
-function updateSettings() {
-  settings = {
-    currency: document.getElementById('currencySetting').value,
-    notifications: document.getElementById('notificationsSetting').value,
-    refresh: document.getElementById('refreshSetting').value
-  };
-  
-  localStorage.setItem("settings", JSON.stringify(settings));
-  
-  if(autoRefreshInterval) clearInterval(autoRefreshInterval);
-  if(settings.refresh > 0) {
-    autoRefreshInterval = setInterval(() => {
-      refreshAll();
-      showToast("Données rafraîchies", "info");
-    }, settings.refresh * 1000);
-  }
-  
-  showToast("Paramètres enregistrés");
-}
-
-function toggleDark() {
-  document.body.classList.toggle("dark");
-  if(chart) {
-    chart.options.scales.y.grid.color = getComputedStyle(document.body).getPropertyValue('--border');
-    chart.update();
-  }
-  if(pieChart) pieChart.update();
-  if(monthlyChart) monthlyChart.update();
-  
-  const icon = document.querySelector('.theme-btn i');
-  if(document.body.classList.contains('dark')) {
-    icon.className = 'fas fa-sun';
-  } else {
-    icon.className = 'fas fa-moon';
-  }
-}
-
-// ============ INITIALISATION FINALE ============
-window.onload = function() {
-  showLoader(true);
-  
-  setTimeout(() => {
-    initCharts();
-    refreshAll();
-    updateProductSelects();
-    updateSettings();
-    
-    // Écouteur pour fermer le menu
-    document.addEventListener('click', function(e) {
-      if(!e.target.closest('.sidebar') && !e.target.closest('.menu-btn')) {
-        closeMenu();
-      }
-    });
-    
-    // Sauvegarde automatique toutes les minutes
-    setInterval(() => {
-      localStorage.setItem("victorGains", JSON.stringify(victorGains));
-      localStorage.setItem("arthurGains", JSON.stringify(arthurGains));
-      localStorage.setItem("products", JSON.stringify(products));
-      localStorage.setItem("transactions", JSON.stringify(transactions));
-      localStorage.setItem("boxes", JSON.stringify(boxes));
-      localStorage.setItem("events", JSON.stringify(events));
-      localStorage.setItem("clients", JSON.stringify(clients));
-      localStorage.setItem("users", JSON.stringify(users));
-      localStorage.setItem("goals", JSON.stringify(goals));
-      console.log("Sauvegarde automatique effectuée");
-    }, 60000);
-    
-    showLoader(false);
-    showToast("Application chargée !");
-  }, 500);
-};
+setInterval(()=>{if(currentUser)loadAll();},60000);
 </script>
-
 </body>
 </html>
